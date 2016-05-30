@@ -13,7 +13,7 @@ bands = ['L','S'] # for testing
 
 import os
 from glob import glob
-from dynspec.tbavg import tbavg2,dyn_spec
+from dynspec.tbavg import tbavg,dyn_spec
 from dynspec.extract_dynspec import saveTxt
 
 mydir = os.getcwd()
@@ -209,7 +209,7 @@ for band in bands:
         rmtables(smalltbavg)
     print 'running tbavg on', smallms, '(bg subtracted) to create', smalltbavg
     try:
-        tbavg2(split,smallms,smalltbavg,weight_mode='flat',datacolumn='corrected')
+        tbavg(split,smallms,smalltbavg,speed='fast',weight_mode='flat',datacolumn='corrected')
     except:
         print 'tbavg failed b/c table',smalltbavg, 'is already open in the CASA cache - restart CASA to fix this problem'
     
@@ -238,7 +238,7 @@ for band in bands:
         rmtables(srctbavg)
     print 'running tbavg on', srcms, '(bg subtracted) to create', srctbavg
     try:
-        tbavg2(split,srcms,srctbavg,weight_mode='flat',datacolumn='corrected')
+        tbavg(split,srcms,srctbavg,speed='fast',weight_mode='flat',datacolumn='corrected')
     except:
         print 'tbavg failed b/c table',srctbavg, 'is already open in the CASA cache - restart CASA to fix this problem'
     

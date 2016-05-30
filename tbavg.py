@@ -9,32 +9,23 @@
 #
 # Modified version:
 # Jackie Villadsen
-# 5/29/2016
+# 5/30/2016
 
 '''
 Notes:
-    
-1) WEIGHTS: 'flat' seems to work best. Ultimately I may want to write my own code to calculate weights per channel and
-   baseline, where the weights are determined by std dev over time.  For this, it would
-   be helpful to be able to specify distinct timeranges for calculating and applying
-   the weights.  This might yield a better RMS when avg'ing over baselines than flat
-   weights.
-   
-2) DISCREPANCIES VS PLOTMS AVG: There are discrepancies between the output of tbavg
-   and plotms avg'ing over all baselines. The discrepancies are fractionally largest
-   when the astronomical signal is small.  The result of plotms avg'ing over baselines
-   does change if you change the weights, so plotms is using the weights somehow - but
-   maybe not in the same way as tbavg?  The plotms results are a closer match to tbavg
-   with weights than tbavg without weights.  WHY IS THERE A DIFFERENCE? Maybe plotms handles flags differently?
 
-3) SPW AVG'ING: plotms avgspw=True no longer works (does not avg spw's together) on post-tbavg ms.  Why?
+- SPW AVG'ING: plotms avgspw=True no longer works (does not avg spw's together) on post-tbavg ms.  Why?
 
-4) TBAVG vs TBAVG2: tbavg2, which uses split for avg'ing, runs ~100x faster than tbavg for large data sets,
+- TBAVG vs TBAVG2: tbavg2, which uses split for avg'ing, runs ~100x faster than tbavg for large data sets,
    but it produces slightly less clean dynamic spectra - why? Use keepflags=False and see if this is fixed.
+
+- SPEED: Currently tbavg pulls up one spw/time at a time and avg's over baselines for that, then goes to next.
+   Consider re-writing this function to apply weights to whole ms at once (all spws/times), then avg over baselines
+   either using split or by calling up one baseline (all spws/times) at a time and summing up data & weights over all baselines.
 '''
 
 import time as timemod
-from taskinit import tbtool,ms
+from taskinit import tbtool
 import numpy
 
 def table(tablename, readonly=True):
@@ -56,18 +47,22 @@ def unique_col_values(tab, colname):
     """Return a numpy array of the unique values in the column"""
     return tab.query('', columns='DISTINCT '+colname).getcol(colname)
 
-def plt(msname):
-    intab = table(msname)
-    x = []
-    y = []
-    for t in range(20):
-        for spw in range(16):
-            for v in intab.getcell('DATA', t * 16 + spw).ravel():
-                x.append(t)
-                y.append(v.real)
-    return x,y
+def tbavg(split, msname, savename, speed='fast',weight_mode='',datacolumn='data'):
+    """
+    Create a new MS with all baselines averaged together.
+    
+    Options for weight_mode are '' (use WEIGHT column for weights), 'spc' (use
+    WEIGHT_SPECTRUM column for weights - only available for speed='slow') and 'flat' (use no weights).
+    
+    Parameter datacolumn can be used to select which column to average over, 'data' (default) or 'corrected'.
+    """
+    if speed=='fast':
+        tbavg_fast(split,msname,savename,weight_mode,datacolumn)
+    elif speed=='slow':
+        dc_dict = {'corrected':'CORRECTED_DATA','data':'DATA'}
+        tbavg_slow(msname,savename,weight_mode,dc_dict[datacolumn])    
 
-def tbavg(msname, savename, weight_mode='', datacolumn='DATA'):
+def tbavg_slow(msname, savename, weight_mode='', datacolumn='DATA'):
     """
     Create a new MS with all baselines averaged together.
     
@@ -140,35 +135,29 @@ def tbavg(msname, savename, weight_mode='', datacolumn='DATA'):
         data = subt.getcol(datacolumn)
         flag = subt.getcol('FLAG')
         good_mask = numpy.logical_not(flag)
-        data *= good_mask
+        data *= good_mask # this step isn't actually needed - just need to multiply weights by good_mask
         outflag=flag.all(baseline_axis)
         outtab.putcell('FLAG',i,outflag)
         if weight_mode == 'flat':
-            avg_data = numpy.average(data,baseline_axis)
-            outtab.putcell('DATA', i, avg_data)
-            # replace WEIGHT column with ones
-            old_wt = outtab.getcell('WEIGHT',i)
-            new_wt = numpy.ones(old_wt.shape)
-            outtab.putcell('WEIGHT',i,new_wt)
+            weights = numpy.ones(data.shape) # weight all baselines equally before averaging (but flagged data will be zeros)
+        elif weight_mode == 'spc':
+            weights = subt.getcol('WEIGHT_SPECTRUM')
         else:
-            if weight_mode == 'spc':
-                weights = subt.getcol('WEIGHT_SPECTRUM')
-            else:
-                weights = numpy.repeat(subt.getcol('WEIGHT'), data_shape[1], axis=0)
-                weights.shape = data.shape
-            weights *= good_mask
-            avg_data, weights_sum = numpy.ma.average(data, baseline_axis, weights, True)
-            outtab.putcell('DATA', i, avg_data.data)
-            outtab.putcell('WEIGHT', i, weights_sum.data.sum(axis=min(2,len(weights_sum.data.shape))-1))
-            if weight_mode == 'spc':
-                outtab.putcell('WEIGHT_SPECTRUM', i, weights_sum.data)
+            weights = numpy.repeat(subt.getcol('WEIGHT'), data_shape[1], axis=0)
+            weights.shape = data.shape
+        weights *= good_mask
+        avg_data, weights_sum = numpy.ma.average(data, baseline_axis, weights, True)
+        outtab.putcell('DATA', i, avg_data.data)
+        outtab.putcell('WEIGHT', i, weights_sum.data.sum(axis=min(2,len(weights_sum.data.shape))-1))
+        if weight_mode == 'spc':
+            outtab.putcell('WEIGHT_SPECTRUM', i, weights_sum.data)
+        subt.unlock()
     intab.unlock()
     outtab.unlock()
-    subt.unlock()
     t2=timemod.time()
     print 'Duration:', t2-t1, 's'
 
-def tbavg2(split, msname, savename, weight_mode='', datacolumn='DATA'):
+def tbavg_fast(split, msname, savename, weight_mode='', datacolumn='DATA'):
     """
     tbavg2(split, msname, savename, weight_mode='', datacolumn='DATA')
     
@@ -180,9 +169,9 @@ def tbavg2(split, msname, savename, weight_mode='', datacolumn='DATA'):
     is DATA, the raw data column).  The column (or columns) must have the format of visibility
     data: options are DATA, MODEL_DATA, CORRECTED_DATA, FLOAT_DATA, LAG_DATA, and/or all.
 
-    Have to pass the function split to tbavg2 - I tried using ms.split but it doesn't give the same result.
+    Have to pass the function split to tbavg2 - I tried using ms.split but it just returns the first baseline for each time/channel.
     """
-    
+
     # track how long this takes (in seconds)
     t1=timemod.time()
     
@@ -202,15 +191,14 @@ def tbavg2(split, msname, savename, weight_mode='', datacolumn='DATA'):
     if weight_mode.lower()=='flat':
         wt = intab.getcol('WEIGHT')
         intab.putcol('WEIGHT',numpy.ones(wt.shape))
-
+    
     # get minimum integration time and make sure our split averaging time is less than that
     try:
         interval = intab.getcol('INTERVAL')
-        dt = min(interval) * 1e-3
+        dt = min(interval) * 1e-2
     except:
         dt = 0.01
     timebin = str(dt)+'s'
-#    timebin='0.1s'
     
     # split and avg over time < integration time
     split(vis=msname,outputvis=savename,datacolumn=datacolumn,timebin=timebin,keepflags=False)
@@ -227,12 +215,6 @@ def tbavg2(split, msname, savename, weight_mode='', datacolumn='DATA'):
     
     t2=timemod.time()
     print 'tbavg duration:', t2-t1, 's'
-
-def interval(times):
-    """Return a likely at the integration time"""
-    t = numpy.sort(times)
-    delta = numpy.around(t[1:] - t[:-1], 2)
-    return numpy.median(delta)
 
 def interpolate(times):
     """Return a regular array with missing elements filled in"""
@@ -303,14 +285,3 @@ def dynspec_LR(msname):
     for i in range(4):
         pol_data[pol_list[i]] = spec['data'][:,i,:]
     return t,nu,pol_data
-
-def threshold(arr, lsigma, usigma=None):
-    """Clip the array to the specified multiple of the RMS."""
-    arr = arr.copy()
-    if usigma == None:
-        usigma = lsigma
-        lsigma *= -1
-    rms = arr.std()
-    arr[arr < lsigma * rms] = lsigma * rms
-    arr[arr > usigma * rms] = usigma * rms
-    return arr
