@@ -8,6 +8,10 @@
 overwrite = False # set this to True if you want existing .src.ms files, tar files, etc produced by pipeline
 # to be overwritten (otherwise pipeline skips steps for which files have already been produced)
 
+makebig = False # set to true to run bg subtraction and tbavg on full-resolution src ms
+
+interactive=False
+
 #bands = os.listdir(mydir)
 bands = ['L','S'] # for testing
 
@@ -21,6 +25,13 @@ tmp = mydir[1:].split('/')
 proj = tmp[2]
 src = tmp[3]
 obs = tmp[4]
+
+def get_fieldname():
+    if proj == '13A-423':
+        field_dict = {'UVCet':'V*UVCet','ADLeo':'adleo'}
+        return field_dict[src]
+    elif proj == '15A-416':
+        return src
 
 def get_phasecen(obs_str):
     # load phasecen dict from file phasecen.txt (in casa_utils) and find entry for this observation
@@ -38,7 +49,9 @@ def get_phasecen(obs_str):
 
 def get_clean_spws(band):
     # relatively RFI-free spw's that will be used for imaging and subtracting bg srcs
-    clean_spw_dict = {'P':'','L':'6,7,11~13','S':'16,19~26','C':''}
+    clean_spw_dict = {'P':'','L':'6,7,11~13','S':'16,19~26','C':'4~13'}
+    if proj=='15A-416' and src=='ADLeo' and obs=='4' and band=='L':
+        return '10~15'
     return clean_spw_dict[band]
 
 def get_clean_scans(band):
@@ -64,13 +77,10 @@ def get_clean_scans(band):
 
 def im_params(vis):
     # return a good cell size and imsize (in pixels) for the ms
-    im.open(vis)
-    returnval,pixels,cell,facets,phasecen=im.advise(takeadvice=False)
-    im.done()
-    if facets > 1:
-        print 'Warning: recommended # of facets > 1.  Imaging will proceed with only one facet.'
-    pixelsize = str(cell['value'] * 2/3) + cell['unit'] # so we will have at least 3 pixels per synthesized beam (perhaps more)
-    npixels = int(pixels * 3/2 * 4) # imsize will be 4 * primary beam at center freq - useful at low freq b/c we get bright srcs outside beam
+    cell,imsize,fieldID=au.pickCellSize(vis,imsize=True,pblevel=0.05)
+    pixelsize = str(cell) + 'arcsec'
+    npixels = imsize[0]
+    print 'Pixel size:', pixelsize, '/ Image size:', npixels, 'pixels'
     return pixelsize,npixels
 
 # read phase center from file /data/jrv/casa_utils/dynspec/phasecen.txt
@@ -94,21 +104,21 @@ for band in bands:
     smallim = msroot + '.smallim'
 
     print '\n----------------'+msroot+'--------------------'
-
+    
     # split src-only ms from calibrated data
     if not os.path.exists(srcms) or overwrite:  # skip this step if srcms already exists
         if os.path.exists(srcms):
             rmtables(srcms)
         print 'creating src-only ms', srcms, 'from calibrated data column of', msfile
-        split(vis=msfile,outputvis=srcms,field=src,keepflags=False)
+        split(vis=msfile,outputvis=srcms,field=get_fieldname(),keepflags=False)
         print 'shifting phase center of', srcms, 'to', phasecen
         fixvis(vis=srcms,outputvis=srcms,phasecenter=phasecen)
-    else:
+    elif makebig:
         print srcms, 'already exists, now deleting MODEL_DATA and CORRECTED_DATA and assuming phase center already shifted'
         # erase corrected data column to remove source subtraction from previous pipeline runs
         clearcal(srcms)
-
-    # use backup as tar file
+    '''
+    # backup as tar file
     tarfile = srcms + '.tar'
     if not os.path.exists(tarfile) or overwrite: # skip this step if tarfile already exists
         print 'saving',tarfile,'with fixvis applied'
@@ -117,7 +127,7 @@ for band in bands:
         print tarfile, 'already exists, skipping the creation of this file'
     # to retrieve pointing center (in radians - final index 0 for RA, 1 for dec):
     #     ptc = vishead(vis=srcms,mode='get',hdkey='ptcs')[0]['r1'][0]
-
+    '''
     # make small ms - clean spw's only, avg'd in time (30s) and freq (64 channels/whole spw)
     if not os.path.exists(smallms) or overwrite:
         if os.path.exists(smallms):
@@ -152,15 +162,16 @@ for band in bands:
     clean(vis=smallms,imagename=dirtyim,scan=clean_scans,imsize=imsize,cell=pixel_size,niter=0,stokes='IQUV') # create dirty image
     rmsQ = imstat(imagename=dirtyim+'.image',stokes='Q')['sigma']
     rmsU = imstat(imagename=dirtyim+'.image',stokes='U')['sigma']
-    rmsQU = max(rmsQ,rmsU)[0]*1000
-    print 'RMS of Stokes Q or U dirty image (max of the two):',rmsQU, 'mJy'
-    threshold = str(rmsQU * 3) + 'mJy'
+    rmsV = imstat(imagename=dirtyim+'.image',stokes='V')['sigma']
+    rmsQUV = min([rmsQ,rmsU,rmsV])[0]*1000
+    print 'RMS of Stokes Q,U,V dirty image (min of the three):',rmsQUV, 'mJy'
+    threshold = str(rmsQUV * 3) + 'mJy'
 
     # clean smallms using only the non-flaring scans with nterms=2 since we have large fractional bandwidth (may need nterms=3?)
     if len(glob(smallim+'.*'))>0:
         rmtables(smallim + '.*') # have to delete old image files (esp. model) so clean will start from scratch
     print 'Imaging non-flaring scans in',smallms,'with nterms=2 - image file', smallim+'.image.tt0'
-    clean(vis=smallms,imagename=smallim,scan=clean_scans,nterms=2,imsize=imsize,cell=pixel_size,niter=10000,threshold=threshold,cyclefactor=5)
+    clean(vis=smallms,imagename=smallim,scan=clean_scans,nterms=2,imsize=imsize,cell=pixel_size,niter=3000,threshold=threshold,cyclefactor=5,interactive=interactive)
     # high cyclefactor is critical to successful clean - this implies "bad PSF" --> poorly known beam map? (due to few antennas? wide bandwidth?)
     # default gain of 0.1 is fine - I tested 0.01 and 0.3 as well - not a huge difference in performance (0.1 had lowest RMS by small amount)
 
@@ -168,6 +179,8 @@ for band in bands:
     model0 = smallim+'.model.tt0'
     model1 = smallim+'.model.tt1'
     cen_mask = 'center_mask'
+    if os.path.exists(cen_mask):
+        rmtables(cen_mask)
     bgmodel0 = smallim + '.bgmodel0'
     bgmodel1 = smallim + '.bgmodel1'
     ncen = str(int(imsize/2)) # center pixel
@@ -190,12 +203,17 @@ for band in bands:
     # create dirty image of smallms w/o BG srcs and save png to plots directory for user to inspect
     dirty_nobg=msroot+'.dirty_nobg'
     imfile = plotdir+dirty_nobg+'.png'
+    imfile2 = plotdir+dirty_nobg+'.small.png'
     if len(glob(dirty_nobg+'.*'))>0:
         rmtables(dirty_nobg+'.*') # delete old image files
     print 'Creating dirty image during non-flaring scans with bg srcs subtracted:',imfile
     clean(vis=smallms,imagename=dirty_nobg,scan=clean_scans,imsize=imsize,cell=pixel_size,niter=0,stokes='IQUV')
-    raster={'file':dirty_nobg+'.image','colormap':'Smooth 2'}
+    blc = int(imsize/2)-64
+    trc = int(imsize/2)+64
+    zoom={'blc':[blc,blc],'trc':[trc,trc]}
+    raster={'file':dirty_nobg+'.image','colormap':'Greyscale 1','range':[0,rmsQUV*0.005]}
     imview(raster=raster,out=imfile)
+    imview(raster=raster,out=imfile2,zoom=zoom)
     
     # plot tseries for smallms
     plotfile = plotdir + msroot + '_tseries.png'
@@ -226,26 +244,27 @@ for band in bands:
 
     ## FULL SRC MS - SUBTRACT BG SRCS AND PLOT TSERIES, SAVE DYNSPEC ##
 
-    # ft to populate model column with clean model - srcms
-    print 'subtracting bg src model from', srcms, '(ft + uvsub)'
-    ft(vis=srcms,nterms=2,model=[bgmodel0,bgmodel1],usescratch=True)
+    if makebig:
+        # ft to populate model column with clean model - srcms
+        print 'subtracting bg src model from', srcms, '(ft + uvsub)'
+        ft(vis=srcms,nterms=2,model=[bgmodel0,bgmodel1],usescratch=True)
+        
+        # uvsub to subtract model column from data column and put it in corrected column - srcms
+        uvsub(vis=srcms)
+        
+        # avg src ms over all baselines
+        if os.path.exists(srctbavg):
+            rmtables(srctbavg)
+        print 'running tbavg on', srcms, '(bg subtracted) to create', srctbavg
+        try:
+            tbavg(split,srcms,srctbavg,speed='fast',weight_mode='flat',datacolumn='corrected')
+        except:
+            print 'tbavg failed b/c table',srctbavg, 'is already open in the CASA cache - restart CASA to fix this problem'
     
-    # uvsub to subtract model column from data column and put it in corrected column - srcms
-    uvsub(vis=srcms)
-    
-    # avg src ms over all baselines
-    if os.path.exists(srctbavg):
-        rmtables(srctbavg)
-    print 'running tbavg on', srcms, '(bg subtracted) to create', srctbavg
-    try:
-        tbavg(split,srcms,srctbavg,speed='fast',weight_mode='flat',datacolumn='corrected')
-    except:
-        print 'tbavg failed b/c table',srctbavg, 'is already open in the CASA cache - restart CASA to fix this problem'
-    
-    # create dynspec for srcms
-    spec = dyn_spec(srctbavg)
-    if os.path.exists(srctbavg+'.dynspec'):
-        os.system('rm -rf ' + srctbavg + '.dynspec')
-    saveTxt(spec,srctbavg)
-
+        # create dynspec for srcms
+        spec = dyn_spec(srctbavg)
+        if os.path.exists(srctbavg+'.dynspec'):
+            os.system('rm -rf ' + srctbavg + '.dynspec')
+        saveTxt(spec,srctbavg)
+        
     os.chdir('..')
