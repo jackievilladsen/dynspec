@@ -38,7 +38,7 @@ refanten = 'ea06' # reference antenna - ea06 is central ant on north arm - check
 phasecen=get_phasecen() # read phase center from file
 
 plotdir = get_plot_dir()
-
+'''
 ### FULL-SIZE MS ###
 
 # steps:
@@ -72,8 +72,10 @@ print 'Applying gaintables',gaintable, 'to',msfile
 applycal(vis=msfile,gaintable=gaintable)
 
 # inspect BP cal in plotms - is flux detected in XX and YY for all BLs and not in XY or YX?
+'''
 amax = amp_plot_max(msfile,visstat,datacolumn='corrected')
 bmax = amax * 2.5
+'''
 plotms(vis=msfile,field=bpcal,xaxis='freq',yaxis='amp',ydatacolumn='corrected',coloraxis='corr',iteraxis='baseline',avgtime='1e8',avgscan=True,plotrange=[0.2,0.5,0,amax],gridrows=3,gridcols=3,plotfile=plotdir+'bpcal_corr.png',exprange='all',showgui=False,overwrite=True)
 print 'Check plots/bpcal_corr.png to see how BPcal looks after initial cals (antpos, requantizer - no TEC yet).  XX and YY are purple and orange, XY and YX are black and pink (respectively).'
 
@@ -93,6 +95,7 @@ summary_1 = field_flag_summary(ms_hs,flagdata)
 np.save('summary1.npy',summary_1)
 
 # transfer ms_hs to manwe, run aoflagger, transfer back
+# Command: aoflagger [msname]
 
 plotms(vis=ms_hs,field=bpcal,xaxis='freq',yaxis='amp',coloraxis='spw',correlation='XX,YY',plotrange=[0.2,0.5,0,bmax],plotfile=plotdir+'flagdata1.png',showgui=False,overwrite=True)
 print 'Check plots dir for flagdata1.png to see RFI in BP cal after one round auto-flagging.'
@@ -124,8 +127,18 @@ cmax = amp_plot_max(ms1spw,visstat,'corrected')
 plotms(vis=ms1spw,field=bpcal,ydatacolumn='corrected',xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,cmax],plotfile=plotdir+'post_B0.png',showgui=False,overwrite=True,avgtime='1e8')
 print 'Check plots/post_B0.png to confirm that initial BP cal has worked.'
 
+# Second round of aoflagger: tar, transfer to manwe, run aoflagger on CORRECTED_DATA column, transfer back
+# Command: aoflagger -column CORRECTED_DATA [msname]
+# a 2nd aoflagger run made basically no difference - maybe run an rflag instead?
 
-# add a second round of aoflagger here??
+plotms(vis=ms1spw,field=bpcal,xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,bmax],plotfile=plotdir+'flagdata2.png',showgui=False,overwrite=True)
+plotms(vis=ms1spw,field=bpcal,ydatacolumn='corrected',xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,cmax],plotfile=plotdir+'post_aoflag2.png',showgui=False,overwrite=True,avgtime='1e8')
+print 'Check plots/flagdata2.png and post_aoflag2.png to see effect of second aoflagger run.'
+'''
+# summarize flagged data
+print 'Flagged data summary after 2nd aoflagger run (w/ bandpass correction):'
+summary_3 = field_flag_summary(ms1spw,flagdata)
+np.save('summary3.npy',summary_3)
 
 
 ### CREATE SMALLER MS BY AVG'ING OVER TIME AND FREQ ###
