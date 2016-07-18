@@ -1,6 +1,6 @@
 '''
 
-aoflagPband.py
+aoflagPband2.py
 
 Run this from the directory with the ms file in it: e.g., /data/jrv/15A-416/YZCMi/1/P
 
@@ -12,7 +12,7 @@ Then merge to single spw and apply initial bandpass - run aoflagger again after 
 Then average flagged ms in time and frequency to create smaller
 ms that will be used by calPband.py for calibration.
 
-Test approach:
+Test approach used in aoflagPband2.py:
 Apply antpos+rq cal, Hanning smooth, then apply initial BP cal, then run aoflagger.
 '''
 
@@ -26,6 +26,7 @@ names = get_names() # file names
 sb = names['sb']
 msfile = sb + '.ms'         # raw, full-size ms file
 ms_hs = sb + '.hs.ms'       # hanning-smoothed, full-size ms file (w/ antpos table applied if it exists)
+name_hs = sb + '.hs'
 name1spw = sb + '.1spw'
 ms1spw = name1spw + '.ms'
 smallms = sb + '.small.ms'
@@ -75,70 +76,60 @@ print 'Applying gaintables',gaintable, 'to',msfile
 applycal(vis=msfile,gaintable=gaintable)
 
 # inspect BP cal in plotms - is flux detected in XX and YY for all BLs and not in XY or YX?
-
+'''
 amax = amp_plot_max(msfile,visstat,datacolumn='corrected')
 bmax = amax * 2.5
+'''
 plotms(vis=msfile,field=bpcal,xaxis='freq',yaxis='amp',ydatacolumn='corrected',coloraxis='corr',iteraxis='baseline',avgtime='1e8',avgscan=True,plotrange=[0.2,0.5,0,amax],gridrows=3,gridcols=3,plotfile=plotdir+'bpcal_corr.png',exprange='all',showgui=False,overwrite=True)
 print 'Check plots/bpcal_corr.png to see how BPcal looks after initial cals (antpos, requantizer - no TEC yet).  XX and YY are purple and orange, XY and YX are black and pink (respectively).'
 
 # Hanning smooth (using datacolumn='corrected' means antpos table will be applied to new ms, if it exists - otherwise will use raw data column)
 hanningsmooth(vis=msfile,outputvis=ms_hs,datacolumn='corrected')
-'''
 
-## AUTOFLAG: AOFLAGGER ##
+
+## Document flag status ##
 
 plotms(vis=ms_hs,field=bpcal,xaxis='freq',yaxis='amp',coloraxis='spw',correlation='XX,YY',plotrange=[0.2,0.5,0,bmax],plotfile=plotdir+'preflag.png',showgui=False,overwrite=True) # plot amp vs. frequency of BP cal
-print 'Check plots dir for preflag.png to see RFI in BP cal before auto flagging.'
+print 'Check plots dir for preflag.png to see RFI in BPcal before auto flagging or bandpass.'
 
 # print summary of flagged data
 print 'Before auto RFI flagging (after flagging zeros):'
 summary_1 = field_flag_summary(ms_hs,flagdata)
 np.save('summary1.npy',summary_1)
 
-# transfer ms_hs to manwe, run aoflagger, transfer back
-# Command: aoflagger [msname]
 
-plotms(vis=ms_hs,field=bpcal,xaxis='freq',yaxis='amp',coloraxis='spw',correlation='XX,YY',plotrange=[0.2,0.5,0,bmax],plotfile=plotdir+'flagdata1.png',showgui=False,overwrite=True)
-print 'Check plots dir for flagdata1.png to see RFI in BP cal after one round auto-flagging.'
+## Bandpass calibration ##
 
-# summarize flagged data
-print 'Flagged data summary after one aoflagger run (w/o bandpass correction):'
-summary_2 = field_flag_summary(ms_hs,flagdata)
-np.save('summary2.npy',summary_2)
+setjy(vis=ms_hs,field=bpcal,standard='Scaife-Heald 2012',usescratch=True,model=bpcal+'_L.im') # load bpcal model to acct for structure, spec index
 
-
-## COMBINE SPWS ##
-# remove spw boundaries and apply initial bpcal to help with auto RFI flagging
-
-mstransform(vis=ms_hs,outputvis=ms1spw,combinespws=True,datacolumn='data') # remove spw boundaries - takes ~ 1 hr for 50 GB SB
-
-setjy(vis=ms1spw,field=bpcal,standard='Scaife-Heald 2012',usescratch=True,model=bpcal+'_L.im') # load bpcal model to acct for structure, spec index
-
-bandpass(vis=ms1spw,field=bpcal,caltable=name1spw+'.B0',refant=refanten,minsnr=0.1) # run BP cal on 1-spw BP ms
+bandpass(vis=ms_hs,field=bpcal,caltable=name_hs+'.B0',refant=refanten,minsnr=0.1) # run BP cal on 1-spw BP ms
 # minsnr=0.1 --> get solns even for channels w/ lots of RFI
 
-print 'Check plots/'+name1spw+'.B0amp.png to inspect initial BP cal.'
-plotcal(caltable=name1spw+'.B0',xaxis='freq',yaxis='amp',iteration='antenna',subplot=441,showgui=False,figfile=plotdir+name1spw+'.B0amp.png')
+print 'Check plots/'+name_hs+'.B0amp.png to inspect initial BP cal.'
+plotcal(caltable=name_hs+'.B0',xaxis='freq',yaxis='amp',iteration='antenna',subplot=441,showgui=False,figfile=plotdir+name_hs+'.B0amp.png')
 
 # apply BP cal table
-applycal(vis=ms1spw,gaintable=[name1spw+'.B0'])
+applycal(vis=ms_hs,gaintable=[name_hs+'.B0'])
 # backup flag file: before_applycal_1
-
-cmax = amp_plot_max(ms1spw,visstat,'corrected')
-plotms(vis=ms1spw,field=bpcal,ydatacolumn='corrected',xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,cmax],plotfile=plotdir+'post_B0.png',showgui=False,overwrite=True,avgtime='1e8')
+'''
+cmax = amp_plot_max(ms_hs,visstat,'corrected')
+'''
+plotms(vis=ms_hs,field=bpcal,ydatacolumn='corrected',xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,cmax],plotfile=plotdir+'post_B0.png',showgui=False,overwrite=True,avgtime='1e8')
 print 'Check plots/post_B0.png to confirm that initial BP cal has worked.'
 
-# Second round of aoflagger: tar, transfer to manwe, run aoflagger on CORRECTED_DATA column, transfer back
-# Command: aoflagger -column CORRECTED_DATA [msname]
-# a 2nd aoflagger run made basically no difference - maybe run an rflag instead?
 
-plotms(vis=ms1spw,field=bpcal,xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,bmax],plotfile=plotdir+'flagdata2.png',showgui=False,overwrite=True)
-plotms(vis=ms1spw,field=bpcal,ydatacolumn='corrected',xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,cmax],plotfile=plotdir+'post_aoflag2.png',showgui=False,overwrite=True,avgtime='1e8')
+# Run aoflagger on BP-corrected data: tar, transfer to manwe, run aoflagger on CORRECTED_DATA column, transfer back
+# Command: aoflagger -column CORRECTED_DATA [msname]
+
+
+plotms(vis=ms_hs,field=bpcal,xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,bmax],plotfile=plotdir+'flagdata2.png',showgui=False,overwrite=True)
+'''
+plotms(vis=ms_hs,field=bpcal,ydatacolumn='corrected',xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,cmax],plotfile=plotdir+'post_aoflag2.png',showgui=False,overwrite=True,avgtime='1e8')
 print 'Check plots/flagdata2.png and post_aoflag2.png to see effect of second aoflagger run.'
 
 # summarize flagged data
 print 'Flagged data summary after 2nd aoflagger run (w/ bandpass correction):'
-summary_3 = field_flag_summary(ms1spw,flagdata)
+summary_3 = field_flag_summary(ms_hs,flagdata)
 np.save('summary3.npy',summary_3)
 
 
@@ -146,7 +137,7 @@ np.save('summary3.npy',summary_3)
 
 # avg over 8 channels --> output channels are 1 MHz
 # avg over 15s intervals
-split(vis=ms1spw,outputvis=smallms,datacolumn='data',width=8,timebin='15s')
+split(vis=ms_hs,outputvis=smallms,datacolumn='data',width=8,timebin='15s')
 
 # backup small ms as tar file
 os.system('tar -cvf ' + smallms + '.tar ' + smallms)

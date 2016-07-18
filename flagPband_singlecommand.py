@@ -1,20 +1,25 @@
 '''
 
-aoflagPband.py
+flagPband.py
 
 Run this from the directory with the ms file in it: e.g., /data/jrv/15A-416/YZCMi/1/P
 
 Run this before calPband.py.
 
 General approach:
-Apply antpos and requantizer corrections, do Hanning smoothing then run aoflagger once.
-Then merge to single spw and apply initial bandpass - run aoflagger again after this?
-Then average flagged ms in time and frequency to create smaller
-ms that will be used by calPband.py for calibration.
+Apply antpos+requantizer corrections and do Hanning smoothing.
+Perform a single tfcrop autoflag on the BP calibrator, then merge to a single
+spw and do initial BP calibration followed by tfcrop+rflag autoflag on the whole data set.
+Average the flagged ms in time and frequency to create smaller ms that will be used by calPband.py for calibration.
 
-Test approach:
-Apply antpos+rq cal, Hanning smooth, then apply initial BP cal, then run aoflagger.
+Steps:
+1 - diagnostic info - check for dead ants/swapped pols & verify good refant
+2 - initial processing - flag zeros, a priori corrections (antpos, requantizer gain), Hanning smoothing
+3 - auto flagging - important to do on full resolution data to maximize sensitivity
 '''
+
+# split command used to create test data set (4 scans: pcal, src, pcal, bpcal) - YZCMi_3P (actually copied from YZCMi_1)
+# split(vis='YZCMi_1P.ms',outputvis='test.ms',scan='21~22,27~28',datacolumn='data')
 
 from dynspec.pipeline_utils import *
 import numpy as np
@@ -37,28 +42,15 @@ bpcal = fields.get('bpcal')
 gcal = fields.get('gcal')
 
 refanten = 'ea06' # reference antenna - ea06 is central ant on north arm - check plots after to make sure this is okay
-
 phasecen=get_phasecen() # read phase center from file
-
 plotdir = get_plot_dir()
-
-### FULL-SIZE MS ###
-
-# steps:
-# 1 - diagnostic info (check for dead ants/swapped pols & identify refant)
-# 2 - initial processing (flag zeros, antpos corrections, Hanning smooth)
-# 3 - auto flagging (important to do on full resolution data to maximize sensitivity)
-
-
-# create BPcal-only ms for testing purposes
-# split(vis='YZCMi_1P.ms',outputvis='bpcal.ms',field='3C147',datacolumn='data')
-# zeros have been flagged but otherwise this is raw data set
-
-## Diagnostic info ##
 '''
+## Diagnostic info ##
+
 listobs(vis=msfile,listfile=msfile+'.listobs')
 
 plotants(vis=msfile,figfile=plotdir+'plotants.png') # plot ant locations to choose refant - should be near array center
+print 'Check plots/plotants.png to verify that default refant',refanten,'is near array center.'
 
 # inspect BP cal in plotms - is flux detected in XX and YY for all BLs and not in XY or YX?
 amax = amp_plot_max(msfile,visstat)
@@ -75,7 +67,6 @@ print 'Applying gaintables',gaintable, 'to',msfile
 applycal(vis=msfile,gaintable=gaintable)
 
 # inspect BP cal in plotms - is flux detected in XX and YY for all BLs and not in XY or YX?
-
 amax = amp_plot_max(msfile,visstat,datacolumn='corrected')
 bmax = amax * 2.5
 plotms(vis=msfile,field=bpcal,xaxis='freq',yaxis='amp',ydatacolumn='corrected',coloraxis='corr',iteraxis='baseline',avgtime='1e8',avgscan=True,plotrange=[0.2,0.5,0,amax],gridrows=3,gridcols=3,plotfile=plotdir+'bpcal_corr.png',exprange='all',showgui=False,overwrite=True)
@@ -83,26 +74,27 @@ print 'Check plots/bpcal_corr.png to see how BPcal looks after initial cals (ant
 
 # Hanning smooth (using datacolumn='corrected' means antpos table will be applied to new ms, if it exists - otherwise will use raw data column)
 hanningsmooth(vis=msfile,outputvis=ms_hs,datacolumn='corrected')
-'''
 
-## AUTOFLAG: AOFLAGGER ##
+
+## AUTOFLAG: TFCROP on bandpass calibrator ##
 
 plotms(vis=ms_hs,field=bpcal,xaxis='freq',yaxis='amp',coloraxis='spw',correlation='XX,YY',plotrange=[0.2,0.5,0,bmax],plotfile=plotdir+'preflag.png',showgui=False,overwrite=True) # plot amp vs. frequency of BP cal
-print 'Check plots dir for preflag.png to see RFI in BP cal before auto flagging.'
+print 'Check plots/preflag.png to see RFI in BP cal before auto flagging.'
 
 # print summary of flagged data
 print 'Before auto RFI flagging (after flagging zeros):'
 summary_1 = field_flag_summary(ms_hs,flagdata)
 np.save('summary1.npy',summary_1)
 
-# transfer ms_hs to manwe, run aoflagger, transfer back
-# Command: aoflagger [msname]
+# run auto-flagger on BP calibrator (5-sigma threshold - fairly high)
+# maxnpieces=5 is lower than default but we have fewer channels per spw than at higher freq
+flagdata(vis=ms_hs,field=bpcal,mode='tfcrop',timecutoff=5.0,freqcutoff=5.0,maxnpieces=5,display='report')
 
 plotms(vis=ms_hs,field=bpcal,xaxis='freq',yaxis='amp',coloraxis='spw',correlation='XX,YY',plotrange=[0.2,0.5,0,bmax],plotfile=plotdir+'flagdata1.png',showgui=False,overwrite=True)
-print 'Check plots dir for flagdata1.png to see RFI in BP cal after one round auto-flagging.'
+print 'Check plots/flagdata1.png to see RFI in BP cal after one round auto-flagging.'
 
 # summarize flagged data
-print 'Flagged data summary after one aoflagger run (w/o bandpass correction):'
+print 'Flagged data summary after one tfcrop autoflag on',bpcal,'only:'
 summary_2 = field_flag_summary(ms_hs,flagdata)
 np.save('summary2.npy',summary_2)
 
@@ -117,31 +109,37 @@ setjy(vis=ms1spw,field=bpcal,standard='Scaife-Heald 2012',usescratch=True,model=
 bandpass(vis=ms1spw,field=bpcal,caltable=name1spw+'.B0',refant=refanten,minsnr=0.1) # run BP cal on 1-spw BP ms
 # minsnr=0.1 --> get solns even for channels w/ lots of RFI
 
-print 'Check plots/'+name1spw+'.B0amp.png to inspect initial BP cal.'
 plotcal(caltable=name1spw+'.B0',xaxis='freq',yaxis='amp',iteration='antenna',subplot=441,showgui=False,figfile=plotdir+name1spw+'.B0amp.png')
+print 'Check plots/'+name1spw+'.B0amp.png to inspect initial BP cal.'
 
 # apply BP cal table
 applycal(vis=ms1spw,gaintable=[name1spw+'.B0'])
-# backup flag file: before_applycal_1
 
 cmax = amp_plot_max(ms1spw,visstat,'corrected')
 plotms(vis=ms1spw,field=bpcal,ydatacolumn='corrected',xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,cmax],plotfile=plotdir+'post_B0.png',showgui=False,overwrite=True,avgtime='1e8')
 print 'Check plots/post_B0.png to confirm that initial BP cal has worked.'
 
-# Second round of aoflagger: tar, transfer to manwe, run aoflagger on CORRECTED_DATA column, transfer back
-# Command: aoflagger -column CORRECTED_DATA [msname]
-# a 2nd aoflagger run made basically no difference - maybe run an rflag instead?
+
+### AUTOFLAG: TFCROP+RFLAG on all fields ###
+
+# command to revert to pre-flag state if needed: flagmanager(vis=ms1spw,mode='restore',versionname='flagdata_1')
+'''
+# run tfcrop (timecutoff=5.0,freqcutoff=5.0,maxnpieces=5) and rflag (winsize=5) in same pass through data
+# rflag uses sliding window in time & freq to flag, whereas tfcrop just uses avg & std over whole time/all freqs
+# rflag: winsize = 5 is # of timesteps in sliding window
+flaglist = ["mode='tfcrop' timecutoff=5.0 freqcutoff=5.0 maxnpieces=5 datacolumn='corrected'","mode='rflag' winsize=5 datacolumn='corrected'"] 
+flagdata(vis=ms1spw, mode='list', inpfile=flaglist, display='report') 
+
 
 plotms(vis=ms1spw,field=bpcal,xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,bmax],plotfile=plotdir+'flagdata2.png',showgui=False,overwrite=True)
-plotms(vis=ms1spw,field=bpcal,ydatacolumn='corrected',xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,cmax],plotfile=plotdir+'post_aoflag2.png',showgui=False,overwrite=True,avgtime='1e8')
-print 'Check plots/flagdata2.png and post_aoflag2.png to see effect of second aoflagger run.'
+plotms(vis=ms1spw,field=bpcal,ydatacolumn='corrected',xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,cmax],plotfile=plotdir+'post_autoflag.png',showgui=False,overwrite=True,avgtime='1e8')
+print 'Check plots/flagdata2.png and post_autoflag.png to see RFI in BP cal after tfcrop+rflag on all fields (w/ bandpass applied).'
 
-# summarize flagged data
-print 'Flagged data summary after 2nd aoflagger run (w/ bandpass correction):'
+print 'Flagged data summary after tfcrop+rflag on all fields (w/ initial BP cal applied):'
 summary_3 = field_flag_summary(ms1spw,flagdata)
 np.save('summary3.npy',summary_3)
 
-
+'''
 ### CREATE SMALLER MS BY AVG'ING OVER TIME AND FREQ ###
 
 # avg over 8 channels --> output channels are 1 MHz
@@ -150,4 +148,4 @@ split(vis=ms1spw,outputvis=smallms,datacolumn='data',width=8,timebin='15s')
 
 # backup small ms as tar file
 os.system('tar -cvf ' + smallms + '.tar ' + smallms)
-
+'''

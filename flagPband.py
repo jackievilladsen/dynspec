@@ -7,10 +7,19 @@ Run this from the directory with the ms file in it: e.g., /data/jrv/15A-416/YZCM
 Run this before calPband.py.
 
 General approach:
-Apply antpos corrections, do Hanning smoothing and tfcrop auto-flagging, then merge to single
-spw and apply initial BP calibration to do rflag auto-flagging.  Average flagged ms in time and frequency to create smaller
-ms that will be used by calPband.py for calibration.
+Apply antpos+requantizer corrections and do Hanning smoothing.
+Perform a single tfcrop autoflag on the BP calibrator, then merge to a single
+spw and do initial BP calibration followed by tfcrop+rflag autoflag on the whole data set.
+Average the flagged ms in time and frequency to create smaller ms that will be used by calPband.py for calibration.
+
+Steps:
+1 - diagnostic info - check for dead ants/swapped pols & verify good refant
+2 - initial processing - flag zeros, a priori corrections (antpos, requantizer gain), Hanning smoothing
+3 - auto flagging - important to do on full resolution data to maximize sensitivity
 '''
+
+# split command used to create test data set (4 scans: pcal, src, pcal, bpcal) - YZCMi_3P (actually copied from YZCMi_1)
+# split(vis='YZCMi_1P.ms',outputvis='test.ms',scan='21~22,27~28',datacolumn='data')
 
 from dynspec.pipeline_utils import *
 import numpy as np
@@ -33,28 +42,15 @@ bpcal = fields.get('bpcal')
 gcal = fields.get('gcal')
 
 refanten = 'ea06' # reference antenna - ea06 is central ant on north arm - check plots after to make sure this is okay
-
 phasecen=get_phasecen() # read phase center from file
-
 plotdir = get_plot_dir()
-
-### FULL-SIZE MS ###
-
-# steps:
-# 1 - diagnostic info (check for dead ants/swapped pols & identify refant)
-# 2 - initial processing (flag zeros, antpos corrections, Hanning smooth)
-# 3 - auto flagging (important to do on full resolution data to maximize sensitivity)
-
-
-# create BPcal-only ms for testing purposes
-# split(vis='YZCMi_1P.ms',outputvis='bpcal.ms',field='3C147',datacolumn='data')
-# zeros have been flagged but otherwise this is raw data set
-
-## Diagnostic info ##
 '''
+## Diagnostic info ##
+
 listobs(vis=msfile,listfile=msfile+'.listobs')
 
 plotants(vis=msfile,figfile=plotdir+'plotants.png') # plot ant locations to choose refant - should be near array center
+print 'Check plots/plotants.png to verify that default refant',refanten,'is near array center.'
 
 # inspect BP cal in plotms - is flux detected in XX and YY for all BLs and not in XY or YX?
 amax = amp_plot_max(msfile,visstat)
@@ -79,27 +75,23 @@ print 'Check plots/bpcal_corr.png to see how BPcal looks after initial cals (ant
 # Hanning smooth (using datacolumn='corrected' means antpos table will be applied to new ms, if it exists - otherwise will use raw data column)
 hanningsmooth(vis=msfile,outputvis=ms_hs,datacolumn='corrected')
 
+'''
+## AUTOFLAG: TFCROP on bandpass calibrator ##
 
-## AUTOFLAG: TFCROP ##
-
-# plotrange is no longer good - probably b/c of requantizer gains
 plotms(vis=ms_hs,field=bpcal,xaxis='freq',yaxis='amp',coloraxis='spw',correlation='XX,YY',plotrange=[0.2,0.5,0,bmax],plotfile=plotdir+'preflag.png',showgui=False,overwrite=True) # plot amp vs. frequency of BP cal
-print 'Check plots dir for preflag.png to see RFI in BP cal before auto flagging.'
+print 'Check plots/preflag.png to see RFI in BP cal before auto flagging.'
 
 # print summary of flagged data
 print 'Before auto RFI flagging (after flagging zeros):'
 summary_1 = field_flag_summary(ms_hs,flagdata)
 np.save('summary1.npy',summary_1)
-'''
 
-# AUTOFLAG - iteration 1 #
-
-# run auto-flagger (5-sigma threshold - fairly high)
+# run auto-flagger on BP calibrator (5-sigma threshold - fairly high)
 # maxnpieces=5 is lower than default but we have fewer channels per spw than at higher freq
-flagdata(vis=ms_hs,mode='tfcrop',timecutoff=5.0,freqcutoff=5.0,maxnpieces=5,display='report')
+flagdata(vis=ms_hs,field=bpcal,mode='tfcrop',timecutoff=5.0,freqcutoff=5.0,maxnpieces=5,display='report')
 
 plotms(vis=ms_hs,field=bpcal,xaxis='freq',yaxis='amp',coloraxis='spw',correlation='XX,YY',plotrange=[0.2,0.5,0,bmax],plotfile=plotdir+'flagdata1.png',showgui=False,overwrite=True)
-print 'Check plots dir for flagdata1.png to see RFI in BP cal after one round auto-flagging.'
+print 'Check plots/flagdata1.png to see RFI in BP cal after one round auto-flagging.'
 
 # summarize flagged data
 print 'Flagged data summary after one tfcrop autoflag:'
@@ -118,7 +110,7 @@ print 'Flagged data summary after two tfcrop autoflags:'
 summary_3 = field_flag_summary(ms_hs,flagdata)
 np.save('summary3.npy',summary_3)
 # the second pass of flagging adds 1-2% more flagged - worth it? perhaps not
-
+'''
 ## COMBINE SPWS ##
 # remove spw boundaries and apply initial bpcal to help with auto RFI flagging
 
@@ -178,4 +170,4 @@ split(vis=ms1spw,outputvis=smallms,datacolumn='data',width=8,timebin='15s')
 
 # backup small ms as tar file
 os.system('tar -cvf ' + smallms + '.tar ' + smallms)
-
+'''

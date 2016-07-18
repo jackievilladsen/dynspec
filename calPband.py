@@ -47,11 +47,12 @@ gaintableGKBKc = [smallname+'.G0',smallname+'.K0',smallname+'.B1',smallname+'.Kc
 gaintableGKBKcDf = [smallname+'.G0',smallname+'.K0',smallname+'.B1',smallname+'.Kc0',smallname+'.Df0']
 gaintableGBKcDf = [smallname+'.G0',smallname+'.B1',smallname+'.Kc0',smallname+'.Df0']
 gaintableGKKcDf = [smallname+'.G0',smallname+'.K1',smallname+'.Kc0',smallname+'.Df0']
+gaintableGKBKcDf2 = [smallname+'.G0',smallname+'.K1',smallname+'.B2',smallname+'.Kc0',smallname+'.Df0']
 gaintableKBKcDf = [smallname+'.K1',smallname+'.B2',smallname+'.Kc0',smallname+'.Df0']
 gaintableKBKcDfG = [smallname+'.K1',smallname+'.B2',smallname+'.Kc0',smallname+'.Df0',smallname+'.G1']
 gaintableKBKcDfG2 = [smallname+'.K1',smallname+'.B2',smallname+'.Kc0',smallname+'.Df0',smallname+'.G2']
 
-fields = get_fields(msfile,vishead) # field names
+fields = get_fields(ms1spw,vishead) # field names
 srcname = fields.get('src')
 bpcal = fields.get('bpcal')
 gcal = fields.get('gcal')
@@ -62,7 +63,7 @@ phasecen=get_phasecen() # read phase center from file
 
 plotdir = get_plot_dir()
 
-
+'''
 ### DOCUMENT FLAGS BEFORE CALIBRATIONS ###
 
 print '% flagged in',smallms,'before calibrations:'
@@ -88,10 +89,10 @@ plotcal(caltable=smallname+'.K0',xaxis='antenna',yaxis='delay',figfile=plotdir+'
 print 'Check plots dir for delay.png - all delays should be < few ns.'
 
 # apply delay table - doing this so we can track how it affects flags
-applycal(vis=smallms,applymode='calflag',gaintable=[smallname+'.K0'],interp=['linear'])
+applycal(vis=smallms,field=bpcal,applymode='calflag',gaintable=[smallname+'.K0'],interp=['linear'])
 
 # show % flagged after delay solns applied
-print '% flagged in',smallms,'after delay cal (no flags at this step if all delay solns were successful):'
+print '% flagged in',smallms,'after delay cal applied to',bpcal,'(no flags at this step if all delay solns were successful):'
 summary_7 = field_flag_summary(smallms,flagdata)
 np.save('summary7.npy',summary_7)
 
@@ -110,7 +111,7 @@ gaincal(vis=smallms,gaintype='G',calmode='p',field=bpcal,caltable=smallname+'.G0
 plotcal(caltable=smallname+'.G0',xaxis='time',yaxis='phase',subplot=441,iteration='antenna',showgui=False,figfile=plotdir+'G0.png')
 print 'Check plots dir G0.png for BP calibrator phase-only gaincal solutions.'
 
-applycal(vis=smallms,field=bpcal,applymode='calflag',gaintable=[smallname+'.K0',smallname+'.G0'],interp=['linear'])
+applycal(vis=smallms,field=bpcal,applymode='calflag',gaintable=[smallname+'.K0',smallname+'.G0'])
 
 plotms(vis=smallms,field=bpcal,xaxis='time',yaxis='phase',ydatacolumn='corrected',coloraxis='baseline',antenna=refanten,correlation='XX',avgchannel='10000',plotfile=plotdir+'bpcal_phase_postcal.png',showgui=False,overwrite=True)
 print 'Check plots dir bpcal_phase_postcal.png to see how BP calibrator phases vary with time after phase-only gaincal.'
@@ -130,24 +131,25 @@ plotcal(caltable=smallname+'.B1',xaxis='freq',yaxis='amp',subplot=441,iteration=
 plotcal(caltable=smallname+'.B1',xaxis='freq',yaxis='phase',subplot=441,iteration='antenna',showgui=False,figfile=plotdir+'BPphase.png')
 print 'Check plots dir BPamp.png and BPphase.png for bandpass solutions.'
 
-# apply bandpass calibration to all fields
-applycal(vis=smallms,applymode='calflag',gaintable=[smallname+'.G0',smallname+'.K0',smallname+'.B1'],interp=['nearest','nearest','nearest'])
+# apply bandpass calibration to BP cal field
+# use 'calonly' b/c otherwise if G0 soln is missing for the first integration for an antenna, that antenna will be flagged in gcal and src
+applycal(vis=smallms,field=bpcal,applymode='calflag',gaintable=[smallname+'.G0',smallname+'.K0',smallname+'.B1'])
 
-print '% flagged in',smallms,'after bandpass applied to all fields:'
+print '% flagged in',smallms,'after bandpass applied to',bpcal+':'
 summary_9 = field_flag_summary(smallms,flagdata)
 np.save('summary9.npy',summary_9)
 
 plotms(vis=smallms,field=bpcal,ydatacolumn='corrected',xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,150],plotfile=plotdir+'post_B1.png',showgui=False,overwrite=True,avgtime='1e8')
 print 'Check plots directory for post_B1.png to confirm that bandpass-calibrated BPcal looks good.'
 # There are a few channels where phase or amp of BP solns looks bad, or where BPcal amp looks bad, but
-#  another round of RFI auto-flagging should catch those hopefully.
+#  another round of RFI auto-flagging should catch those hopefully. However it's probably better to flag BP solns so that
+#  it gets applied to all fields.
 
 
 ### FLAG BASED ON BP CALIBRATOR ###
 
 # run autoflagger one more time with better-calibrated data
 flagdata(vis=smallms,mode='rflag',datacolumn='corrected',winsize=5,display='report')
-# backup: flagdata_3
 
 print '% flagged in',smallms,'after rflag with bandpass applied:'
 summary_10 = field_flag_summary(smallms,flagdata)
@@ -187,7 +189,7 @@ print 'Check plots/bpcal_cross.png to see strength of cross polns.  XX and YY ar
 
 # poltype='Df': assume calibrator is unpolarized; solve for each channel
 # preavg=1. - time interval for applying parallactic angle corrections
-#polcal(vis=smallms,field=bpcal,poltype='Df',caltable=smallname+'.Df0',refant=refanten,preavg=1.0,gaintable=gaintableGKBKc)
+polcal(vis=smallms,field=bpcal,poltype='Df',caltable=smallname+'.Df0',refant=refanten,preavg=1.0,gaintable=gaintableGKBKc)
 
 plotcal(caltable=smallname+'.Df0',xaxis='freq',yaxis='amp',iteration='antenna',subplot=441,plotrange=[200,500,0,1],showgui=False,figfile=plotdir+'leakage_preflag.png')
 print 'Check plots/leakage_preflag.png for D terms (freq-dpdt leakage between polns for each antenna).  Should be <<1.'
@@ -209,39 +211,64 @@ np.save('summary11.npy',summary_11)
 plotms(vis=smallms,field=bpcal,xaxis='freq',yaxis='amp',ydatacolumn='corrected',coloraxis='corr',iteraxis='baseline',avgtime='1e8',avgscan=True,plotrange=[0.2,0.5,0,70],gridrows=3,gridcols=3,plotfile=plotdir+'bpcal_cross_corr.png',showgui=False,exprange='all',overwrite=True)
 print 'Check plots/bpcal_cross_corr.png to see strength of cross polns after polcal.  XX and YY are purple and orange, XY and YX are black and pink (respectively).'
 
-'''
-
-# broke off here!
 
 ### REDO BANDPASS AND DELAY CALIBRATION ###
 
 # delay calibration
 gaincal(vis=smallms,gaintype='K',field=bpcal,caltable=smallname+'.K1',refant=refanten,minsnr=3.0,parang=True,gaintable=gaintableGBKcDf)
-plotcal(caltable=smallname+'.K0',xaxis='antenna',yaxis='delay',figfile=plotdir+'delay.png',showgui=False)
-print 'Check plots dir for delay.png - all delays should be < few ns.'
+plotcal(caltable=smallname+'.K1',xaxis='antenna',yaxis='delay',figfile=plotdir+'delay1.png',showgui=False)
+print 'Check plots/delay1.png for updated delay solutions after polcal.'
+
+# bandpass calibration
+bandpass(vis=smallms,caltable=smallname+'.B2',field=bpcal,refant=refanten,gaintable=gaintableGKKcDf)
+plotcal(caltable=smallname+'.B2',xaxis='freq',yaxis='amp',subplot=441,iteration='antenna',showgui=False,figfile=plotdir+'BPamp2.png')
+plotcal(caltable=smallname+'.B2',xaxis='freq',yaxis='phase',subplot=441,iteration='antenna',showgui=False,figfile=plotdir+'BPphase2.png')
+print 'Check plots dir BPamp2.png and BPphase2.png for updated bandpass solutions after polcal.'
+
+# ADD: AUTOFLAG BP SOLNS
+
+# apply updated calibration to all fields
+applycal(vis=smallms,applymode='calflagstrict',gaintable=gaintableGKBKcDf2)
+
+print '% flagged in',smallms,'after updated bandpass and delay applied to all fields:'
+summary_12 = field_flag_summary(smallms,flagdata)
+np.save('summary12.npy',summary_12)
+
+plotms(vis=smallms,field=bpcal,ydatacolumn='corrected',xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,150],plotfile=plotdir+'post_K1B2.png',showgui=False,overwrite=True,avgtime='1e8')
+print 'Check plots/post_K1B2.png to confirm that BPcal looks good after updated bandpass and delay after polcal.'
+# looks identical - I don't know that re-solving for bandpass and delay is really necessary.
 
 
-### GAIN CALIBRATION: J0204-1701 ###
-# useful gaincal identifying info#
-# field name: J0204-1701
+### FLAG w/ final BP calibration ###
+
+# run autoflagger one more time with final calibrations based on BPcal
+flagdata(vis=smallms,mode='rflag',datacolumn='corrected',winsize=5,display='report')
+
+print '% flagged in',smallms,'after rflag with K1 and B2 applied:'
+summary_13 = field_flag_summary(smallms,flagdata)
+np.save('summary13.npy',summary_13)
+
+plotms(vis=smallms,field=bpcal,ydatacolumn='corrected',xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,150],plotfile=plotdir+'post_K1B2_rflag.png',showgui=False,overwrite=True,avgtime='1e8')
+print 'Check plots directory for post_K1B2_rflag.png to confirm that polarization- and bandpass-calibrated BPcal looks good after rflag.'
+
+'''
+### GAIN CALIBRATION ###
+# approach: initial phase-only gaincal w/ no model, followed by imaging and selfcal on gaincal field
 
 ## Initial phase-only gaincal ##
+gaincal(vis=smallms,caltable=smallname+'.G1',field=bpcal+','+gcal,gaintable=gaintableKBKcDf,solint='inf',gaintype='G',calmode='p',refant=refanten)
+# solint='inf' --> one solution per scan
 
-# apply all cals to gain calibrator (don't flag yet)
-applycal(vis=smallms,field=gcal,applymode='calonly',gaintable=gaintableGKBKcDf)
-# inspect in plotms: real(vis) has a wide spread (not positive), but >> for XX,YY than for XY,YX --> perhaps this is due
-#   to having a number of roughly equally bright srcs in the field?
+'''
+# plot gain solutions
+plotcal
 
-# let's do a phase-only gaincal (assuming pt src) then image gaincal field
-gaincal(vis=smallms,caltable=smallname+'.G1',field=bpcal+','+gcal,gaintable=gaintableKBKcDf,solint='120s',gaintype='G',calmode='p',refant=refanten)
-
-# apply this new calibration then inspect in plotms
+# apply to gcal field so we can plot
 applycal(vis=smallms,field=gcal,applymode='calflagstrict',gaintable=gaintableKBKcDfG)
-# backup: before_applycal_9
 
-# inspect in plotms
-# frequency dependence of gain appears to change with time - perhaps better to break it back up into multiple spw's?
-# don't do this for now but may come back to it
+
+
+# should I break it back up into multiple spw's for gaincal? come back to this
 
 
 ## Image gain calibrator field ##
