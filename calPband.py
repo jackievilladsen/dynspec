@@ -132,7 +132,7 @@ plotcal(caltable=smallname+'.B1',xaxis='freq',yaxis='phase',subplot=441,iteratio
 print 'Check plots dir BPamp.png and BPphase.png for bandpass solutions.'
 
 # apply bandpass calibration to BP cal field
-# use 'calonly' b/c otherwise if G0 soln is missing for the first integration for an antenna, that antenna will be flagged in gcal and src
+# apply to BPcal only b/c otherwise if G0 soln is missing for the first integration for an antenna, that antenna will be flagged in gcal and src
 applycal(vis=smallms,field=bpcal,applymode='calflag',gaintable=[smallname+'.G0',smallname+'.K0',smallname+'.B1'])
 
 print '% flagged in',smallms,'after bandpass applied to',bpcal+':'
@@ -146,28 +146,13 @@ print 'Check plots directory for post_B1.png to confirm that bandpass-calibrated
 #  it gets applied to all fields.
 
 
-### FLAG BASED ON BP CALIBRATOR ###
-
-# run autoflagger one more time with better-calibrated data
-flagdata(vis=smallms,mode='rflag',datacolumn='corrected',winsize=5,display='report')
-
-print '% flagged in',smallms,'after rflag with bandpass applied:'
-summary_10 = field_flag_summary(smallms,flagdata)
-np.save('summary10.npy',summary_10)
-
-plotms(vis=smallms,field=bpcal,ydatacolumn='corrected',xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,150],plotfile=plotdir+'post_rflag3.png',showgui=False,overwrite=True,avgtime='1e8')
-print 'Check plots directory for post_rflag3.png to confirm that bandpass-calibrated BPcal looks good after rflag.'
-
 
 ### POLARIZATION CALIBRATION: 3C147 ###
 
 # Perley et al. 2013: % (linear?) polarization @ 1.05 GHz, rising w/ frequency --> P band should be lower
-# 3C48: 0.3%
-# 3C138: 5.6%
-# 3C147: <0.05%
-# 3C286: 8.6%
-# We can assume few percent or less lin pol in these sources --> cross-delay calibration will be accurate
-#   to within a few percent (few hundredths of a percent for 3C147, the calibrator I use most often).
+pol_dict = {'3C48':'0.3%','3C138':'5.6%','3C147':'<0.05%','3C286':'8.6%'}
+p = pol_dict.get(bpcal,'[unknown source name]')
+print 'Perley+13:',bpcal,'1.05-GHz linear polarization is',p+', error on P-band pol cal should be less than this.'
 
 ## Cross-delay calibration ##
 
@@ -201,11 +186,11 @@ plotcal(caltable=smallname+'.Df0',xaxis='freq',yaxis='amp',iteration='antenna',s
 plotcal(caltable=smallname+'.Df0',xaxis='freq',yaxis='amp',iteration='antenna',subplot=441,showgui=False,figfile=plotdir+'leakage_clip_zoom.png')
 print 'Check plots/leakage_clip[_zoom].png for D terms after autoflag (clip values > 0.4).  Should be <<1.'
 
-applycal(vis=smallms,field=bpcal,applymode='calflagstrict',gaintable=gaintableGKBKcDf)
+applycal(vis=smallms,field=bpcal,applymode='calflag',gaintable=gaintableGKBKcDf)
 
 print '% flagged in',smallms,'after applying poln calibration tables:'
-summary_11 = field_flag_summary(smallms,flagdata)
-np.save('summary11.npy',summary_11)
+summary_10 = field_flag_summary(smallms,flagdata)
+np.save('summary10.npy',summary_10)
 
 # inspect amplitude of cross-pols (XY,YX) for BP cal
 plotms(vis=smallms,field=bpcal,xaxis='freq',yaxis='amp',ydatacolumn='corrected',coloraxis='corr',iteraxis='baseline',avgtime='1e8',avgscan=True,plotrange=[0.2,0.5,0,70],gridrows=3,gridcols=3,plotfile=plotdir+'bpcal_cross_corr.png',showgui=False,exprange='all',overwrite=True)
@@ -223,20 +208,27 @@ print 'Check plots/delay1.png for updated delay solutions after polcal.'
 bandpass(vis=smallms,caltable=smallname+'.B2',field=bpcal,refant=refanten,gaintable=gaintableGKKcDf)
 plotcal(caltable=smallname+'.B2',xaxis='freq',yaxis='amp',subplot=441,iteration='antenna',showgui=False,figfile=plotdir+'BPamp2.png')
 plotcal(caltable=smallname+'.B2',xaxis='freq',yaxis='phase',subplot=441,iteration='antenna',showgui=False,figfile=plotdir+'BPphase2.png')
-print 'Check plots dir BPamp2.png and BPphase2.png for updated bandpass solutions after polcal.'
+print 'Check plots/BPamp2.png and BPphase2.png for updated bandpass solutions after polcal.'
 
-# ADD: AUTOFLAG BP SOLNS
+# flag bandpass caltable based on phases - for some reason a few channels have negative values for Real(bandpass)
+#  - can catch this by flagging Real(bandpass) or phase(bandpass) ('ARG_ALL'=phase of all polns)
+flagdata(vis=smallname+'.B2',mode='rflag',winsize=3,correlation='ARG_ALL',datacolumn='CPARAM',display='report')
+plotcal(caltable=smallname+'.B2',xaxis='freq',yaxis='amp',subplot=441,iteration='antenna',showgui=False,figfile=plotdir+'BPamp3.png')
+plotcal(caltable=smallname+'.B2',xaxis='freq',yaxis='phase',subplot=441,iteration='antenna',showgui=False,figfile=plotdir+'BPphase3.png')
+print 'Check plots/BPamp3.png and BPphase3.png for updated B2 after rflag on B2 phase.'
 
 # apply updated calibration to all fields
-applycal(vis=smallms,applymode='calflagstrict',gaintable=gaintableGKBKcDf2)
+applycal(vis=smallms,applymode='calflag',gaintable=gaintableKBKcDf)
+applycal(vis=smallms,field=bpcal,applymode='calflag',gaintable=gaintableGKBKcDf2)
 
 print '% flagged in',smallms,'after updated bandpass and delay applied to all fields:'
-summary_12 = field_flag_summary(smallms,flagdata)
-np.save('summary12.npy',summary_12)
+summary_11 = field_flag_summary(smallms,flagdata)
+np.save('summary11.npy',summary_11)
 
 plotms(vis=smallms,field=bpcal,ydatacolumn='corrected',xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,150],plotfile=plotdir+'post_K1B2.png',showgui=False,overwrite=True,avgtime='1e8')
 print 'Check plots/post_K1B2.png to confirm that BPcal looks good after updated bandpass and delay after polcal.'
-# looks identical - I don't know that re-solving for bandpass and delay is really necessary.
+# looks identical - I don't know that re-solving for bandpass and delay is really necessary but I'm leaving it in
+#  in case some observations have worse polarization leakage
 
 
 ### FLAG w/ final BP calibration ###
@@ -245,13 +237,13 @@ print 'Check plots/post_K1B2.png to confirm that BPcal looks good after updated 
 flagdata(vis=smallms,mode='rflag',datacolumn='corrected',winsize=5,display='report')
 
 print '% flagged in',smallms,'after rflag with K1 and B2 applied:'
-summary_13 = field_flag_summary(smallms,flagdata)
-np.save('summary13.npy',summary_13)
+summary_12 = field_flag_summary(smallms,flagdata)
+np.save('summary12.npy',summary_12)
 
 plotms(vis=smallms,field=bpcal,ydatacolumn='corrected',xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,150],plotfile=plotdir+'post_K1B2_rflag.png',showgui=False,overwrite=True,avgtime='1e8')
 print 'Check plots directory for post_K1B2_rflag.png to confirm that polarization- and bandpass-calibrated BPcal looks good after rflag.'
 
-'''
+
 ### GAIN CALIBRATION ###
 # approach: initial phase-only gaincal w/ no model, followed by imaging and selfcal on gaincal field
 
@@ -259,32 +251,50 @@ print 'Check plots directory for post_K1B2_rflag.png to confirm that polarizatio
 gaincal(vis=smallms,caltable=smallname+'.G1',field=bpcal+','+gcal,gaintable=gaintableKBKcDf,solint='inf',gaintype='G',calmode='p',refant=refanten)
 # solint='inf' --> one solution per scan
 
-'''
-# plot gain solutions
-plotcal
+# plot gain solutions - phase only (since that's all we solved for)
+plotcal(caltable=smallname+'.G1',xaxis='time',yaxis='phase',subplot=441,iteration='antenna',showgui=False,figfile=plotdir+'G2phase.png')
 
-# apply to gcal field so we can plot
-applycal(vis=smallms,field=gcal,applymode='calflagstrict',gaintable=gaintableKBKcDfG)
-
-
+# apply to gcal field so we can plot and image
+applycal(vis=smallms,field=gcal,applymode='calflag',gaintable=gaintableKBKcDfG)
 
 # should I break it back up into multiple spw's for gaincal? come back to this
-
+# inspecting spectrum per scan in plotms, it looks mostly good - one scan has one bad spw, see if flagging gets this,
+#    otherwise we may need to split it up
+'''
 
 ## Image gain calibrator field ##
 
-# max uvwave ~ 60,000 --> 3.3'' res --> 1'' pixels
-# imsize: 40'/0.25 GHz --> 160' --> 10,000 pixels (more if we want to image 2-3 x FOV)
-clean(vis=smallms,imagename=gcal+'.v0',field=gcal,niter=1000,nterms=2,cell=['1.5arcsec'],imsize=[8192,8192])
-# whoops I probably should have set "threshold"... oh well
-# also I should have used usescratch=True to populate the MODEL_DATA column
+# Get imaging parameters
+pixel_size,imsize = im_params(smallms)
 
+# measure RMS of Stokes Q,U,V dirty images during non-flaring scans
+dirtyim='dirty'
+if len(glob(dirtyim+'.*'))>0:
+    rmtables(dirtyim + '.*') # have to delete old image files (esp. model) so clean will start from scratch
+print 'Creating dirty image of',gcal,'- will use Stokes QUV RMS to set threshold (3*RMS) for cleaning'
+clean(vis=smallms,imagename=dirtyim,field=gcal,imsize=imsize,cell=pixel_size,niter=0,stokes='IQUV') # create dirty image
+rmsQ = imstat(imagename=dirtyim+'.image',stokes='Q')['sigma']
+rmsU = imstat(imagename=dirtyim+'.image',stokes='U')['sigma']
+rmsV = imstat(imagename=dirtyim+'.image',stokes='V')['sigma']
+rmsQUV = min([rmsQ,rmsU,rmsV])[0]*1000
+print 'RMS of Stokes Q,U,V dirty image (min of the three):',rmsQUV, 'mJy'
+threshold = str(rmsQUV * 3) + 'mJy'
 
-## Use model image to populate model column and inspect ##
+# clean smallms with nterms=2 since we have large fractional bandwidth (may need nterms=3?)
+gcalim = gcal+'.v0'
+if len(glob(gcalim+'.*'))>0:
+    rmtables(gcalim + '.*') # have to delete old image files (esp. model) so clean will start from scratch
+print 'Imaging',gcal,'field with nterms=2 - image file', gcalim+'.image.tt0'
+clean(vis=smallms,imagename=gcalim,field=gcal,nterms=2,imsize=imsize,cell=pixel_size,niter=3000,threshold=threshold,cyclefactor=5,interactive=True,usescratch=True)
+# high cyclefactor forces major cycles (going back to visibilities) more often - important if PSF poorly known
+# can also try changing cycle gain but in other bands the default gain of 0.1 has been fine
 
-# use ft to populate MODEL_DATA column of ms from model images (.tt0 and .tt1)
-ft(vis=smallms,nterms=2,model=[gcal+'.v0.model.tt0',gcal+'.v0.model.tt1'],usescratch=True,field=gcal)
+# add command to save image of field as .png
 
+# use ft to populate MODEL_DATA column of ms from model images (.tt0 and .tt1) - don't need to do this if had usescratch=True for clean
+#ft(vis=smallms,nterms=2,model=[gcal+'.v0.model.tt0',gcal+'.v0.model.tt1'],usescratch=True,field=gcal)
+
+'''
 
 ## Amp+phase gaincal using clean model of pcal field ##
 

@@ -9,6 +9,7 @@ Provides functionality used by various pipeline scripts in the dynspec package.
 import os
 from glob import glob
 from recipes import tec_maps
+import analysisUtils as au
 
 def get_fields(vis,vishead):
     # return dictionary f with keys 'src','gcal','bpcal' for a given vis
@@ -105,6 +106,15 @@ def amp_plot_max(vis,visstat,datacolumn='data'):
     stat = visstat(vis,antenna='0&1',correlation='XX',datacolumn=datacolumn)
     return stat[datacolumn.upper()]['median']*2.
 
+def im_params(vis,pblevel=0.05):
+    # return a good cell size and imsize (in pixels) for the ms
+    cell,imsize,fieldID=au.pickCellSize(vis,imsize=True,pblevel=0.05)
+    pixelsize = str(cell) + 'arcsec'
+    npixels = imsize[0]
+    print 'Pixel size:', pixelsize, '/ Image size:', npixels, 'pixels'
+    return pixelsize,npixels
+
+
 '''
 
 def get_fieldname():
@@ -142,22 +152,4 @@ def get_clean_scans(band):
     except KeyError:
         print 'no line for band', band, 'in file', fname, '- assuming all scans are flare-free'
 
-def im_params(vis):
-    # return a good cell size and imsize (in pixels) for the ms
-    cell,imsize,fieldID=au.pickCellSize(vis,imsize=True,pblevel=0.05)
-    pixelsize = str(cell) + 'arcsec'
-    npixels = imsize[0]
-    print 'Pixel size:', pixelsize, '/ Image size:', npixels, 'pixels'
-    return pixelsize,npixels
-
-for band in bands:
-    os.chdir(band)
-    msroot = src + '_' + obs + band
-    msfile = msroot + '.ms'
-    srcms = msroot + '.src.ms'
-    srctbavg = msroot + '.tbavg.ms'
-    smallms = msroot + '.small.ms'
-    clean_spws = get_clean_spws(band)
-    smalltbavg = msroot + '.small_tbavg.ms'
-    smallim = msroot + '.smallim'
 '''
