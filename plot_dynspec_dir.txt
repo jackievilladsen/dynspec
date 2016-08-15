@@ -1,0 +1,13 @@
+13A-423/UVCet/1
+13A-423/UVCet/2
+15A-416/UVCet/1
+15A-416/UVCet/2
+15A-416/UVCet/3
+15A-416/UVCet/4
+#15A-416/UVCet/5 - S band hasn't run yet
+15A-416/ADLeo/3
+15A-416/ADLeo/4
+#15A-416/ADLeo/5 - S band hasn't run yet
+15A-416/EQPeg/2
+15A-416/YZCMi/1
+15A-416/YZCMi/2

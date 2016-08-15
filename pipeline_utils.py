@@ -39,6 +39,28 @@ def get_names():
         names['sb'] = names['src']+'_'+names['obs']+names['band']
     return names
 
+def extract_ms(msfile):
+    # give a tarfile named msfile+'.tar', this will run tar -xv and then
+    # move the contents to msfile and msfile.flagversions
+
+    tarfile = msfile+'.tar'
+    flagfile = msfile+'.flagversions'
+    
+    if os.path.exists(msfile):
+        print msfile, 'already exists, exiting extract_ms without re-extracting.', \
+              'Delete',msfile,'before running extract_ms if you want a fresh version.'
+        return
+    
+    print 'extracting ms from tarfile...'
+    os.system('tar -xf '+tarfile)
+    filelist = glob('lustre/*/*/*/*/*/*')
+    for f in filelist:
+        if f[-3:] == '.ms':
+            os.system('mv '+f+' '+msfile)
+        elif f[-13:]=='.flagversions':
+            os.system('mv '+f+' '+flagfile)
+    os.system('rm -rf lustre')    
+
 def get_phasecen():
     # load phasecen dict from file phasecen.txt (in casa_utils) and find entry for this observation
     # format of one line of phasecen dict: 15A-416_YZCMi_1---J2000 7h44m39.810 3d33m1.91
@@ -52,9 +74,47 @@ def get_phasecen():
     f.close()
     pcen_dict = {}
     for l in lines:
-        [obs_name,coords]=l.rstrip().split('---')
+        [obs_name,coords]=[s.rstrip() for s in l.split('---')]
         pcen_dict[obs_name] = coords
     return pcen_dict[obs_str]
+
+def get_clean_scans():
+    # read clean (flare-free) scans and spws from clean_scans.txt in dynspec code dir
+    # format of a line in this file should be:
+    # SB                 clean_scans  clean_spws
+    # 15A-416_ADLeo_4L---0~13,15~17---10~15
+    # clean_scans and clean_spws can both be blank, must separate by '---', but don't need 2nd entry, e.g.
+    # 15A-416_ADLeo_4L--- ---10~15
+    # 15A-416_ADLeo_4L---0~13,15~17
+    
+    names = get_names()
+    obs_str = names['proj']+'_'+names['sb']
+    
+    fname = '/data/jrv/casa_utils/dynspec/clean_scans.txt'
+    f = open(fname)
+    lines = f.readlines()
+    f.close()
+    clean_scan_dict = {}
+    clean_spw_dict = {}
+    for l in lines:
+        tmp=[s.rstrip() for s in l.split('---')]
+        try:
+            obs_name = tmp[0]
+            clean_scan_dict[obs_name] = tmp[1]
+            clean_spw_dict[obs_name] = tmp[2]
+        except:
+            pass
+#    return clean_scan_dict, clean_spw_dict
+    return clean_scan_dict.get(obs_str,''),clean_spw_dict.get(obs_str,'')
+
+'''
+def get_clean_spws(band):
+    # relatively RFI-free spw's that will be used for imaging and subtracting bg srcs
+    clean_spw_dict = {'P':'','L':'6,7,11~13','S':'16,19~26','C':'4~13'}
+    if proj=='15A-416' and sb=='ADLeo_4L':
+        return '10~15'
+    return clean_spw_dict[band]
+'''
 
 def get_plot_dir():
     # return path to current directory + '/plots/', creating this directory if it does not exist yet
@@ -99,21 +159,32 @@ def init_cal(vis,gencal,plotcal):
             gaintable.append(t)
     return gaintable
 
-def amp_plot_max(vis,visstat,datacolumn='data'):
+def amp_plot_max(vis,visstat,datacolumn='data',field=''):
     # returns 2*median visibility amplitude for single baseline/pol, which
     # is a rough estimate of a good maximum plot value for plotting raw visibilities
     # (may need to be more sophisticated for calibrated data)
-    stat = visstat(vis,antenna='0&1',correlation='XX',datacolumn=datacolumn)
+    stat = visstat(vis,antenna='0&1',correlation='XX',datacolumn=datacolumn,field=field)
     return stat[datacolumn.upper()]['median']*2.
 
 def im_params(vis,pblevel=0.05):
     # return a good cell size and imsize (in pixels) for the ms
-    cell,imsize,fieldID=au.pickCellSize(vis,imsize=True,pblevel=0.05)
+    cell,imsize,fieldID=au.pickCellSize(vis,imsize=True,pblevel=pblevel)
     pixelsize = str(cell) + 'arcsec'
     npixels = imsize[0]
     print 'Pixel size:', pixelsize, '/ Image size:', npixels, 'pixels'
     return pixelsize,npixels
 
+def get_params(key,pipe_params):
+    # helper function to load pipeline parameters for dynspec_pipeline.py
+    pipe_params_default = {'overwrite':False,'makebig':False,'interactive':False}
+    # overwrite: set this to True if you want existing .src.ms, .src.ms.tar, and .small.ms
+    #            to be overwritten (otherwise pipeline skips steps for which files have already been produced)
+    # makebig: set to True to run bg subtraction and tbavg on full-resolution src ms
+    # interactive: set to True to make cleaning interactive
+    try:
+        return pipe_params[key]
+    except:
+        return pipe_params_default[key]
 
 '''
 

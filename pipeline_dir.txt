@@ -1,0 +1,13 @@
+# files not included: 13A-423_ADLeo_1L (CASA pipeline failed),
+#  15A-416_UVCet_1S (CASA pipeline failed)
+#/data/jrv/15A-416/ADLeo/5/S - requested imsize too big
+/data/jrv/15A-416/EQPeg/1/S
+/data/jrv/15A-416/EQPeg/2/S
+/data/jrv/15A-416/EVLac/1/S
+/data/jrv/15A-416/EVLac/2/S
+/data/jrv/15A-416/UVCet/2/S
+/data/jrv/15A-416/UVCet/3/S
+/data/jrv/15A-416/UVCet/4/S
+#/data/jrv/15A-416/UVCet/5/S - imsize probably too big
+/data/jrv/15A-416/YZCMi/1/S
+/data/jrv/15A-416/YZCMi/2/S
