@@ -163,12 +163,12 @@ def amp_plot_max(vis,visstat,datacolumn='data',field=''):
     # returns 2*median visibility amplitude for single baseline/pol, which
     # is a rough estimate of a good maximum plot value for plotting raw visibilities
     # (may need to be more sophisticated for calibrated data)
-    stat = visstat(vis,antenna='0&1',correlation='XX',datacolumn=datacolumn,field=field)
+    stat = visstat(vis,antenna='0&1;2&3;4&5',correlation='XX',datacolumn=datacolumn,field=field)
     return stat[datacolumn.upper()]['median']*2.
 
-def im_params(vis,pblevel=0.05):
+def im_params(vis,pblevel=0.1):
     # return a good cell size and imsize (in pixels) for the ms
-    cell,imsize,fieldID=au.pickCellSize(vis,imsize=True,pblevel=pblevel)
+    cell,imsize,fieldID=au.pickCellSize(vis,imsize=True,pblevel=pblevel,npix=3)
     pixelsize = str(cell) + 'arcsec'
     npixels = imsize[0]
     print 'Pixel size:', pixelsize, '/ Image size:', npixels, 'pixels'
@@ -185,6 +185,24 @@ def get_params(key,pipe_params):
         return pipe_params[key]
     except:
         return pipe_params_default[key]
+
+def get_ants(vis,msmd):
+    # returns a list of antennas (ea-# style names) from measurement set vis
+    # must pass msmd (the ms metadata tool)
+    msmd.open(vis)
+    antlist = msmd.antennanames()
+    msmd.done()
+    return antlist
+
+def get_refant(vis,msmd):
+    # return a refant near array center that is in subarray in vis]
+    # must pass msmd (the ms metadata tool)
+    preferred_refant = ['ea06','ea22','ea05','ea25'] # identified by hand
+    antlist = get_ants(vis,msmd)
+    for a in preferred_refant:
+        if a in antlist:
+            return a
+    return antlist[0] # should not happen
 
 '''
 

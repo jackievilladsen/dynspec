@@ -43,19 +43,27 @@ srcname = fields.get('src')
 bpcal = fields.get('bpcal')
 gcal = fields.get('gcal')
 
-refanten = 'ea06' # reference antenna - ea06 is central ant on north arm - check plots after to make sure this is okay
+refanten = get_refant(ms1spw,msmd) # get a refant that was used in this subarray
 phasecen=get_phasecen() # read phase center from file
 plotdir = get_plot_dir()
 
-gaintableKB = [name1spw+'.K0',name1spw+'.B1']
-gaintableKBKc = [name1spw+'.K0',name1spw+'.B1',name1spw+'.Kc0']
-gaintableKBKcDf = [name1spw+'.K0',name1spw+'.B1',name1spw+'.Kc0',name1spw+'.Df0']
-gaintableKBKcDfB = [name1spw+'.K0',name1spw+'.B1',name1spw+'.Kc0',name1spw+'.Df0',name1spw+'.B2']
+
+### A PRIORI CALIBRATIONS ###
+
+print 'Solving for a priori calibrations - antpos and requantizer gains...'
+gaintableAR = init_cal(ms1spw,gencal,plotcal)
+
+gaintableARK = gaintableAR+[name1spw+'.K0']
+gaintableKB = gaintableAR+[name1spw+'.K0',name1spw+'.B1']
+gaintableKBKc = gaintableAR+[name1spw+'.K0',name1spw+'.B1',name1spw+'.Kc0']
+gaintableKBKcDf = gaintableAR+[name1spw+'.K0',name1spw+'.B1',name1spw+'.Kc0',name1spw+'.Df0']
+gaintableKBKcDfB = gaintableAR+[name1spw+'.K0',name1spw+'.B1',name1spw+'.Kc0',name1spw+'.Df0',name1spw+'.B2']
+
 
 ### DELAY CALIBRATION ### - duration: ~1 min
 
 print 'Solving for delays...'
-gaincal(vis=ms1spw,gaintype='K',field=bpcal,caltable=name1spw+'.K0',refant=refanten,minsnr=3.0,parang=True)
+gaincal(vis=ms1spw,gaintype='K',field=bpcal,caltable=name1spw+'.K0',refant=refanten,minsnr=3.0,gaintable=gaintableAR)
 plotcal(caltable=name1spw+'.K0',xaxis='antenna',yaxis='delay',figfile=plotdir+'delay.png',showgui=False)
 print 'Check plots/delay.png - all delays should be < few ns.'
 
@@ -63,7 +71,7 @@ print 'Check plots/delay.png - all delays should be < few ns.'
 ### BANDPASS CALIBRATION ### - duration: ~3.5 min
 
 print 'Solving for bandpass table B1 for',ms1spw
-bandpass(vis=ms1spw,caltable=name1spw+'.B1',field=bpcal,refant=refanten,gaintable=[name1spw+'.K0'])
+bandpass(vis=ms1spw,caltable=name1spw+'.B1',field=bpcal,refant=refanten,gaintable=gaintableARK)
 flagdata(vis=name1spw+'.B1',mode='rflag',winsize=3,correlation='ARG_ALL',datacolumn='CPARAM',freqdevscale=4.0) # ARG_ALL = phase
 plotcal(caltable=name1spw+'.B1',xaxis='freq',yaxis='amp',subplot=441,iteration='antenna',showgui=False,figfile=plotdir+'B1amp.png')
 plotcal(caltable=name1spw+'.B1',xaxis='freq',yaxis='phase',subplot=441,iteration='antenna',showgui=False,figfile=plotdir+'B1phase.png')
@@ -105,7 +113,6 @@ np.save('summary4.npy',summary_4)
 plotms(vis=ms1spw,field=bpcal,ydatacolumn='corrected',xaxis='freq',yaxis='amp',coloraxis='corr',plotrange=[0.2,0.5,0,150],plotfile=plotdir+'BPcal_postcal.png',showgui=False,overwrite=True,avgtime='1e8')
 print 'Check plots/BPcal_postcal.png to confirm that fully-calibrated BPcal looks good. XX and YY are purple and orange, XY and YX are black and pink (respectively).'
 
-
 ### FLAG w/ final BP calibration ### - duration: ~1 min + 3.5 min * Nscans
 
 # run autoflagger one more time with final calibrations based on BPcal - duration: 3.5 min/target scan, 1 min/pcal scan
@@ -117,13 +124,5 @@ summary_5 = field_flag_summary(ms1spw,flagdata)
 np.save('summary5.npy',summary_5)
 
 plotms(vis=ms1spw,field=bpcal,ydatacolumn='corrected',xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,150],plotfile=plotdir+'BPcal_postcal_rflag.png',showgui=False,overwrite=True,avgtime='1e8')
-print 'Check plots/BPcal_postcal_rflag.png to confirm that fully-calibrated BPcal looks good after rflag+growaround.'
-
-
-### IMAGE GAIN CALIBRATOR TO CONFIRM LOCATION ###
-
-clean(vis=ms1spw,field=gcal,imagename='gcal',cell='3arcsec',niter=0) # duration:
-imview(raster={'file':'gcal.image'},out=plotdir+'gcal.png')
-print 'Check plots/gcal.png to confirm that gain calibrator is roughly in center of image and not smeared, implying that calibrations',\
-      'derived from BP calibrator are fairly good throughout entire SB.'
-
+plotms(vis=ms1spw,xaxis='scan',yaxis='baseline',coloraxis='field',avgtime='1e8',avgchannel='10000',plotfile=plotdir+'baselines_postcal.png',overwrite=True,showgui=False)
+print 'Check plots/BPcal_postcal_rflag.png and baselines_postcal.png to confirm that fully-calibrated BPcal looks good after rflag+growaround.'

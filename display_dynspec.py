@@ -75,7 +75,7 @@ except:
 
 plot_params = {}
 #plot_params = {'dx':30,'tlims':array([20.,120.]),'smin':0.01} # UVCet?
-plot_params = {'flims':array([1.e9,2.1e9]),'dx':30} # ADLeo_4
+#plot_params = {'flims':array([1.e9,2.1e9]),'dx':30} # ADLeo_4
 #plot_params = {'tlims':array([60.,71.]),'dx':5,'smin':.030,'smax':.180} # YZCMi_1
 
 

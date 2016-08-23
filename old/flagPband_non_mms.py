@@ -4,8 +4,6 @@ flagPband.py
 
 Run this from the directory with the ms file in it: e.g., /data/jrv/15A-416/YZCMi/1/P
 
-Run it in parallel CASA: mpicasa -n 8 /data/jrv/casa-release-4.6.0-el6/casa
-
 Run this before calPband.py.
 
 General approach:
@@ -52,18 +50,25 @@ srcname = fields.get('src')
 bpcal = fields.get('bpcal')
 gcal = fields.get('gcal')
 
-refanten = get_refant(msfile,msmd) # get a refant that was used in this subarray
+refanten = 'ea06' # reference antenna - ea06 is central ant on north arm - check plots after to make sure this is okay
 phasecen=get_phasecen() # read phase center from file
 plotdir = get_plot_dir()
 
 ## Diagnostic info ##
 
-listobs(vis=msfile,listfile=msfile+'.listobs',overwrite=True)
+listobs(vis=msfile,listfile=msfile+'.listobs')
 
 plotants(vis=msfile,figfile=plotdir+'plotants.png') # plot ant locations to choose refant - should be near array center
 print 'Check plots/plotants.png to verify that default refant',refanten,'is near array center.'
 
 ## Initial processing ##
+
+print 'Flagging zeros (correlator errors)...'
+flagdata(vis=msfile,mode='clip',clipzeros=True) # zeros indicate correlator malfunction - should be ~1% of data or less
+
+#gaintable = init_cal(msfile,gencal,plotcal)
+#print 'Applying gaintables',gaintable, 'to',msfile
+#applycal(vis=msfile,gaintable=gaintable)
 
 # inspect BP cal in plotms to look for dead or swapped ants
 amax = amp_plot_max(msfile,visstat,field=bpcal)
@@ -71,13 +76,9 @@ bmax = amax * 2.5
 plotms(vis=msfile,field=bpcal,xaxis='freq',yaxis='amp',coloraxis='corr',iteraxis='baseline',avgtime='1e8',avgscan=True,plotrange=[0.2,0.5,0,amax],gridrows=3,gridcols=3,plotfile=plotdir+'bpcal_raw.png',exprange='all',showgui=False,overwrite=True)
 print 'Check plots/bpcal_raw.png to look for dead ants or swapped polarizations and confirm whether', refanten,'is a good refant (low RFI, no weird behavior).  XX and YY are purple and orange, XY and YX are black and pink (respectively).'
 
-print 'Flagging zeros (correlator errors)...'
-flagdata(vis=msfile,mode='clip',clipzeros=True) # zeros indicate correlator malfunction - should be ~1% of data or less
-
-# Hanning smooth, partition for parallelization, and average in time
-print 'Hanning smoothing',msfile,' and avging over 6-sec intervals (--> ~5% amp error in A array) to create',ms_hs
-mstransform(vis=msfile,outputvis=ms_hs,field=bpcal+','+srcname,datacolumn='data',hanning=True,timeaverage=True,timebin='6s',createmms=True,separationaxis='scan')
-listpartition(vis=ms_hs,listfile=ms_hs+'.listpartition')
+# Hanning smooth on corrected data
+print 'Hanning smoothing',msfile,' and avging over 6-sec intervals (--> 5% amp error in A array) to create',ms_hs
+mstransform(vis=msfile,outputvis=ms_hs,field=bpcal+','+srcname,hanning=True,timeaverage=True,timebin='6s',createmms=True,separationaxis='scan',numsubms='7')
 
 # remove msfile (to save room)
 # only do this if the tarfile exists
@@ -113,46 +114,39 @@ print 'Combining all spws from',ms_hs,'to create',ms1spw
 mstransform(vis=ms_hs,outputvis=ms1spw,combinespws=True,datacolumn='data') # remove spw boundaries - takes ~ 1 hr for 50 GB SB
 rmtables(ms_hs) # save disk space
 
-# Initial bandpass solution #
-
 fluxmodel=bpcal+'_L.im'
 print 'Loading virtual flux model',fluxmodel
-setjy(vis=ms1spw,field=bpcal,standard='Scaife-Heald 2012',model=fluxmodel,usescratch=True) # load bpcal model to acct for structure, spec index
+setjy(vis=ms1spw,field=bpcal,standard='Scaife-Heald 2012',model=fluxmodel) # load bpcal model to acct for structure, spec index
 
 print 'Solving for initial bandpass w/ minsnr=0.1.'
 bandpass(vis=ms1spw,field=bpcal,caltable=name1spw+'.B0',refant=refanten,minsnr=0.1) # run BP cal on 1-spw BP ms
-plotcal(caltable=name1spw+'.B0',xaxis='freq',yaxis='amp',iteration='antenna',subplot=441,showgui=False,figfile=plotdir+'B0amp.png')
-plotcal(caltable=name1spw+'.B0',xaxis='freq',yaxis='phase',iteration='antenna',subplot=441,showgui=False,figfile=plotdir+'B0phase.png')
-print 'Check plots/B0[amp/phase].png to inspect initial BP cal.'
+# minsnr=0.1 --> get solns even for channels w/ lots of RFI
 
+print 'Check plots/'+name1spw+'.B0[amp/phase].png to inspect initial BP cal.'
+plotcal(caltable=name1spw+'.B0',xaxis='freq',yaxis='amp',iteration='antenna',subplot=441,showgui=False,figfile=plotdir+name1spw+'.B0amp.png')
+plotcal(caltable=name1spw+'.B0',xaxis='freq',yaxis='phase',iteration='antenna',subplot=441,showgui=False,figfile=plotdir+name1spw+'.B0phase.png')
+
+# apply BP cal table
 print 'Applying initial bandpass solution so spectrum is smooth for rflag.'
 applycal(vis=ms1spw,gaintable=[name1spw+'.B0'])
+# backup flag file: before_applycal_1
 
 cmax = amp_plot_max(ms1spw,visstat,'corrected',field=bpcal)
-plotms(vis=ms1spw,field=bpcal,ydatacolumn='corrected',xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,cmax],plotfile=plotdir+'post_B0_amp.png',showgui=False,overwrite=True,avgtime='1e8')
-plotms(vis=ms1spw,field=bpcal,ydatacolumn='corrected',xaxis='freq',yaxis='phase',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,-180,180],plotfile=plotdir+'post_B0_phase.png',showgui=False,overwrite=True,avgtime='1e8')
-print 'Check plots/post_B0_[amp/phase].png to confirm that initial BP cal has worked.'
-
+plotms(vis=ms1spw,field=bpcal,ydatacolumn='corrected',xaxis='freq',yaxis='amp',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,cmax],plotfile=plotdir+'post_B0.png',showgui=False,overwrite=True,avgtime='1e8')
+print 'Check plots/post_B0.png to confirm that initial BP cal has worked.'
 
 ### AUTOFLAG: RFLAG ###
 
 # mode='rflag': use sliding window in time & freq to flag (whereas tfcrop just uses avg & std over whole time/all freqs)
 # winsize = 5: # of timesteps in sliding window
 # run 2x to get some more RFI (1st round gets a lot more but 2nd round's cleanup seems to be important)
-# run separately on XX,YY and XY,YX for BP cal
 print '1st rflag...'
-flagdata(vis=ms1spw,mode='rflag',field=srcname,datacolumn='corrected',winsize=5)
-flagdata(vis=ms1spw,mode='rflag',field=bpcal,datacolumn='corrected',winsize=5,correlation='XX,YY',flagbackup=False)
-flagdata(vis=ms1spw,mode='rflag',field=bpcal,datacolumn='corrected',winsize=5,correlation='XY,YX',flagbackup=False)
-
+flagdata(vis=ms1spw,mode='rflag',datacolumn='corrected',winsize=5)
 print '2nd rflag...'
-flagdata(vis=ms1spw,mode='rflag',field=srcname,datacolumn='corrected',winsize=5,flagbackup=False)
-flagdata(vis=ms1spw,mode='rflag',field=bpcal,datacolumn='corrected',winsize=5,correlation='XX,YY',flagbackup=False)
-flagdata(vis=ms1spw,mode='rflag',field=bpcal,datacolumn='corrected',winsize=5,correlation='XY,YX',flagbackup=False)
+flagdata(vis=ms1spw,mode='rflag',datacolumn='corrected',winsize=5,flagbackup=False)
 
 plotms(vis=ms1spw,field=bpcal,xaxis='freq',yaxis='amp',ydatacolumn='corrected',coloraxis='corr',correlation='XX,YY',plotrange=[0.2,0.5,0,cmax],plotfile=plotdir+'post_rflag2.png',showgui=False,overwrite=True,avgtime='1e8')
-plotms(vis=ms1spw,xaxis='scan',yaxis='baseline',coloraxis='field',avgtime='1e8',avgchannel='10000',plotfile=plotdir+'baselines_rflag2.png',overwrite=True,showgui=False)
-print 'Check plots/post_rflag2.png and baselines_rflag2.png to see RFI in BP cal and # of unflagged baselines after second rflag.'
+print 'Check plots/post_rflag2.png to see RFI in BP cal after second rflag.'
 
 print 'Flagged data summary after second rflag:'
 summary_3 = field_flag_summary(ms1spw,flagdata)
@@ -161,5 +155,3 @@ np.save('summary3.npy',summary_3)
 # back up final flag state - flags will also be saved by applycal in calPband.py but
 #  this makes it easier to identify flagversion associated with end of flagPband.py
 flagmanager(vis=ms1spw,mode='save',versionname='post_flagPband')
-
-

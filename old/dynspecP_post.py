@@ -1,9 +1,8 @@
 # run this pipeline from the directory for the particular observation you want to process
-# (e.g., /data/jrv/15A-416/YZCMi/1/L)
+# (e.g., /data/jrv/15A-416/YZCMi/1/P)
 #
-# This pipeline should be run after the VLA pipeline.  It will look for ms files in locations such
-#   as YZCMi_1L.ms (where the name can be inferred from the directory location), which should have
-#   the calibrated data column from the VLA pipeline.
+# This pipeline should be run after flagPband.py and calPband.py.  It will look for ms1spw (e.g., YZCMi_1P.1spw.ms),
+#  where the calibrated data column should include the calibrated target field.
 #
 # If you want to change default parameters for pipeline, create dictionary pipe_params before running this
 #   script with execfile.  Default for pipe_params is: {'overwrite':False,'makebig':False,'interactive':False}
@@ -12,24 +11,21 @@
 # 1) Definitions - parameters, field names, filenames, phasecen
 # 2) ms file creation
 #    a) Use mstransform to make srcms (calibrated science target only w/ phase center on star, single spw)
-#    b) Run automated flagging (rflag) 2x on single-spw srcms
-#    c) Split smallms (time- and freq-avg'd srcms)
-# 3) Create BG src model from smallms
+# 3) Create BG src model from srcms
 #    a) Plot raw time series (will show sidelobes of BG srcs) and read non-flaring scans/spws from file
-#    b) Image and clean smallms in non-flare scans/spws w/ nterms>1 (2? 3?)
+#    b) Image and clean non-flare scans/spws w/ nterms>1 (2? 3?)
 #    c) Mask central star out of model image to create BG model image
-# 4) Subtract BG srcs and avg over baselines - run on smallms, and srcms if makebig=True
+# 4) Subtract BG srcs and avg over baselines
 #    a) FT BG model image then uvsub
 #    b) Average over all baselines
 #    c) Extract dynamic spectrum from baseline-avg'd ms
-#    d) Diagnostic plots of BG-subtracted smallms - time series & dirty image
+#    d) Diagnostic plots of BG-subtracted srcms - time series & dirty image
 
 import os
 from glob import glob
 from dynspec.tbavg import tbavg,dyn_spec
 from dynspec.extract_dynspec import saveTxt
 from dynspec.pipeline_utils import *
-
 
 
 ### 1) DEFINITIONS ###
@@ -49,50 +45,33 @@ band = names['band']
 print '\n----------------'+sb+'--------------------'
 
 plotdir = get_plot_dir() # file names
-msfile = sb + '.ms'
-rawsrc = sb + '.src.ms'
+ms1spw = sb + '.1spw.ms'
 srcms = sb + '.star.ms'
 srctbavg = sb + '.tbavg.ms'
-smallms = sb + '.star.small.ms'
-smalltbavg = sb + '.star.small_tbavg.ms'
 smallim = sb + '.smallim'
 
-if os.path.exists(msfile):
-    fields = get_fields(msfile,vishead) # field names
-else:
-    fields = get_fields(rawsrc,vishead)
+fields = get_fields(ms1spw,vishead)
 srcname = fields.get('src')
 bpcal = fields.get('bpcal')
 gcal = fields.get('gcal')
 phasecen=get_phasecen()
 
-
-
+'''
 ### 2) MS FILE CREATION ###
 
 ## a) Use mstransform to make srcms (calibrated science target only w/ phase center on star, single spw) ##
 
-# use mstransform to create 1-spw src-only ms from calibrated data
-# in some directories, we have pipeline output (msfile) and in
-#    others, we only have target data from pipeline output (rawsrc)
-if band=='S':
-    spw='16~31'
-else:
-    spw=''
+# use mstransform to create src-only ms from calibrated data column of ms1spw
 if not os.path.exists(srcms) or overwrite:  # skip this step if srcms already exists
     if os.path.exists(srcms):
         rmtables(srcms)
     if os.path.exists(srcms+'.flagversions'):
         os.system('rm -rf '+srcms+'.flagversions')
-    if os.path.exists(msfile): # msfile exists so use it to create srcms
-        print 'creating 1-spw src-only ms', srcms, 'from calibrated data column of', msfile
-        mstransform(vis=msfile,outputvis=srcms,field=srcname,combinespws=True,keepflags=False,spw=spw)
-    else: # msfile does not exist so use rawsrc to create srcms
-        print 'creating 1-spw src-only ms', srcms, 'from data column of', rawsrc, '(which is calibrated)'
-        mstransform(vis=rawsrc,outputvis=srcms,combinespws=True,keepflags=False,datacolumn='data',spw=spw)
+    print 'creating src-only ms', srcms, 'from calibrated data column of', ms1spw
+    mstransform(vis=ms1spw,outputvis=srcms,field=srcname,keepflags=False)
     print 'shifting phase center of', srcms, 'to', phasecen
     fixvis(vis=srcms,outputvis=srcms,phasecenter=phasecen)
-elif makebig:
+else:
     print srcms, 'already exists, now deleting MODEL_DATA and CORRECTED_DATA and assuming phase center already shifted'
     # erase corrected data column to remove source subtraction from previous pipeline runs
     clearcal(srcms)
@@ -105,48 +84,28 @@ if not os.path.exists(tarfile) or overwrite: # skip this step if tarfile already
 else:
     print tarfile, 'already exists, skipping the creation of this file'
 
-## b) Run automated flagging (rflag) 2x on single-spw srcms ##
-#         This is so RFI doesn't impact BG model and also for dynspec quality
-
-summary_1 = field_flag_summary(srcms,flagdata)
-flagdata(vis=srcms,mode='rflag',freqdevscale=3.0) # freqdevscale=3.0: flag channels w/ local (3-chan) rms 3x greater than global rms
-summary_2 = field_flag_summary(srcms,flagdata)
-flagdata(vis=srcms,mode='rflag',freqdevscale=3.0)
-summary_3 = field_flag_summary(srcms,flagdata)
 
 
-## c) Split smallms - srcms avg'd in time (30s) and freq (16 channels) ##
-
-if not os.path.exists(smallms) or overwrite:
-    if os.path.exists(smallms):
-        rmtables(smallms)
-    print 'avging', srcms,'over 30s and 16 channels to create', smallms
-    split(vis=srcms,outputvis=smallms,datacolumn='data',width=16,timebin='30s',keepflags=False)
-else:
-    print smallms, 'already exists, skipping the creation of this file but erasing MODEL_DATA and CORRECTED_DATA columns'
-    # erase corrected data column to remove source subtraction from previous pipeline runs
-    clearcal(smallms)
-
-
-
-### 3) CREATE BACKGROUND SOURCE MODEL FROM SMALLMS ###
+### 3) CREATE BACKGROUND SOURCE MODEL FROM SRCMS ###
 
 ## a) Plot raw time series (will show sidelobes of BG srcs) and read non-flaring scans/spws from file ##
+print 'Plotting time series before source subtraction... a circularly polarized stellar burst should be positive in real part of XX and YY (orange and purple), and opposite signs in imaginary part of XY and YX (pink and black).'
 plotfile = plotdir + sb + '_dirty_tseries.png'
-plotms(vis=smallms,xaxis='scan',yaxis='real',avgchannel='64',avgbaseline=True,correlation='RR,LL',coloraxis='corr',plotfile=plotfile,overwrite=True,showgui=False)
+implotfile = plotdir + sb + '_dirty_tseries_im.png'
+plotms(vis=srcms,xaxis='scan',yaxis='real',avgchannel='2048',avgtime='1e8',avgbaseline=True,coloraxis='corr',plotfile=plotfile,overwrite=True,showgui=False)
+plotms(vis=srcms,xaxis='scan',yaxis='imag',avgchannel='2048',avgtime='1e8',avgbaseline=True,coloraxis='corr',plotfile=implotfile,overwrite=True,showgui=False)
 if interactive:
-    raw_input('Check plots/'+sb+'_dirty_tseries.png to identify flare-free scans, add them to dynspec/clean_scans.txt, then hit Return.')
+    raw_input('Check plots/'+sb+'_dirty_tseries[_im].png to identify flare-free scans, add them to dynspec/clean_scans.txt, then hit Return.')
+'''
 clean_scans,clean_spws = get_clean_scans()
 print 'Scans and spws used as flare-free for',sb,'(blank is all): scan=\''+clean_scans+'\', spw=\''+clean_spws+'\''
 
 
-## b) Image and clean smallms in non-flare scans/spws w/ nterms=2 ##
+## b) Image and clean srcms in non-flare scans/spws w/ nterms=2 ##
 
 # get parameters for imaging
-if os.path.exists(msfile):
-    pixel_size,imsize = im_params(msfile)
-else:
-    pixel_size,imsize = im_params(rawsrc)
+pixel_size,imsize = im_params(srcms)
+
 if imsize > 10000:
     print 'Warning: imsize>10000, setting to imsize=10000 (may cut off full FOV)'
     imsize = 10000
@@ -154,25 +113,30 @@ if imsize > 10000:
 # measure RMS of Stokes Q&U dirty image during non-flaring scans
 #  (when subtracting BG srcs later we assume unpolarized, so this will prevent overcleaning polarized BG src)
 dirtyim='dirty'
+'''
 if len(glob(dirtyim+'.*'))>0:
     rmtables(dirtyim + '.*') # have to delete old image files (esp. model) so clean will start from scratch
 print 'Creating dirty image during non-flaring scans - will use Stokes Q&U RMS to set threshold (3*RMS) for cleaning'
-imsize_d = min(imsize,2000)
-clean(vis=smallms,imagename=dirtyim,scan=clean_scans,spw=clean_spws,imsize=imsize_d,cell=pixel_size,niter=0,stokes='IQUV') # create dirty image
+'''
+imsize_d = min(imsize,1024)
+'''
+clean(vis=srcms,imagename=dirtyim,scan=clean_scans,spw=clean_spws,imsize=imsize_d,cell=pixel_size,niter=0,stokes='IQUV') # create dirty image
+'''
 rmsQ = imstat(imagename=dirtyim+'.image',stokes='Q')['sigma']
 rmsU = imstat(imagename=dirtyim+'.image',stokes='U')['sigma']
 rmsV = imstat(imagename=dirtyim+'.image',stokes='V')['sigma']
 rmsQUV = min([rmsQ,rmsU,rmsV])[0]*1000
 print 'RMS of Stokes Q,U,V dirty image (min of the three):',rmsQUV, 'mJy'
 threshold = str(rmsQUV * 3) + 'mJy'
-
-# clean smallms using only the non-flaring scans with nterms=2 since we have large fractional bandwidth (may need nterms=3?)
+'''
+# clean srcms using only the non-flaring scans with nterms=2 since we have large fractional bandwidth (may need nterms=3?)
 if len(glob(smallim+'.*'))>0:
     rmtables(smallim + '.*') # have to delete old image files (esp. model) so clean will start from scratch
-print 'Imaging non-flaring scans in',smallms,'with nterms=2 - image file', smallim+'.image.tt0'
-clean(vis=smallms,imagename=smallim,scan=clean_scans,spw=clean_spws,nterms=2,imsize=imsize,cell=pixel_size,niter=3000,threshold=threshold,cyclefactor=5,interactive=interactive)
-# high cyclefactor is critical to successful clean - this implies "bad PSF" --> poorly known beam map? (due to few antennas? wide bandwidth?)
-# default gain of 0.1 is fine - I tested 0.01 and 0.3 as well - not a huge difference in performance (0.1 had lowest RMS by small amount)
+print 'Imaging non-flaring scans in',srcms,'with nterms=2 - image file', smallim+'.image.tt0'
+clean(vis=srcms,imagename=smallim,scan=clean_scans,spw=clean_spws,nterms=2,imsize=imsize,cell=pixel_size,niter=3000,threshold=threshold,cyclefactor=5,interactive=interactive)
+# high cyclefactor is CRITICAL to successful clean if not using clean boxes, otherwise sidelobes end up in clean model - this means that the image plane
+#   PSF used by clean is not very accurate (b/c of nterms=2? b/c of subarray --> fewer ants?)
+# default gain of 0.1 is fine - higher gain (0.3) results in more spurious clean components
 
 
 ## c) Mask central star out of model image to create BG model image ##
@@ -183,48 +147,48 @@ model1 = smallim+'.model.tt1'
 cen_mask = 'center_mask'
 if os.path.exists(cen_mask):
     rmtables(cen_mask)
+'''
 bgmodel0 = smallim + '.bgmodel0'
 bgmodel1 = smallim + '.bgmodel1'
+'''
 ncen = str(int(imsize/2)) # center pixel
-circle_cen = 'circle[['+ncen+'pix,'+ncen+'pix],5pix]' # a 5-pixel diameter circle in the image center
+circle_cen = 'circle[['+ncen+'pix,'+ncen+'pix],10pix]' # a 10-pixel radius(?) circle in the image center
 print 'Excluding image center region', circle_cen, 'from model of bg srcs'
 makemask(mode='copy',inpimage=model0,output=cen_mask,inpmask=circle_cen,overwrite=True) # create mask with ones in center
 immath(imagename=[model0,cen_mask],outfile=bgmodel0,expr='IM0*(1-IM1)')
 immath(imagename=[model1,cen_mask],outfile=bgmodel1,expr='IM0*(1-IM1)')
-# bgmodel0,1 are the same as model0,1 but with the center pixels removed (radius 5 pixels)
-
+# bgmodel0,1 are the same as model0,1 but with the center pixels removed (radius 10 pixels)
 
 
 ### 4) SUBTRACT BG AND CREATE DYNSPEC ###
-
-mslist = [smallms]
-tblist = [smalltbavg]
-if makebig:
-    mslist.append(srcms)
-    tblist.append(srctbavg)
+'''
+mslist = [srcms]
+tblist = [srctbavg]
 
 for (ms,tb) in zip(mslist,tblist):
     
     ## a) FT background model image then uvsub ##
-    
+    clearcal(ms)
     # ft to populate MODEL_DATA column with clean model
     print 'subtracting bg src model from', ms, '(ft + uvsub)'
+    ft(vis=ms,nterms=2,model=[bgmodel0,bgmodel1],usescratch=True)
     ft(vis=ms,nterms=2,model=[bgmodel0,bgmodel1],usescratch=True)
     
     # uvsub to subtract model column from data column and put it in corrected column
     uvsub(vis=ms)
+    #uvsub(vis=ms)
     
     ## b) Avg over all baselines ##
-
+    
     # tbavg creates new "single-baseline" ms
     if os.path.exists(tb):
-        rmtables(tb)
+        os.system('rm -rf '+tb)
     print 'running tbavg on', ms, '(bg subtracted) to create', tb
     try:
         tbavg(split,ms,tb,speed='fast',weight_mode='flat',datacolumn='corrected')
     except:
         print 'tbavg failed, probably b/c table',tb, 'is already open in the CASA cache - restart CASA to fix this problem'
-
+    
     ## c) Extract dynspec ##
     
     print 'Saving dynspec to files in directory',tb+'.dynspec'
@@ -232,18 +196,19 @@ for (ms,tb) in zip(mslist,tblist):
     if os.path.exists(tb+'.dynspec'):
         os.system('rm -rf ' + tb + '.dynspec')
     saveTxt(spec,tb)
+    
 
 
-## d) Diagnostic plots of BG-subtracted smallms - time series & dirty image ##
+## d) Diagnostic plots of BG-subtracted srcms - time series & dirty image ##
 
-# create dirty images of smallms w/o BG
+# create dirty images of srcms w/o BG
 dirty_nobg=sb+'.dirty_nobg'
 imfile = plotdir+dirty_nobg+'.jpg'
 imfile2 = plotdir+dirty_nobg+'.small.jpg'
 if len(glob(dirty_nobg+'.*'))>0:
     rmtables(dirty_nobg+'.*') # delete old image files
 print 'Creating dirty image during non-flaring scans with bg srcs subtracted:',imfile
-clean(vis=smallms,imagename=dirty_nobg,scan=clean_scans,spw=clean_spws,imsize=imsize_d,cell=pixel_size,niter=0,stokes='IQUV')
+clean(vis=srcms,imagename=dirty_nobg,scan=clean_scans,spw=clean_spws,imsize=imsize_d,cell=pixel_size,niter=0,stokes='IQUV')
 blc = int(imsize_d/2)-64
 trc = int(imsize_d/2)+64
 zoom={'blc':[blc,blc],'trc':[trc,trc]}
@@ -251,10 +216,11 @@ raster={'file':dirty_nobg+'.image','colormap':'Greyscale 1','range':[0,rmsQUV*0.
 imview(raster=raster,out=imfile)
 imview(raster=raster,out=imfile2,zoom=zoom)
 
-# plot tseries for smallms w/o BG
+# plot tseries for srcms w/o BG
 plotfile = plotdir + sb + '_tseries.png'
 plotfile_im = plotdir + sb + '_im_tseries.png' # make sure there is no variation in Im(vis)
 print 'Plotting time series for', sb,'with bg srcs removed:',plotfile, '(+im in filename for Im(vis))'
-plotms(vis=smallms,xaxis='time',yaxis='real',ydatacolumn='corrected',avgchannel='128',avgbaseline=True,correlation='RR,LL',coloraxis='corr',plotfile=plotfile,overwrite=True,showgui=False)
-plotms(vis=smallms,xaxis='time',yaxis='imag',ydatacolumn='corrected',avgchannel='128',avgbaseline=True,correlation='RR,LL',coloraxis='corr',plotfile=plotfile_im,overwrite=True,showgui=False)
+plotms(vis=srcms,xaxis='scan',yaxis='real',ydatacolumn='corrected',avgchannel='2048',avgtime='1e8',avgbaseline=True,coloraxis='corr',plotfile=plotfile,overwrite=True,showgui=False)
+plotms(vis=srcms,xaxis='scan',yaxis='imag',ydatacolumn='corrected',avgchannel='2048',avgtime='1e8',avgbaseline=True,coloraxis='corr',plotfile=plotfile_im,overwrite=True,showgui=False)
+
 
