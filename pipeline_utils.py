@@ -74,9 +74,31 @@ def get_phasecen():
     f.close()
     pcen_dict = {}
     for l in lines:
-        [obs_name,coords]=[s.rstrip() for s in l.split('---')]
-        pcen_dict[obs_name] = coords
+        if l[0] != '#':
+            [obs_name,coords]=[s.rstrip() for s in l.split('---')]
+            pcen_dict[obs_name] = coords
     return pcen_dict[obs_str]
+
+def get_phasecenP():
+    # load phasecen dict from file phasecenP.txt (in casa_utils) and find entry for this observation
+    # format of one line of phasecen dict: SB---Ipos---Vpos
+    # e.g.:    15A-416_YZCMi_1---J2000 7h44m39.810 3d33m1.91---J2000 7h44m39.815 3d33m1.90
+    
+    names = get_names()
+    obs_str = names['proj']+'_'+names['src']+'_'+names['obs']
+    
+    fname = '/data/jrv/casa_utils/dynspec/phasecenP.txt'
+    f = open(fname)
+    lines = f.readlines()
+    f.close()
+    pcenI_dict = {}
+    pcenV_dict = {}
+    for l in lines:
+        if l[0] != '#':
+            [obs_name,coordsI,coordsV]=[s.rstrip() for s in l.split('---')]
+            pcenI_dict[obs_name] = coordsI
+            pcenV_dict[obs_name] = coordsV
+    return pcenI_dict.get(obs_str,''),pcenV_dict.get(obs_str,'')
 
 def get_clean_scans():
     # read clean (flare-free) scans and spws from clean_scans.txt in dynspec code dir
@@ -169,6 +191,8 @@ def amp_plot_max(vis,visstat,datacolumn='data',field=''):
 def im_params(vis,pblevel=0.1):
     # return a good cell size and imsize (in pixels) for the ms
     cell,imsize,fieldID=au.pickCellSize(vis,imsize=True,pblevel=pblevel,npix=3)
+    if imsize[0]<5000:
+        cell,imsize,fieldID=au.pickCellSize(vis,imsize=True,pblevel=pblevel,npix=5)
     pixelsize = str(cell) + 'arcsec'
     npixels = imsize[0]
     print 'Pixel size:', pixelsize, '/ Image size:', npixels, 'pixels'

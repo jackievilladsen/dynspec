@@ -1,10 +1,9 @@
-/data/jrv/15A-416/EQPeg/1/P
-/data/jrv/15A-416/EQPeg/2/P
-/data/jrv/15A-416/ADLeo/1/P
-/data/jrv/15A-416/ADLeo/2/P
-/data/jrv/15A-416/ADLeo/3/P
-/data/jrv/15A-416/UVCet/1/P
 /data/jrv/15A-416/UVCet/2/P
 /data/jrv/15A-416/UVCet/3/P
 /data/jrv/15A-416/UVCet/4/P
 /data/jrv/15A-416/UVCet/5/P
+/data/jrv/15A-416/ADLeo/2/P
+/data/jrv/15A-416/ADLeo/3/P
+/data/jrv/15A-416/ADLeo/5/P
+/data/jrv/15A-416/EQPeg/1/P
+/data/jrv/15A-416/EQPeg/2/P

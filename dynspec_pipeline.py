@@ -56,9 +56,12 @@ srctbavg = sb + '.tbavg.ms'
 smallms = sb + '.star.small.ms'
 smalltbavg = sb + '.star.small_tbavg.ms'
 smallim = sb + '.smallim'
+dirtyim='dirty'
 
-if os.path.exists(msfile):
-    fields = get_fields(msfile,vishead) # field names
+if os.path.exists(srcms):
+    fields = get_fields(srcms,vishead) # field names
+elif os.path.exists(msfile):
+    fields = get_fields(msfile,vishead)
 else:
     fields = get_fields(rawsrc,vishead)
 srcname = fields.get('src')
@@ -66,6 +69,9 @@ bpcal = fields.get('bpcal')
 gcal = fields.get('gcal')
 phasecen=get_phasecen()
 
+clean_scans,clean_spws = get_clean_scans()
+threshold='0.2mJy'
+imsize_d=1024
 
 
 ### 2) MS FILE CREATION ###
@@ -79,7 +85,7 @@ if band=='S':
     spw='16~31'
 else:
     spw=''
-if not os.path.exists(srcms) or overwrite:  # skip this step if srcms already exists
+if not os.path.exists(srcms):  # skip this step if srcms already exists
     if os.path.exists(srcms):
         rmtables(srcms)
     if os.path.exists(srcms+'.flagversions'):
@@ -92,28 +98,28 @@ if not os.path.exists(srcms) or overwrite:  # skip this step if srcms already ex
         mstransform(vis=rawsrc,outputvis=srcms,combinespws=True,keepflags=False,datacolumn='data',spw=spw)
     print 'shifting phase center of', srcms, 'to', phasecen
     fixvis(vis=srcms,outputvis=srcms,phasecenter=phasecen)
+    ## b) Run automated flagging (rflag) 2x on single-spw srcms ##
+    #         This is so RFI doesn't impact BG model and also for dynspec quality
+    summary_1 = field_flag_summary(srcms,flagdata)
+    flagdata(vis=srcms,mode='rflag',freqdevscale=3.0) # freqdevscale=3.0: flag channels w/ local (3-chan) rms 3x greater than global rms
+    summary_2 = field_flag_summary(srcms,flagdata)
+    flagdata(vis=srcms,mode='rflag',freqdevscale=3.0)
+    summary_3 = field_flag_summary(srcms,flagdata)
 elif makebig:
-    print srcms, 'already exists, now deleting MODEL_DATA and CORRECTED_DATA and assuming phase center already shifted'
-    # erase corrected data column to remove source subtraction from previous pipeline runs
-    clearcal(srcms)
+    clearcal(srcms) # erase corrected data column to remove source subtraction from previous pipeline runs
+    if overwrite:
+        print srcms, 'already exists, now deleting MODEL_DATA and CORRECTED_DATA and shifting phase center to', phasecen
+        fixvis(vis=srcms,outputvis=srcms,phasecenter=phasecen)
+    else:
+        print srcms, 'already exists, now deleting MODEL_DATA and CORRECTED_DATA and assuming phase center already shifted'
 
 # backup src-only ms as tar file (in case calibrated pipeline ms and srcms get corrupted)
 tarfile = srcms + '.tar'
-if not os.path.exists(tarfile) or overwrite: # skip this step if tarfile already exists
+if not os.path.exists(tarfile): # skip this step if tarfile already exists
     print 'saving',tarfile,'with fixvis applied'
     os.system('tar -cf ' + tarfile + ' ' + srcms)
 else:
-    print tarfile, 'already exists, skipping the creation of this file'
-
-## b) Run automated flagging (rflag) 2x on single-spw srcms ##
-#         This is so RFI doesn't impact BG model and also for dynspec quality
-
-summary_1 = field_flag_summary(srcms,flagdata)
-flagdata(vis=srcms,mode='rflag',freqdevscale=3.0) # freqdevscale=3.0: flag channels w/ local (3-chan) rms 3x greater than global rms
-summary_2 = field_flag_summary(srcms,flagdata)
-flagdata(vis=srcms,mode='rflag',freqdevscale=3.0)
-summary_3 = field_flag_summary(srcms,flagdata)
-
+    print tarfile, 'already exists, skipping the creation of this file - warning: phase center in tarfile may not be most recent and flagging may not have been applied'
 
 ## c) Split smallms - srcms avg'd in time (30s) and freq (16 channels) ##
 
@@ -132,10 +138,13 @@ else:
 ### 3) CREATE BACKGROUND SOURCE MODEL FROM SMALLMS ###
 
 ## a) Plot raw time series (will show sidelobes of BG srcs) and read non-flaring scans/spws from file ##
+
 plotfile = plotdir + sb + '_dirty_tseries.png'
+im_plotfile = plotdir + sb + '_dirty_tseries_im.png'
 plotms(vis=smallms,xaxis='scan',yaxis='real',avgchannel='64',avgbaseline=True,correlation='RR,LL',coloraxis='corr',plotfile=plotfile,overwrite=True,showgui=False)
+plotms(vis=smallms,xaxis='scan',yaxis='imag',avgchannel='64',avgbaseline=True,correlation='RR,LL',coloraxis='corr',plotfile=im_plotfile,overwrite=True,showgui=False)
 if interactive:
-    raw_input('Check plots/'+sb+'_dirty_tseries.png to identify flare-free scans, add them to dynspec/clean_scans.txt, then hit Return.')
+    raw_input('Check plots/'+sb+'_dirty_tseries[_im].png to identify flare-free scans, add them to dynspec/clean_scans.txt, then hit Return.')
 clean_scans,clean_spws = get_clean_scans()
 print 'Scans and spws used as flare-free for',sb,'(blank is all): scan=\''+clean_scans+'\', spw=\''+clean_spws+'\''
 
@@ -143,22 +152,18 @@ print 'Scans and spws used as flare-free for',sb,'(blank is all): scan=\''+clean
 ## b) Image and clean smallms in non-flare scans/spws w/ nterms=2 ##
 
 # get parameters for imaging
-if os.path.exists(msfile):
-    pixel_size,imsize = im_params(msfile)
-else:
-    pixel_size,imsize = im_params(rawsrc)
-if imsize > 10000:
-    print 'Warning: imsize>10000, setting to imsize=10000 (may cut off full FOV)'
-    imsize = 10000
-
+pixel_size,imsize = im_params(srcms)
+if imsize > 8192:
+    print 'Warning: requested imsize of',imsize,'pix is large, instead setting to imsize=8192 (may cut off full FOV)'
+    imsize = 8192
 # measure RMS of Stokes Q&U dirty image during non-flaring scans
 #  (when subtracting BG srcs later we assume unpolarized, so this will prevent overcleaning polarized BG src)
-dirtyim='dirty'
 if len(glob(dirtyim+'.*'))>0:
-    rmtables(dirtyim + '.*') # have to delete old image files (esp. model) so clean will start from scratch
+    os.system('rm -rf '+dirtyim + '.*') # have to delete old image files (esp. model) so clean will start from scratch
 print 'Creating dirty image during non-flaring scans - will use Stokes Q&U RMS to set threshold (3*RMS) for cleaning'
-imsize_d = min(imsize,2000)
+imsize_d = min(imsize,1024)
 clean(vis=smallms,imagename=dirtyim,scan=clean_scans,spw=clean_spws,imsize=imsize_d,cell=pixel_size,niter=0,stokes='IQUV') # create dirty image
+
 rmsQ = imstat(imagename=dirtyim+'.image',stokes='Q')['sigma']
 rmsU = imstat(imagename=dirtyim+'.image',stokes='U')['sigma']
 rmsV = imstat(imagename=dirtyim+'.image',stokes='V')['sigma']
@@ -166,13 +171,22 @@ rmsQUV = min([rmsQ,rmsU,rmsV])[0]*1000
 print 'RMS of Stokes Q,U,V dirty image (min of the three):',rmsQUV, 'mJy'
 threshold = str(rmsQUV * 3) + 'mJy'
 
-# clean smallms using only the non-flaring scans with nterms=2 since we have large fractional bandwidth (may need nterms=3?)
+clearcal(smallms)
+# clean smallms using only the non-flaring scans with nterms=2 since we have large fractional bandwidth
+#  - may need nterms=3 to help remove bright srcs from ADLeo, EVLac, but nterms=3 gave worse residuals than nterms=2 for YZCMi_1S
 if len(glob(smallim+'.*'))>0:
     rmtables(smallim + '.*') # have to delete old image files (esp. model) so clean will start from scratch
 print 'Imaging non-flaring scans in',smallms,'with nterms=2 - image file', smallim+'.image.tt0'
 clean(vis=smallms,imagename=smallim,scan=clean_scans,spw=clean_spws,nterms=2,imsize=imsize,cell=pixel_size,niter=3000,threshold=threshold,cyclefactor=5,interactive=interactive)
+
 # high cyclefactor is critical to successful clean - this implies "bad PSF" --> poorly known beam map? (due to few antennas? wide bandwidth?)
 # default gain of 0.1 is fine - I tested 0.01 and 0.3 as well - not a huge difference in performance (0.1 had lowest RMS by small amount)
+# YZCMi_1S: selfcal made RMS/residuals worse - not bright enough? overcleaned before selfcal? for now, don't do selfcal.
+
+#os.system('rm -rf aproj.*')
+#clean(vis=smallms,imagename='aproj',scan=clean_scans,spw=clean_spws,nterms=2,imsize=imsize,cell=pixel_size,niter=3000,threshold=threshold,cyclefactor=5,interactive=interactive,gridmode='aprojection',wprojplanes=-1)
+# uses small circle for FOV - this is a problem...
+# next step: try tclean w/ gridder='awproj' to see if this works better
 
 
 ## c) Mask central star out of model image to create BG model image ##
@@ -192,7 +206,6 @@ makemask(mode='copy',inpimage=model0,output=cen_mask,inpmask=circle_cen,overwrit
 immath(imagename=[model0,cen_mask],outfile=bgmodel0,expr='IM0*(1-IM1)')
 immath(imagename=[model1,cen_mask],outfile=bgmodel1,expr='IM0*(1-IM1)')
 # bgmodel0,1 are the same as model0,1 but with the center pixels removed (radius 5 pixels)
-
 
 
 ### 4) SUBTRACT BG AND CREATE DYNSPEC ###
@@ -218,7 +231,7 @@ for (ms,tb) in zip(mslist,tblist):
 
     # tbavg creates new "single-baseline" ms
     if os.path.exists(tb):
-        rmtables(tb)
+        os.system('rm -rf '+tb)
     print 'running tbavg on', ms, '(bg subtracted) to create', tb
     try:
         tbavg(split,ms,tb,speed='fast',weight_mode='flat',datacolumn='corrected')
@@ -242,10 +255,10 @@ imfile = plotdir+dirty_nobg+'.jpg'
 imfile2 = plotdir+dirty_nobg+'.small.jpg'
 if len(glob(dirty_nobg+'.*'))>0:
     rmtables(dirty_nobg+'.*') # delete old image files
-print 'Creating dirty image during non-flaring scans with bg srcs subtracted:',imfile
-clean(vis=smallms,imagename=dirty_nobg,scan=clean_scans,spw=clean_spws,imsize=imsize_d,cell=pixel_size,niter=0,stokes='IQUV')
-blc = int(imsize_d/2)-64
-trc = int(imsize_d/2)+64
+print 'Creating image during non-flaring scans with bg srcs subtracted:',imfile
+clean(vis=smallms,imagename=dirty_nobg,scan=clean_scans,spw=clean_spws,imsize=imsize_d,cell=pixel_size,niter=500,stokes='IQUV')
+blc = int(imsize_d/2)-32
+trc = int(imsize_d/2)+32
 zoom={'blc':[blc,blc],'trc':[trc,trc]}
 raster={'file':dirty_nobg+'.image','colormap':'Greyscale 1','range':[0,rmsQUV*0.005]}
 imview(raster=raster,out=imfile)

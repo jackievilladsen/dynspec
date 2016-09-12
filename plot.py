@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Last modified: August 7 2015
 
-@author: jackie
+plot.py: Tools for manipulating and plotting dynamic spectra, time series, etc.
+This functionality is accessed by the user through the class Dynspec.
+
 """
 
 from pylab import *
@@ -415,7 +416,7 @@ class Dynspec:
         scale = plot_params.get('scale','log')    # options: log, linear       
         smin = plot_params.get('smin',smin)
         smax = plot_params.get('smax',smax)
-        dx = plot_params.get('dx',5.)             # spacing between x axis tick marks - time in minutes (default: 5 min)
+        dx = plot_params.get('dx',15.)             # spacing between x axis tick marks - time in minutes (default: 15 min)
         dy = plot_params.get('dy',0.5)            # spacing between y axis tick marks - frequency in GHz (default: 0.5 GHz)
         tlims = self.time[0].mjds()+plot_params.get('tlims',array([0,1e6]))*60.             # min and max time to plot (in min since beginning of obs)
         flims = plot_params.get('flims',array([min(self.f),max(self.f)+1]))                 # min and max frequencies to plot (in Hz)
@@ -430,6 +431,7 @@ class Dynspec:
         ## Large plot (entire dynspec, binned) ##
         figure()
         ax=subplot(111,axisbg='k')
+        print pol,smin,smax
         if scale=='log':
             imshow(log10(spec).T,aspect=ar,vmin=log10(smin),vmax=log10(smax),origin='lower',cmap='seismic')
             ds = round(log10(smax)-log10(smin),1)/5         # spacing between colorbar ticks
@@ -437,8 +439,10 @@ class Dynspec:
             ticklbls = (10**(ticks+3)).round().astype(int)  # colorbar tick labels
         else: # scale = 'linear'
             imshow(spec.T,aspect=ar,vmin=smin,vmax=smax,origin='lower',cmap='seismic')
-            ds = round(smax,1)/5                            # spacing between colorbar ticks
-            ticks = arange(0,smax+ds,ds)                    # colorbar tick locations
+            ds = round(smax,2)/5                            # spacing between colorbar ticks
+            if ds == 0.0:
+                ds = smax/10.
+            ticks = arange(smin,smax+ds,ds)                    # colorbar tick locations
             ticklbls = ticks*1000                           # colorbar tick labels
         
         # add colorbar and change labels to show log scale
