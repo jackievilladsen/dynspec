@@ -29,14 +29,14 @@ def rebin2d(a,wt,binsize):
     a1 = a.reshape(sh)
     wt1=wt.reshape(sh)
     tmp,wt2 = average(a1,len(sh)-1,wt1,True)
-    return ma.average(tmp,1,wt2)
+    return average(tmp,1,wt2)
 
 def rebin1d(a,binsize):
     l = floor(len(a)/binsize)*binsize
     a1 = a[0:l]
     sh = len(a1)/binsize,binsize
     a2 = a1.reshape(sh)
-    return ma.average(a2,1)
+    return average(a2,1)
 
 def rebin1d_ma(a,binsize):
     l = floor(len(a)/binsize)*binsize
@@ -177,35 +177,43 @@ class Dynspec:
     def read_params(self,params):
         # params is a dictionary with certain useful parameters:
         #   params['filename']: directory name to load dynspec from (must contain rr.dat, ll.dat, freq.dat, times.dat)
+        #   params['i']: load dynspec only starting from time with that index (default 0)
         #   params['uniform']: regrid to uniform time/frequency sampling after loading dynspec (default False)
         filename = params.get('filename','')
+        i = params.get('i',0)
         uniform = params.get('uniform',False)
-        return filename,uniform
+        return filename,i,uniform
     
     def load_dynspec(self,params):
         # if filename is a valid file, then loads dynspec (rr,ll,t,f) from that directory
         # self.spec['rr'] and self.spec['ll'] are loaded as masked arrays
         # optional parameter i is used to tell it to load the dynspec starting from time with index i
         # future modification: enable imax as well?
-        filename,uniform=self.read_params(params)
-        if not os.path.exists(filename):
-            print 'Warning: bad dynspec filename:', filename
-        else:
-            for pol in ['rr','ll']:
-                fname = filename + '/' + pol + '.npy'
-                if os.path.exists(fname):
-                    print 'loading', fname
-                    self.spec[pol] = make_ma(load(fname))
-                    print pol,'rms:', self.get_rms(pol)*1000, 'mJy'
-                        
+        filename,i,uniform=self.read_params(params)
+        if os.path.exists(filename):
+            print 'loading RR from', filename
+            if os.path.exists(filename+'/rr.npy'):
+                exten = '.npy'
+                loadfunc = load
+            else:
+                exten = '.dat'
+                loadfunc = loadtxt
+            self.spec['rr'] = real(make_ma(loadfunc(filename+'/rr'+exten))[i:,:])
+            print 'RCP rms:', self.get_rms('rr')*1000, 'mJy'
+            
+            print 'loading LL from', filename
+            self.spec['ll'] = real(make_ma(loadfunc(filename+'/ll'+exten))[i:,:])
+            print 'LCP rms:', self.get_rms('ll')*1000, 'mJy'
+            
             self.f=array(loadtxt(filename+'/freq.dat'))       # units: Hz
             
-            t=array(loadtxt(filename+'/times.dat'))  # units: MJD in seconds
-            self.time = TimeSec(t,format='mjds')     # create Time object containing list of MJD times            
+            t=array(loadtxt(filename+'/times.dat')[i:])  # units: MJD in seconds
+            self.time = TimeSec(t,format='mjds')         # create Time object containing list of MJD times            
             
             if uniform:
-                self.regrid_uniform()                # regrid to uniform time and frequency sampling
-            
+                self.regrid_uniform()                    # regrid to uniform time and frequency sampling
+        else:
+            print 'Warning: bad dynspec filename:', filename
     
     def make_xlist(self,x,dx,x0=None):
         # xlist: for each element in x, count how many units of dx it is away from x0 (or x[0] if x0 is not defined)
@@ -275,14 +283,17 @@ class Dynspec:
         f = self.make_full_indlist(flist)
         flen = len(f)
         
+        ll = ma.zeros((tlen,flen))
+        ll.mask = ones((tlen,flen))
+        
         # cycle through all poln products in self.spec
         for pol in self.spec.keys():
             # create empty dynspec with regridded dimensions
-            spec = ma.zeros((tlen,flen)) * 0j
+            spec = ma.zeros((tlen,flen))
             spec.mask = ones((tlen,flen))
         
             # use add_band to regrid onto new dimensions, overwriting self.spec[pol]
-            print 'regridding', pol, 'onto uniform time-frequency grid'
+            print 'regridding', pol
             self.spec[pol] = add_band(spec,t,f,self.spec[pol],tlist,flist)
             spec = None    # so that it stops taking up memory
         
@@ -317,7 +328,7 @@ class Dynspec:
         # cycle through all poln products in self.spec
         for pol in self.spec.keys():
             # create big empty masked array (with dimensions big enough to hold both dynspec)
-            spec = ma.zeros((tlen,flen)) * 0j
+            spec = ma.zeros((tlen,flen))
             spec.mask = ones((tlen,flen))
             print 'merging dynspec:', pol
             # add our own dynspec to big dynspec
@@ -340,15 +351,12 @@ class Dynspec:
         # return freq list in GHz
         return self.f/1.e9
     
-    def get_rms(self,pol='',func=imag):
-        # return rms of dynspec in Jy (calculates RMS per channel then takes median RMS)
-        # default is RMS of Im(LL), but can use any pol that is a key in self.spec,
-        # and func can be any function converting complex numbers to real numbers (such as imag, real, abs, angle)
-        if pol == '':
-            pol = self.spec.keys()[0]
-        rms = ma.median(ma.std(func(self.spec[pol]),0)).data
+    def get_rms(self,pol='ll'):
+        # return rms of dynspec in Jy
+        # default pol product is 'll', but can use any pol that is a key in self.spec
+        rms = ma.median(ma.std(self.spec[pol],0)).data
         try:
-            return rms[0] # in case rms is a single-valued array - this happens sometimes but not always, not sure why
+            return rms[0]
         except:
             return rms
         
@@ -389,7 +397,7 @@ class Dynspec:
         ds.f = rebin1d(self.f,nf)
         
         # print rms of new dynspec
-        print 'binned dynspec rms:', ds.get_rms()*1000, 'mJy'
+        print 'binned dynspec LCP rms:', ds.get_rms()*1000, 'mJy'
         
         return ds
 
@@ -398,14 +406,13 @@ class Dynspec:
         # create an imshow color plot of the dynamic spectrum
         # no binning
         
-        func = plot_params.get('func',real) # part of complex visibility to plot (real, imag, abs, angle)
         pol = plot_params.get('pol','rr')
         rmspol = plot_params.get('rmspol','ll')
         # generate automatic plot limits (units: flux in Jy)
         smin = self.get_rms(rmspol)*1.5
-        smax = percentile(func(self.spec[pol]),99)*1.6 # get the 99th percentile flux
+        smax = percentile(self.spec[pol],99)*1.6 # get the 97th percentile flux
 
-        # plot params #
+        # plot params #                                                        
         scale = plot_params.get('scale','log')    # options: log, linear       
         smin = plot_params.get('smin',smin)
         smax = plot_params.get('smax',smax)
@@ -416,7 +423,7 @@ class Dynspec:
         ar0 = plot_params.get('ar0',1.0)
         
         # clip dynspec to match tlims, flims
-        spec,t,f = clip_dynspec(func(self.spec[pol]),[tlims[0],tlims[1],flims[0],flims[1]],self.time.mjds(),self.f)
+        spec,t,f = clip_dynspec(self.spec[pol],[tlims[0],tlims[1],flims[0],flims[1]],self.time.mjds(),self.f)
         t0 = TimeSec(t[0],format='mjds')
         
         ar = ar0*len(t)/len(f)
@@ -468,44 +475,4 @@ class Dynspec:
         yticks(tick_locs, tick_labels)
         ylabel('Frequency (GHz)')
 
-    def clip(self,tmin=0,tmax=1e6,fmin=0,fmax=1.e12):
-        # returns a new Dynspec object clipped to the time and frequency
-        #  limits specified (tmin and tmax are time in minutes since beginning of obs,
-        #  fmin and fmax are in Hz)
-        
-        ds = Dynspec()  # create an empty Dynspec object  - need to define ds.spec[pol], ds.time, ds.f
-        
-        # calculate time in minutes since beginning of obs (since this is what we're using to clip)
-        mjds0 = self.time.mjds()[0]
-        t_minutes = (self.time.mjds()-mjds0)/60.
-        
-        # clip each pol's spec
-        for pol in self.spec.keys():
-            ds.spec[pol],t,ds.f = clip_dynspec(self.spec[pol],[tmin,tmax,fmin,fmax],t_minutes,self.f)
 
-        # calculate mjds times of new dynspec
-        t_mjds = t*60. + mjds0
-        ds.time = TimeSec(t_mjds,format='mjds')
-        
-        return ds
-
-    def rms_spec(self,pol='i',func=imag):
-        # return the RMS spectrum (RMS in each channel) in the complex func of the specified pol
-        #  default is RMS of imag(LL)
-        return std(func(self.spec[pol]),0)
-
-    def tseries(self,fmin=0,fmax=1.e12,weight_mode='rms'):
-        # return a Dynspec object that is a time series integrated from fmin to fmax
-        # weight_mode: 'rms' --> weight by 1/rms^2; anything else --> no weights
-        ds = self.clip(fmin=fmin,fmax=fmax)
-        tseries = Dynspec()
-        tseries.time = ds.time
-        tseries.f = mean(ds.f)
-        if weight_mode == 'rms':
-            rms = ds.rms_spec()
-            wt = 1/rms**2
-        else:
-            wt = ones(len(ds.f))
-        for pol in ds.spec.keys():
-            tseries.spec[pol] = ma.average(ds.spec[pol],1,wt)
-        return tseries

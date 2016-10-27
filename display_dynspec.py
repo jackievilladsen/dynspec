@@ -215,9 +215,10 @@ except:
 #ds.mask_RFI(8.)
 ds.spec['v'] = (ds.spec['rr']-ds.spec['ll'])/2
 ds.spec['i'] = (ds.spec['rr']+ds.spec['ll'])/2
-ds.spec['rc'] = ds.spec['v']/ds.spec['i']
+#ds.spec['rc'] = real(ds.spec['v'])/real(ds.spec['i'])
+
 ds_bin = ds.bin_dynspec(nt,nf)
-ds_bin.spec['rc'] = ds_bin.spec['v']/ds_bin.spec['i']
+ds_bin.spec['rc'] = real(ds_bin.spec['v'])/real(ds_bin.spec['i'])
 #ds_bin.mask_RFI(5.)
 
 pol_dict = {'ll':'LCP','rr':'RCP','v':'StokesV','i':'StokesI','rc':'rc'}
@@ -238,9 +239,12 @@ for pol in ['ll','rr','i','v','rc']:
     if os.path.exists(plotfile):
         os.system('rm -f ' + plotfile)
     savefig(plotfile,bbox_inches='tight')
+
+
+
 '''
 # calculate time series for ADLeo 3, 3-4 GHz
-rms = std(ds_bin.spec['v'],0) # rms for each frequency
+rms = std(imag(ds_bin.spec['v']),0) # rms for each frequency
 #tseries = average(ds_bin.spec['v'],1,1/rms**2) # compute variance-weighted V tseries (so RFI doesn't dominate)
 #tseries = average(ds_bin.spec['v'],1)
 ds2 = ds_bin.bin_dynspec(1,15)
