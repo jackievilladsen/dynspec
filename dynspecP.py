@@ -49,7 +49,8 @@ print '\n----------------'+sb+'--------------------'
 plotdir = get_plot_dir() # file names
 ms1spw = sb + '.1spw.ms'
 srcms = sb + '.star.ms'
-srctbavg = {'I':sb+'.tbavg.ms','V':sb+'.tbavgV.ms'}
+#srctbavg = {'I':sb+'.tbavg.ms','V':sb+'.tbavgV.ms'}
+srctbavg = sb + '.tbavg.ms'
 smallim = sb + '.smallim'
 
 try:
@@ -58,20 +59,17 @@ except:
     fields = get_fields(ms1spw,vishead)
 srcname = fields.get('src')
 
-pcen_list = []
-stokes_list = []
-phasecen=get_phasecen()
-
 phasecenI,phasecenV = get_phasecenP()
 if phasecenV != '':
-    phasecen = phasecenV
-    pcen_list.append(phasecenV)
-    stokes_list.append('V')
-if phasecenI != '':
-    phasecen = phasecenI
-    pcen_list.append(phasecenI)
-    stokes_list.append('I')
-# pcen_list contains only measured imfit locations of detections
+    pcen = phasecenV
+    stokes = 'V'
+elif phasecenI != '':
+    pcen = phasecenI
+    stokes = 'I'
+else:
+    pcen=get_phasecen()
+    stokes = 'apriori'
+# pcen is V src location if detected, then I if detected, then a priori
 
 clean_scans,clean_spws = get_clean_scans()
 imsize_d = 1024
@@ -90,7 +88,7 @@ cen_mask = 'center_mask'
 bgmodel0 = smallim + '.bgmodel0'
 bgmodel1 = smallim + '.bgmodel1'
 ncen = str(int(imsize/2)) # center pixel
-
+'''
 ### 2) MS FILE CREATION ###
 
 ## a) Use mstransform to make srcms (calibrated science target only w/ phase center on star, single spw) ##
@@ -109,7 +107,7 @@ else:
     print srcms, 'already exists, now deleting MODEL_DATA and CORRECTED_DATA and assuming phase center already shifted'
     # erase corrected data column to remove source subtraction from previous pipeline runs
     clearcal(srcms)
-'''
+
 # backup src-only ms as tar file (in case calibrated pipeline ms and srcms get corrupted)
 tarfile = srcms + '.tar'
 if not os.path.exists(tarfile) or overwrite: # skip this step if tarfile already exists
@@ -188,7 +186,7 @@ immath(imagename=[model0,cen_mask],outfile=bgmodel0,expr='IM0*(1-IM1)')
 immath(imagename=[model1,cen_mask],outfile=bgmodel1,expr='IM0*(1-IM1)')
 # bgmodel0,1 are the same as model0,1 but with the center pixels removed (radius 10 pixels)
 
-
+'''
 ### 4) SUBTRACT BG AND CREATE DYNSPEC ###
 
 ## a) FT background model image then uvsub ##
@@ -215,38 +213,32 @@ zoom={'blc':[blc,blc],'trc':[trc,trc]}
 raster={'file':dirty_nobg+'.image','colormap':'Greyscale 1','range':[0,rmsQUV*0.005]}
 imview(raster=raster,out=imfile)
 imview(raster=raster,out=imfile2,zoom=zoom)
-'''
-for (pcen,stokes) in zip(pcen_list,stokes_list):
-    
-    print 'Shifting phase center to Stokes',stokes,'src location from phasecenP.txt:',pcen
-    fixvis(vis=srcms,outputvis=srcms,phasecenter=pcen)
 
-    # plot tseries for srcms w/o BG using this phasecenter
-    plotfile = plotdir + sb + '_'+ stokes+'_tseries.png'
-    plotfile_im = plotdir + sb + '_'+stokes+'_im_tseries.png' # make sure there is no variation in Im(vis)
-    print 'Plotting time series for', sb,'with bg srcs removed:',plotfile, '(+im in filename for Im(vis)) - phasecen is',pcen
-    plotms(vis=srcms,xaxis='scan',yaxis='real',ydatacolumn='data',avgchannel='2048',avgtime='1e8',avgbaseline=True,coloraxis='corr',plotfile=plotfile,overwrite=True,showgui=False)
-    plotms(vis=srcms,xaxis='scan',yaxis='imag',ydatacolumn='data',avgchannel='2048',avgtime='1e8',avgbaseline=True,coloraxis='corr',plotfile=plotfile_im,overwrite=True,showgui=False)
-'''    
-    ## b) Avg over all baselines ##
-    
-    tb = srctbavg[stokes]
-    # tbavg creates new "single-baseline" ms
-    if os.path.exists(tb):
-        os.system('rm -rf '+tb)
-    print 'running tbavg on', srcms, '(bg subtracted) to create', tb
-    try:
-        tbavg(split,srcms,tb,speed='fast',weight_mode='flat',datacolumn='data')
-    except:
-        print 'tbavg failed, probably b/c table',tb, 'is already open in the CASA cache - restart CASA to fix this problem'
+print 'Shifting phase center to Stokes',stokes,'src location from phasecenP.txt:',pcen
+fixvis(vis=srcms,outputvis=srcms,phasecenter=pcen)
 
-    ## c) Extract dynspec ##
-    
-    print 'Saving dynspec to files in directory',tb+'.dynspec'
-    spec = dyn_spec(tb)
-    if os.path.exists(tb+'.dynspec'):
-        os.system('rm -rf ' + tb + '.dynspec')
-    saveTxt(spec,tb)
+# plot tseries for srcms w/o BG using this phasecenter
+plotfile = plotdir + sb + '_'+ stokes+'_tseries.png'
+plotfile_im = plotdir + sb + '_'+stokes+'_im_tseries.png' # make sure there is no variation in Im(vis)
+print 'Plotting time series for', sb,'with bg srcs removed:',plotfile, '(+im in filename for Im(vis)) - phasecen is',pcen
+plotms(vis=srcms,xaxis='scan',yaxis='real',ydatacolumn='corrected',avgchannel='2048',avgtime='1e8',avgbaseline=True,coloraxis='corr',plotfile=plotfile,overwrite=True,showgui=False)
+plotms(vis=srcms,xaxis='scan',yaxis='imag',ydatacolumn='corrected',avgchannel='2048',avgtime='1e8',avgbaseline=True,coloraxis='corr',plotfile=plotfile_im,overwrite=True,showgui=False)
 
-'''
+## b) Avg over all baselines ##
 
+# tbavg creates new "single-baseline" ms
+if os.path.exists(srctbavg):
+    os.system('rm -rf '+srctbavg)
+print 'running tbavg on', srcms, '(bg subtracted) to create', srctbavg
+try:
+    tbavg(split,srcms,srctbavg,speed='fast',weight_mode='flat',datacolumn='corrected')
+except:
+    print 'tbavg failed, probably b/c table',srctbavg, 'is already open in the CASA cache - restart CASA to fix this problem'
+
+## c) Extract dynspec ##
+
+print 'Saving dynspec to files in directory',srctbavg+'.dynspec'
+spec = dyn_spec(srctbavg)
+if os.path.exists(srctbavg+'.dynspec'):
+    os.system('rm -rf ' + srctbavg + '.dynspec')
+saveTxt(spec,srctbavg)

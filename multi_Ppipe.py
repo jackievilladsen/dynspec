@@ -13,5 +13,5 @@ def load_dirs():
 dirs = load_dirs()
 for d in dirs:
     os.chdir(d)
-    print 'Running flagPband.py in directory', d
+    print 'Running Ppipe.py in directory', d
     execfile('/data/jrv/casa_utils/dynspec/Ppipe.py')

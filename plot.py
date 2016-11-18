@@ -191,7 +191,7 @@ class Dynspec:
         if not os.path.exists(filename):
             print 'Warning: bad dynspec filename:', filename
         else:
-            for pol in ['rr','ll']:
+            for pol in ['rr','ll','xx','yy','xy','yx']:
                 fname = filename + '/' + pol + '.npy'
                 if os.path.exists(fname):
                     print 'loading', fname
@@ -229,10 +229,13 @@ class Dynspec:
         tlist = self.make_xlist(t,self.dt())
         return tlist
         
-    def get_flist(self):
+    def get_flist(self,df=None):
         # return flist: flist is the number of frequency channels
         # that each row in the dynamic spectrum is separated from the first channel (so flist[0] is 0)
-        flist = self.make_xlist(self.f,self.df())
+        # df, if given, MUST = self.df()/whole number (so we can add blank channels)
+        if df is None:
+            df = self.df()
+        flist = self.make_xlist(self.f,df)
         return flist
 
     def gen_x(self,xlist,x0,dx):
@@ -262,7 +265,7 @@ class Dynspec:
         # in units of Hz
         self.f = self.gen_x(flist,f0,self.df())
     
-    def regrid_uniform(self):
+    def regrid_uniform(self,df=None):
         # regrid by adding blank rows and columns so that time and frequency sampling is uniform
         
         # make list of times that counts from 0 and includes times when there are no data
@@ -271,7 +274,7 @@ class Dynspec:
         tlen = len(t)
         
         # make list of frequencies that has no gaps
-        flist = self.get_flist()
+        flist = self.get_flist(df) 
         f = self.make_full_indlist(flist)
         flen = len(f)
         
@@ -295,8 +298,8 @@ class Dynspec:
     def add_dynspec(self,dyn):
         # merge another Dynspec object dyn with this object
         # regrid etc as necessary to make them both fit in the dynamic spectrum
-        # assume for now that they both have the same df and dt
-        # deal with fixing that later
+        # Current approach: dt must be the same, df must be integer multiples;
+        #  new dynspec will have alternating blank channels in portion from more coarsely gridded dynspec
         
         dt = self.dt()
         t1 = self.time.mjds()
@@ -307,8 +310,15 @@ class Dynspec:
         tlen = max(concatenate([tlist1,tlist2]))+1
         tlist = arange(tlen)
         
-        df = self.df()
-        ftemp = concatenate([self.f,dyn.f])
+        df = min(self.df(),dyn.df())
+        # round self.f and dyn.f to nearest integer multiple of df (to ensure they are on same frequency grid)
+        d_selff = df/2 - (self.f[0] + df/2) % df
+        d_dynf = df/2 - (dyn.f[0] + df/2) % df
+        selff = self.f + d_selff
+        dynf = dyn.f + d_dynf
+        if d_selff != 0 or d_dynf != 0:
+            print 'add_dynspec is adding', d_selff/1e6, 'MHz to self.f and', d_dynf/1e6, 'MHz to dyn.f to make even frequency grid'
+        ftemp = concatenate([selff,dynf])
         fmin = min(ftemp)
         fmax = max(ftemp)
         f = arange(fmin,fmax+df,df)
@@ -321,9 +331,9 @@ class Dynspec:
             spec.mask = ones((tlen,flen))
             print 'merging dynspec:', pol
             # add our own dynspec to big dynspec
-            spec = add_band(spec,tlist,f,self.spec[pol],tlist1,self.f)
+            spec = add_band(spec,tlist,f,self.spec[pol],tlist1,selff)
             # add new dynspec to big dynspec
-            spec = add_band(spec,tlist,f,dyn.spec[pol],tlist2,dyn.f)    
+            spec = add_band(spec,tlist,f,dyn.spec[pol],tlist2,dynf)
             # overwrite self.spec[pol] with new dynspec
             self.spec[pol] = spec
             spec = None
@@ -362,6 +372,18 @@ class Dynspec:
             self.spec[pol].mask *= chanmask
             self.spec[pol] = self.spec[pol] * (1-chanmask)
             print n, 'channels masked for', pol, '- new RMS:', self.get_rms(pol)*1000, 'mJy'
+
+    def mask_SNR(self,rmsfac=3.,func=real):
+        # returns dynspec with pixels masked that have SNR < rmsfac (where SNR is calculated relative to channel RMS in Imag component)
+        ds = deepcopy(self)
+        for pol in self.spec.keys():
+            rms_spec = self.rms_spec(pol=pol)
+            if pol in ['v','rc']:
+                lowSNR = abs(func(self.spec[pol])) < (rmsfac * rms_spec)  # creates masked array of True/False values showing where to mask
+            else:
+                lowSNR = func(self.spec[pol]) < (rmsfac * rms_spec)  # creates masked array of True/False values showing where to mask
+            ds.spec[pol] = ma.masked_where(lowSNR,self.spec[pol])
+        return ds
         
     def bin_dynspec(self,nt,nf):
         # returns a new dynspec object with binning in time or frequency
@@ -396,35 +418,36 @@ class Dynspec:
 
     def plot_dynspec(self,plot_params={}):
         # create an imshow color plot of the dynamic spectrum
-        # no binning
         
         func = plot_params.get('func',real) # part of complex visibility to plot (real, imag, abs, angle)
         pol = plot_params.get('pol','rr')
-        rmspol = plot_params.get('rmspol','ll')
+        rmspol = plot_params.get('rmspol',pol)
+        
         # generate automatic plot limits (units: flux in Jy)
-        smin = self.get_rms(rmspol)*1.5
-        smax = percentile(func(self.spec[pol]),99)*1.6 # get the 99th percentile flux
+        smin = self.get_rms(rmspol)*3 # default minimum flux on color scale is 3*RMS (median channel-based RMS)
+        smax = percentile(func(self.spec[pol]),99) # default max flux on color scale is (99th percentile flux)
 
         # plot params #
-        scale = plot_params.get('scale','log')    # options: log, linear       
+        scale = plot_params.get('scale','linear')    # options: log, linear       
         smin = plot_params.get('smin',smin)
         smax = plot_params.get('smax',smax)
-        dx = plot_params.get('dx',15.)             # spacing between x axis tick marks - time in minutes (default: 15 min)
-        dy = plot_params.get('dy',0.5)            # spacing between y axis tick marks - frequency in GHz (default: 0.5 GHz)
+        dx = plot_params.get('dx',0.)             # spacing between x axis tick marks - time in minutes (default: 0 --> auto)
+        dy = plot_params.get('dy',0.)             # spacing between y axis tick marks - frequency in GHz (default: 0 --> auto)
         tlims = self.time[0].mjds()+plot_params.get('tlims',array([0,1e6]))*60.             # min and max time to plot (in min since beginning of obs)
         flims = plot_params.get('flims',array([min(self.f),max(self.f)+1]))                 # min and max frequencies to plot (in Hz)
         ar0 = plot_params.get('ar0',1.0)
+        axis_labels = plot_params.get('axis_labels',['xlabel','ylabel','cbar','cbar_label'])
+        trim_mask = plot_params.get('trim_mask',True) # whether to cut off fully masked edges when making plot
         
         # clip dynspec to match tlims, flims
-        spec,t,f = clip_dynspec(func(self.spec[pol]),[tlims[0],tlims[1],flims[0],flims[1]],self.time.mjds(),self.f)
+        spec,t,f = clip_dynspec(func(self.spec[pol]),[tlims[0],tlims[1],flims[0],flims[1]],self.time.mjds(),self.f,trim_mask=trim_mask)
         t0 = TimeSec(t[0],format='mjds')
         
         ar = ar0*len(t)/len(f)
         
         ## Large plot (entire dynspec, binned) ##
-        figure()
-        ax=subplot(111,axisbg='k')
-        print pol,smin,smax
+        gca().set_axis_bgcolor('k')
+        print func.func_name,pol,smin,smax
         if scale=='log':
             imshow(log10(spec).T,aspect=ar,vmin=log10(smin),vmax=log10(smax),origin='lower',cmap='seismic')
             ds = round(log10(smax)-log10(smin),1)/5         # spacing between colorbar ticks
@@ -432,41 +455,52 @@ class Dynspec:
             ticklbls = (10**(ticks+3)).round().astype(int)  # colorbar tick labels
         else: # scale = 'linear'
             imshow(spec.T,aspect=ar,vmin=smin,vmax=smax,origin='lower',cmap='seismic')
-            ds = round(smax,2)/5                            # spacing between colorbar ticks
+            ds = round((smax-smin),2)/5                            # spacing between colorbar ticks
             if ds == 0.0:
-                ds = smax/10.
-            ticks = arange(smin,smax+ds,ds)                    # colorbar tick locations
-            ticklbls = ticks*1000                           # colorbar tick labels
+                ds = (smax-smin)/10.
+            tickmin = sign(smin) * (abs(smin) - (abs(smin) % ds))
+            tickmax = smax - (smax % ds)
+            ticks = arange(tickmin,tickmax+ds,ds)                    # colorbar tick locations
+            ticklbls = np.round(ticks*1000,1)                           # colorbar tick labels
         
-        # add colorbar and change labels to show log scale
-        cbar = colorbar()
-        if pol is 'rc':
-            cbar.set_label('Percent Circular Polarization')
-            ticks = arange(-1.,1.1,0.2)
-            ticklbls = arange(-100,101,20)
-            cbar.set_ticks(ticks)
-            cbar.set_ticklabels(ticklbls)
-        else:
-            cbar.set_label('Flux (mJy)')
-            cbar.set_ticks(ticks)
-            cbar.set_ticklabels(ticklbls)
+        # add colorbar and change labels to show scale
+        if 'cbar' in axis_labels:
+            cbar = colorbar(fraction=0.046, pad=0.04) # fraction=0.046,pad=0.04 - these numbers magically make colorbar same size as plot
+            if pol is 'rc':
+                if 'cbar_label' in axis_labels:
+                    cbar.set_label('Percent Circular Polarization')
+                ticks = arange(-1.,1.1,0.2)
+                ticklbls = arange(-100,101,20)
+                cbar.set_ticks(ticks)
+                cbar.set_ticklabels(ticklbls)
+            else:
+                if 'cbar_label' in axis_labels:
+                    cbar.set_label('Flux (mJy)')
+                cbar.set_ticks(ticks)
+                cbar.set_ticklabels(ticklbls)
 
         # label x axis in minutes
         t_minutes = (t-t0.mjds())/60.  # get time since beginning of observation in minutes
         xmax = max(t_minutes)
+        if dx == 0.:
+            dx = ceil(xmax/40)*10
         xtick_lbls = arange(0,xmax+dx,dx)
         tick_labels,tick_locs = make_tick_labels(xtick_lbls,t_minutes)
         xticks(tick_locs, tick_labels)
-        xlabel('Time in minutes since '+ t0.iso +' UTC')
+        if 'xlabel' in axis_labels:
+            xlabel('Time in minutes since '+ t0.iso +' UTC')
 
         # label y axis in GHz
         f_GHz = f/1.e9
+        if dy == 0.:
+            dy = ceil((max(f_GHz)-min(f_GHz))/4*2)/2
         ymin = round(min(f_GHz)/dy)*dy
         ymax = round(max(f_GHz)/dy)*dy
         ytick_lbls = arange(ymin,ymax+dy,dy)
         tick_labels,tick_locs = make_tick_labels(ytick_lbls,f_GHz)
         yticks(tick_locs, tick_labels)
-        ylabel('Frequency (GHz)')
+        if 'ylabel' in axis_labels:
+            ylabel('Frequency (GHz)')
 
     def clip(self,tmin=0,tmax=1e6,fmin=0,fmax=1.e12):
         # returns a new Dynspec object clipped to the time and frequency
@@ -491,7 +525,7 @@ class Dynspec:
 
     def rms_spec(self,pol='i',func=imag):
         # return the RMS spectrum (RMS in each channel) in the complex func of the specified pol
-        #  default is RMS of imag(LL)
+        #  default is RMS of imag(I)
         return std(func(self.spec[pol]),0)
 
     def tseries(self,fmin=0,fmax=1.e12,weight_mode='rms'):

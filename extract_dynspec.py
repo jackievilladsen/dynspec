@@ -1,4 +1,3 @@
-from dynspec.tbavg import *
 from numpy import *
 import pickle
 import os
@@ -23,12 +22,16 @@ def savePickle(spec,fileroot):
 
   
 def saveTxt(spec,fileroot):
-  # creates directory [fileroot].dynspec containing nu.dat, t.dat,
-  # rr.dat, rl.dat, lr.dat, ll.dat
+  # creates directory [fileroot].dynspec containing freq.dat, times.dat,
+  # and rr.npy, rl.npy, lr.npy, ll.npy (or xx.npy, xy.npy, ... for P band)
+  
   nu = spec['freqs']
   t = spec['times']
   
-  pol_list = ['rr','rl','lr','ll']
+  if max(nu) < 1.e9:
+    pol_list = ['xx','xy','yx','yy']
+  else:
+    pol_list = ['rr','rl','lr','ll']
   pol_data = {}
   for i in range(4):
     pol_data[pol_list[i]] = spec['data'][:,i,:]
