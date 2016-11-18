@@ -502,7 +502,7 @@ class Dynspec:
         if 'ylabel' in axis_labels:
             ylabel('Frequency (GHz)')
 
-    def clip(self,tmin=0,tmax=1e6,fmin=0,fmax=1.e12):
+    def clip(self,tmin=0,tmax=1e6,fmin=0,fmax=1.e12,trim_mask=True):
         # returns a new Dynspec object clipped to the time and frequency
         #  limits specified (tmin and tmax are time in minutes since beginning of obs,
         #  fmin and fmax are in Hz)
@@ -515,7 +515,7 @@ class Dynspec:
         
         # clip each pol's spec
         for pol in self.spec.keys():
-            ds.spec[pol],t,ds.f = clip_dynspec(self.spec[pol],[tmin,tmax,fmin,fmax],t_minutes,self.f)
+            ds.spec[pol],t,ds.f = clip_dynspec(self.spec[pol],[tmin,tmax,fmin,fmax],t_minutes,self.f,trim_mask=trim_mask)
 
         # calculate mjds times of new dynspec
         t_mjds = t*60. + mjds0

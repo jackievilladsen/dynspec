@@ -1,5 +1,5 @@
 '''
-plot_adleo_ds.py - Load ADLeo multi-band dynamic spectrum for a given epoch, bin to specified resolution, and plot to file
+plot_ds_vlba.py - Load ADLeo VLA multi-band dynamic spectrum for a given epoch, bin to specified resolution, and plot with VLBA time series
 '''
 
 #from dynspec import load_dict
@@ -15,7 +15,6 @@ smax = 0.02
 
 src = 'ADLeo'
 epochlist = ['3','4','5']
-epochlist = ['3']
 
 params = {'legend.fontsize': 'small',
           'axes.titlesize': 'medium',
@@ -32,15 +31,9 @@ for epoch in epochlist:
 
     # load multi-band dynspec
     savefile = savedir + src + '_' + epoch + '.dynspec.pickle'
-    ds_dict = pickle.load( open( savefile, "rb" ) )
-    ds = ds_dict['VLA']
-    dsVLBA = ds_dict['VLBA']
-
-    ### Calculate and plot VLBA time series ###
+    ds = pickle.load( open( savefile, "rb" ) )
     
-    
-    
-    ### Plot VLA dynspec ###
+    ### Plot dynspec ###
 
     # bin dynspec to improve signal-to-noise ratio
     nt = n_sec/6  # number of integrations to bin together (current resolution is 6 sec)

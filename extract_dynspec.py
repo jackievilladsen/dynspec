@@ -30,10 +30,12 @@ def saveTxt(spec,fileroot):
   
   if max(nu) < 1.e9:
     pol_list = ['xx','xy','yx','yy']
+  elif max(nu) > 7.e9: # VLBA data, I just have rr and ll
+    pol_list = ['rr','ll']
   else:
     pol_list = ['rr','rl','lr','ll']
   pol_data = {}
-  for i in range(4):
+  for i in range(len(pol_list)):
     pol_data[pol_list[i]] = spec['data'][:,i,:]
 
   savedir = fileroot + '.dynspec'
