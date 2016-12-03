@@ -536,10 +536,10 @@ class Dynspec:
         #  default is RMS of imag(I)
         return std(func(self.spec[pol]),0)
 
-    def tseries(self,fmin=0,fmax=1.e12,weight_mode='rms'):
+    def tseries(self,fmin=0,fmax=1.e12,weight_mode='rms',trim_mask=False):
         # return a Dynspec object that is a time series integrated from fmin to fmax
         # weight_mode: 'rms' --> weight by 1/rms^2; anything else --> no weights
-        ds = self.clip(fmin=fmin,fmax=fmax)
+        ds = self.clip(fmin=fmin,fmax=fmax,trim_mask=trim_mask)
         tseries = Dynspec()
         tseries.time = ds.time
         tseries.f = mean(ds.f)

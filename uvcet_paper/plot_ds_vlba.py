@@ -19,7 +19,6 @@ scale = 'log'
 
 src = 'UVCet'
 epochlist = ['3','4','5']
-epochlist = ['3']
 
 params = {'legend.fontsize': 'small',
           'axes.titlesize': 'medium',
@@ -54,7 +53,7 @@ for epoch in epochlist:
     # Calculate VLBA time series
     dsVLBA_bin = dsVLBA.bin_dynspec(nt=nt_VLBA,nf=nf_VLBA)
     tseriesVLBA = dsVLBA_bin.tseries(weight_mode='flat')
-    t = dsVLBA_bin.get_tlist() * dsVLBA.dt()/60.
+    t = tseriesVLBA.get_tlist() * tseriesVLBA.dt()/60.
     iflux = tseriesVLBA.spec['i']*1e3
     vflux = tseriesVLBA.spec['v']*1e3
     flux_err = std(imag(iflux))
@@ -77,17 +76,18 @@ for epoch in epochlist:
     ds_bin.plot_dynspec(plot_params=pp)
     ax.xaxis.set_visible(False)
     ax = axes([0,0.97,1,0.2])
-    #ax=axes([0,0.97,0.914,0.2]) #2: 0.96
-    #axhline(0,color='k')
-    #errorbar(t,iflux,flux_err)
-    #plot(t,vflux)
-    #xlim([min(t),max(t)])
-    #ylabel('VLBA Flux (mJy)')
     dsVLBA_bin.plot_dynspec(plot_params=ppX)
     cb = gca().images[-1].colorbar
     cb.remove()
+    ax.xaxis.set_visible(False)
+    ax=axes([0,1.17,0.914,0.2]) #2: 0.96
+    axhline(0,color='k')
+    errorbar(t,iflux,flux_err)
+    plot(t,vflux)
+    xlim([min(t),max(t)])
+    ylabel('VLBA Flux (mJy)')
     title(src + ' ' + epoch)
-    gca().xaxis.set_visible(False)
+    ax.xaxis.set_visible(False)
     ax = axes([0,0,1,0.2])
     dsP_bin.plot_dynspec(plot_params=ppP)
     cb = gca().images[-1].colorbar

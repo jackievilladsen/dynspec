@@ -57,6 +57,8 @@ smallms = sb + '.star.small.ms'
 smalltbavg = sb + '.star.small_tbavg.ms'
 smallim = sb + '.smallim'
 dirtyim='dirty'
+bgmodel0 = smallim + '.bgmodel0'
+bgmodel1 = smallim + '.bgmodel1'
 
 if os.path.exists(srcms):
     fields = get_fields(srcms,vishead) # field names
@@ -72,6 +74,11 @@ phasecen=get_phasecen()
 clean_scans,clean_spws = get_clean_scans()
 threshold='0.2mJy'
 imsize_d=1024
+
+pixel_size,imsize = im_params(srcms)
+if imsize > 8192:
+    print 'Warning: requested imsize of',imsize,'pix is large, instead setting to imsize=8192 (may cut off full FOV)'
+    imsize = 8192
 
 
 ### 2) MS FILE CREATION ###
@@ -107,6 +114,7 @@ if not os.path.exists(srcms):  # skip this step if srcms already exists
     summary_3 = field_flag_summary(srcms,flagdata)
 elif makebig:
     clearcal(srcms) # erase corrected data column to remove source subtraction from previous pipeline runs
+    #fixvis(vis=srcms,outputvis=srcms,phasecenter=phasecen)
     if overwrite:
         print srcms, 'already exists, now deleting MODEL_DATA and CORRECTED_DATA and shifting phase center to', phasecen
         fixvis(vis=srcms,outputvis=srcms,phasecenter=phasecen)
@@ -133,7 +141,7 @@ else:
     # erase corrected data column to remove source subtraction from previous pipeline runs
     clearcal(smallms)
 
-
+'''
 
 ### 3) CREATE BACKGROUND SOURCE MODEL FROM SMALLMS ###
 
@@ -150,12 +158,12 @@ print 'Scans and spws used as flare-free for',sb,'(blank is all): scan=\''+clean
 
 
 ## b) Image and clean smallms in non-flare scans/spws w/ nterms=2 ##
-
 # get parameters for imaging
 pixel_size,imsize = im_params(srcms)
 if imsize > 8192:
     print 'Warning: requested imsize of',imsize,'pix is large, instead setting to imsize=8192 (may cut off full FOV)'
     imsize = 8192
+
 # measure RMS of Stokes Q&U dirty image during non-flaring scans
 #  (when subtracting BG srcs later we assume unpolarized, so this will prevent overcleaning polarized BG src)
 if len(glob(dirtyim+'.*'))>0:
@@ -207,7 +215,7 @@ immath(imagename=[model0,cen_mask],outfile=bgmodel0,expr='IM0*(1-IM1)')
 immath(imagename=[model1,cen_mask],outfile=bgmodel1,expr='IM0*(1-IM1)')
 # bgmodel0,1 are the same as model0,1 but with the center pixels removed (radius 5 pixels)
 
-
+'''
 ### 4) SUBTRACT BG AND CREATE DYNSPEC ###
 
 mslist = [smallms]
@@ -248,7 +256,7 @@ for (ms,tb) in zip(mslist,tblist):
 
 
 ## d) Diagnostic plots of BG-subtracted smallms - time series & dirty image ##
-
+'''
 # create dirty images of smallms w/o BG
 dirty_nobg=sb+'.dirty_nobg'
 imfile = plotdir+dirty_nobg+'.jpg'
@@ -263,7 +271,7 @@ zoom={'blc':[blc,blc],'trc':[trc,trc]}
 raster={'file':dirty_nobg+'.image','colormap':'Greyscale 1','range':[0,rmsQUV*0.005]}
 imview(raster=raster,out=imfile)
 imview(raster=raster,out=imfile2,zoom=zoom)
-
+'''
 # plot tseries for smallms w/o BG
 plotfile = plotdir + sb + '_tseries.png'
 plotfile_im = plotdir + sb + '_im_tseries.png' # make sure there is no variation in Im(vis)
