@@ -385,9 +385,12 @@ class Dynspec:
             ds.spec[pol] = ma.masked_where(lowSNR,self.spec[pol])
         return ds
         
-    def bin_dynspec(self,nt,nf):
+    def bin_dynspec(self,nt,nf,mask_partial=1.):
         # returns a new dynspec object with binning in time or frequency
         # nt and nf are the number of time and frequency channels to bin together
+        # mask_partial: if <1, mask pixels in new dynspec where a fraction of the contributing
+        #               pixels in the original dynspec > mask_partial (e.g. 0.5) were masked
+        # A lower value for mask_partial will flag more data
         
         # create empty Dynspec object for new binned dynamic spectrum
         ds = Dynspec()
@@ -401,6 +404,11 @@ class Dynspec:
         for pol in self.spec.keys():
             # bin dynamic spectrum
             ds.spec[pol] = rebin2d_ma(self.spec[pol],(nt,nf))
+            if mask_partial < 1.:
+                frac_masked = rebin2d_ma(self.spec[pol].mask,(nt,nf))
+                frac_too_high = frac_masked > mask_partial
+                new_mask = ma.mask_or(ds.spec[pol].mask,frac_too_high)
+                ds.spec[pol].mask = new_mask
         
         # create new time list with center times for each bin
         t = self.time.mjds()

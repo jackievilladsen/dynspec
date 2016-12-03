@@ -285,3 +285,21 @@ def dynspec_LR(msname):
     for i in range(4):
         pol_data[pol_list[i]] = spec['data'][:,i,:]
     return t,nu,pol_data
+
+def scan_reindex(vis,gap=50.):
+   # replace scan numbers to count up from 1, changing every time there is a gap in time
+   #   greater than gap (in seconds) between entries
+   # assumes ms is already chronological; does not account for multiple fields
+   # (but should be fine w/ multiple fields if gap < slew time)
+   t = tbtool()
+   t.open(vis, nomodify=False)
+   scanlist0 = t.getcol('SCAN_NUMBER')
+   times = t.getcol('TIME')
+   scanlist = numpy.ones(scanlist0.shape)
+   dt = times[1:]-times[:-1]   # should be in seconds
+   scan_inc = numpy.cumsum(dt>gap)
+   scanlist[1:] += scan_inc
+   scanlist = scanlist.astype(int)
+   t.putcol('SCAN_NUMBER',scanlist)
+   t.unlock()
+   t.close()

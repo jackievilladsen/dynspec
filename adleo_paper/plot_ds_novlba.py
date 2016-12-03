@@ -1,5 +1,5 @@
 '''
-plot_adleo_ds.py - Load ADLeo multi-band dynamic spectrum for a given epoch, bin to specified resolution, and plot to file
+plot_ds_vlba.py - Load ADLeo VLA multi-band dynamic spectrum for a given epoch, bin to specified resolution, and plot with VLBA time series
 '''
 
 #from dynspec import load_dict
@@ -15,7 +15,7 @@ smax = 0.02
 
 src = 'ADLeo'
 epochlist = ['3','4','5']
-epochlist = ['3']
+epoch=['3']
 
 params = {'legend.fontsize': 'small',
           'axes.titlesize': 'medium',
@@ -27,52 +27,33 @@ rcParams.update(params)
 
 savedir = '/data/jrv/adleo_paper/'
 
-nt = n_sec/6  # number of integrations to bin together (current resolution is 6 sec)
-nf = n_MHz/2  # number of channels to bin together (current resolution is 2 MHz)
-
 # Cycle through epochs
 for epoch in epochlist:
 
-    close('all')
-    figure(figsize=(6,6))
-
     # load multi-band dynspec
     savefile = savedir + src + '_' + epoch + '.dynspec.pickle'
-    ds_dict = pickle.load( open( savefile, "rb" ) )
-    ds = ds_dict['VLA']
-    dsVLBA = ds_dict['VLBA']
+    ds = pickle.load( open( savefile, "rb" ) )
+
     
-    # Calculate VLBA time series
-    dsVLBA = dsVLBA.bin_dynspec(nt=nt,nf=1)
-    dsVLBA = dsVLBA.tseries(weight_mode='flat')
-    t = dsVLBA.get_tlist() * dsVLBA.dt()/60.
-    iflux = dsVLBA.spec['i']*1e3
-    vflux = dsVLBA.spec['v']*1e3
-    flux_err = std(imag(iflux))
-    
+    ### Plot dynspec ###
+
     # bin dynspec to improve signal-to-noise ratio
-    #ds_bin = ds.bin_dynspec(nt,nf)
-    ds_bin = ds.bin_dynspec(nt,nf,mask_partial=0.75) # will flag if 3/4 of contributing pixels flagged --> 50% sensitivity
+    nt = n_sec/6  # number of integrations to bin together (current resolution is 6 sec)
+    nf = n_MHz/2  # number of channels to bin together (current resolution is 2 MHz)
+    ds_bin = ds.bin_dynspec(nt,nf)
+    ds_bin = ds.bin_dynspec(nt,nf,mask_partial=0.5)
     # nt=15, nf=8 comes from high-resolution plots of bright burst
     # maybe use lower res for all bands then do second plot with high res of just bright burst
-    
+
     #smax = min(ds_bin.rms_spec('v'))*rmsfac
     smin = -smax
-    pp = {'pol':'v','smin':smin,'smax':smax,'func':real}
-
-    # plot tseries above dynspec (time axis aligned) and save figure
-    # to do: set x-axis limits for time series
-    clf()
-    ax=axes([0,0,1,1])
+    pp = {'pol':'v','smin':smin,'smax':smax}
+    
+    # create figure and save
+    close('all')
+    figure(figsize=(6,6))
     ds_bin.plot_dynspec(plot_params=pp)
-    ax=axes([0,0.96,0.915,0.2]) #2: 0.96
-    axhline(0,color='k')
-    errorbar(t,iflux,flux_err)
-    plot(t,vflux)
-    xlim([min(t),max(t)])
-    ylabel('VLBA Flux (mJy)')
     title(src + ' ' + epoch)
-    gca().xaxis.set_visible(False)
     figfile = savedir + src + '_' + epoch + '_dynspec.pdf'
     savefig(figfile,bbox_inches='tight')
 

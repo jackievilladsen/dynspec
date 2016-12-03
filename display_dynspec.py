@@ -36,7 +36,8 @@ plot_params_dict = {
 #'15A-416_ADLeo_3': {'flims':array([1.e9,1.9e9]),'dx':30,'smin':0.01,'smax':0.1,'nt':15,'nf':8},
 #'15A-416_ADLeo_3': {'dx':30,'smin':0.01,'smax':0.1,'nt':15,'nf':8},
 '15A-416_ADLeo_3': {'dx':30,'smin':0,'smax':0.005,'nt':300,'nf':64,'scale':'linear'},
-'15A-416_ADLeo_4': {'flims':array([1.e9,1.9e9]),'dx':30,'smin':0.02,'smax':0.2,'nt':8},
+#'15A-416_ADLeo_4': {'flims':array([1.e9,1.9e9]),'dx':30,'smin':0.02,'smax':0.2,'nt':8}, # L band
+'15A-416_ADLeo_4': {'flims':array([1.6e9,4.0e9]),'tlims':array([133.,145.]),'dx':5,'smin':-0.03,'smax':0.03,'nt':5,'nf':32,'scale':'linear'}, # short burst
 '15A-416_ADLeo_5': {'dx':30,'smin':0.005,'smax':0.05,'nt':60,'nf':32},
 '15A-416_EQPeg_1': {'smin':0,'smax':0.005,'nt':150,'nf':64,'scale':'linear'},
 '15A-416_EQPeg_2': {'smin':0.002,'smax':0.02,'nt':60,'nf':32},
@@ -69,7 +70,7 @@ V_params_dict = {
 '13A-423_ADLeo_3': {'smin':-0.0025,'smax':0.0025,'scale':'linear'},
 '13A-423_ADLeo_4': {'smin':-0.0025,'smax':0.0025,'scale':'linear'},
 #'15A-416_ADLeo_3': {'flims':array([1.e9,1.9e9]),'dx':30,'smin':-0.025,'smax':0.025,'scale':'linear'},
-'15A-416_ADLeo_4': {'flims':array([1.e9,1.9e9]),'dx':30,'smin':-0.07,'smax':0.07,'scale':'linear'},
+#'15A-416_ADLeo_4': {'flims':array([1.e9,1.9e9]),'dx':30,'smin':-0.07,'smax':0.07,'scale':'linear'},
 '15A-416_ADLeo_5': {'dx':30,'smin':-0.01,'smax':0.01,'scale':'linear'},
 '15A-416_EQPeg_2': {'smin':-0.01,'smax':0.01,'scale':'linear'},
 '15A-416_UVCet_1': {'pol':'v','tlims':array([40.,120.]),'dx':10,'smin':-.05,'smax':.05,'scale':'linear'},
@@ -94,7 +95,7 @@ I_params_dict = {
 '13A-423_ADLeo_3': {'smin':0,'smax':0.0025,'scale':'linear'},
 '13A-423_ADLeo_4': {'smin':0,'smax':0.0025,'scale':'linear'},
 #'15A-416_ADLeo_3': {'flims':array([1.e9,1.9e9]),'dx':30,'smin':0.0025,'smax':0.025},
-'15A-416_ADLeo_4': {'flims':array([1.e9,1.9e9]),'dx':30,'smin':0.01,'smax':0.1},
+#'15A-416_ADLeo_4': {'flims':array([1.e9,1.9e9]),'dx':30,'smin':0.01,'smax':0.1},
 '15A-416_ADLeo_5': {'dx':30,'smin':0.0025,'smax':0.025},
 '15A-416_EQPeg_2': {'smin':0.001,'smax':0.01},
 '15A-416_UVCet_1': {'pol':'i','tlims':array([40.,120.]),'dx':10,'smin':.01,'smax':.05},
@@ -118,7 +119,7 @@ rc_params_dict = {
 '13A-423_ADLeo_3': {'smin':-1,'smax':1,'scale':'linear'},
 '13A-423_ADLeo_4': {'smin':-1,'smax':1,'scale':'linear'},
 #'15A-416_ADLeo_3': {'flims':array([1.e9,1.9e9]),'dx':30,'smin':-1,'smax':1,'scale':'linear'},
-'15A-416_ADLeo_4': {'flims':array([1.e9,1.9e9]),'dx':30,'smin':-1,'smax':1,'scale':'linear'},
+#'15A-416_ADLeo_4': {'flims':array([1.e9,1.9e9]),'dx':30,'smin':-1,'smax':1,'scale':'linear'},
 '15A-416_ADLeo_5': {'dx':30,'smin':-1,'smax':1,'scale':'linear'},
 '15A-416_EQPeg_2': {'smin':-1,'smax':1,'scale':'linear'},
 '15A-416_UVCet_1': {'tlims':array([40.,120.]),'dx':10,'smin':-1,'smax':1,'scale':'linear'},
@@ -212,17 +213,15 @@ except:
             ds.add_dynspec(ds_band)
         ds_band = None
 
-#ds.mask_RFI(8.)
-ds.spec['v'] = (ds.spec['rr']-ds.spec['ll'])/2
-ds.spec['i'] = (ds.spec['rr']+ds.spec['ll'])/2
-#ds.spec['rc'] = real(ds.spec['v'])/real(ds.spec['i'])
-
 ds_bin = ds.bin_dynspec(nt,nf)
+ds_bin.spec['v'] = (ds_bin.spec['rr']-ds_bin.spec['ll'])/2
+ds_bin.spec['i'] = (ds_bin.spec['rr']+ds_bin.spec['ll'])/2
 ds_bin.spec['rc'] = real(ds_bin.spec['v'])/real(ds_bin.spec['i'])
 #ds_bin.mask_RFI(5.)
 
 pol_dict = {'ll':'LCP','rr':'RCP','v':'StokesV','i':'StokesI','rc':'rc'}
 for pol in ['ll','rr','i','v','rc']:
+    close('all')
     if pol is 'v':
         pp = V_plot_params
     elif pol is 'i':
@@ -239,7 +238,17 @@ for pol in ['ll','rr','i','v','rc']:
     if os.path.exists(plotfile):
         os.system('rm -f ' + plotfile)
     savefig(plotfile,bbox_inches='tight')
-
+    
+    clf()
+    pp['func']=imag
+    ds_bin.plot_dynspec(plot_params=pp)
+    p = pol_dict[pol]
+    title('Imag('+p+') Dynamic Spectrum')
+    plotfile = 'plots/'+p+'dynspec_imag.png'
+    if os.path.exists(plotfile):
+        os.system('rm -f ' + plotfile)
+    savefig(plotfile,bbox_inches='tight')
+    pp['func']=real
 
 
 '''
