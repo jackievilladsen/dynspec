@@ -95,8 +95,8 @@ for survey in survey_list:
     semilogx(Srange[survey],dN_dS[survey],'.-')
 #legend(leg_list)
 gca().set_prop_cycle(None)
-for survey in survey_list:
-    semilogx(Srange[survey],dN_dS_imag[survey],'-')
+#for survey in survey_list:
+#    semilogx(Srange[survey],dN_dS_imag[survey],'-')
 axis([smin,2,0,0.3])
 xlabel('Flux S (Jy) at 1 pc')
 ylabel('Fraction of time brighter than S')

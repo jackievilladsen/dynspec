@@ -57,6 +57,8 @@ for obs in filelist:
     ds_obs = None
     for f in ds_files:
         band = get_band(f)
+        if band == 'X' or band == 'P':
+            continue
         params={'filename':f,'uniform':True}
         ds = Dynspec(params)
         ds.spec['i'] = (ds.spec['rr']+ds.spec['ll'])/2

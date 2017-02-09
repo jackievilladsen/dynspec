@@ -22,10 +22,10 @@ mpl.rcParams['image.interpolation'] = 'hanning'
 # add tailored parameters (such as time range) here
 plot_params_dict = {
 #'15A-416_ADLeo_4': {'flims':array([1.e9,1.9e9]),'dx':30,'smin':0.02,'smax':0.2,'nt':8}, # L band
-'15A-416_ADLeo_4': {'dx':2.0,'dy':0.1,'smin':-0.03,'smax':0.03,'nt':4,'nf':32,'scale':'linear'}, # short burst
+'15A-416_ADLeo_5': {'dx':2.0,'dy':0.1,'smin':-0.03,'smax':0.03,'nt':4,'nf':32,'scale':'linear'}, # short burst
 }
-flims = array([1.6e9,4.0e9])
-tlims = array([133.,145.])
+flims = array([0.2e9,0.5e9])
+tlims = array([0.,1000.])
 
 ##### USER-DEFINED PARAMETERS #####
 
@@ -74,7 +74,7 @@ rcpp = {'scale':'linear','smin':-1,'smax':1}
 rc_plot_params = pp.copy()
 rc_plot_params.update(rcpp)
 
-bands = plot_params.get('bands',['S','L'])
+bands = plot_params.get('bands',['P'])
 
 # number of time and frequency channels to bin together
 nt = plot_params.get('nt',4)
@@ -99,6 +99,8 @@ except:
         if band=='L':
             ds_band = ds_band.bin_dynspec(nt=1,nf=2) # bin L-band dynamic spectrum to 2-MHz channels
             ds_band.f -= 0.5e6   # this is a quick fix; figure out how to address this better later
+        if band=='P':
+            ds_band.mask_RFI(rmsfac=1.5)
         if ds is None:
             ds = deepcopy(ds_band)
         else:
@@ -107,8 +109,8 @@ except:
 
 ds_bin = ds.bin_dynspec(nt,nf)
 ds_bin = ds_bin.clip(tmin=tlims[0],tmax=tlims[1],fmin=flims[0],fmax=flims[1])
-ds_bin.spec['v'] = (ds_bin.spec['rr']-ds_bin.spec['ll'])/2
-ds_bin.spec['i'] = (ds_bin.spec['rr']+ds_bin.spec['ll'])/2
+ds_bin.spec['v'] = (ds_bin.spec['xy']-ds_bin.spec['yx'])/(2.j)
+ds_bin.spec['i'] = (ds_bin.spec['xx']+ds_bin.spec['yy'])/2
 ds_bin.spec['rc'] = real(ds_bin.spec['v'])/real(ds_bin.spec['i'])
 #ds_bin.mask_RFI(5.)
 '''
@@ -145,11 +147,11 @@ for pol in ['ll','rr','i','v','rc']:
 '''
 
 # clip out RCP burst dynspec
-dsR = ds_bin.clip(tmin=2.5,tmax=4.5,fmin=1.6e9,fmax=2.3e9)
+dsR = ds_bin.clip(tmin=182,tmax=193,fmin=0.27e9,fmax=0.38e9)
 clf()
-dsR.plot_dynspec(plot_params={'pol':'rr','smin':0.01,'df':0.1,'dx':0.2,'dy':0.1})
-savefig('plots/dsR.pdf',bbox_inches='tight')
-
+dsR.plot_dynspec(plot_params={'pol':'v','smin':-0.08,'smax':0.08,'dx':2,'dy':0.01})
+savefig('plots/dsP_epoch5.pdf',bbox_inches='tight')
+'''
 # calculate flux-weighted mean time
 t = dsR.get_tlist() * dsR.dt() # time in seconds
 f = dsR.f/(1.e6)  # frequency in MHz
@@ -179,7 +181,6 @@ print 'Drift rate:', drift_rate, 'MHz/sec'
 
 #show()
 
-
 tseries1 = dsR.tseries(fmin=1.6e9,fmax=1.8e9)
 tseries2 = dsR.tseries(fmin=1.8e9,fmax=2.0e9)
 t = tseries1.get_tlist() * tseries1.dt()
@@ -189,11 +190,4 @@ xlabel('Time in seconds')
 ylabel('Flux (mJy) in RCP')
 legend(('1.6-1.8 GHz','1.8-2 GHz'))
 savefig('plots/drift.pdf',bbox_inches='tight')
-
-### LCP portion of burst ###
-
-dsL = ds_bin.clip(tmin=0,tmax=8,fmin=1.6e9,fmax=4.0e9)
-dsL = dsL.bin_dynspec(nt=2,nf=2)
-clf()
-dsL.plot_dynspec(plot_params={'pol':'v','smin':-0.015,'smax':0.015,'df':0.1,'dx':0.5,'dy':0.1,'scale':'linear'})
-savefig('plots/dsL.pdf',bbox_inches='tight')
+'''

@@ -6,7 +6,7 @@ test_plot.py: Script to test functionality of the Dynspec class as I'm
 import os
 from dynspec.plot import *
 integration_time = 600
-survey = 'Shi'
+survey = 'Phi'
 
 # tested spline interpolation to smooth tseries
 # From time series z (a masked array):

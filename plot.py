@@ -365,8 +365,8 @@ class Dynspec:
     def mask_RFI(self,rmsfac=5.):
         print 'masking chans w/ rms >',rmsfac,'* median rms'
         for pol in self.spec.keys():
-            rms = std(self.spec[pol],0)  # rms vs freq
-            medrms = median(rms)
+            rms = std(imag(self.spec[pol]),0)  # rms vs freq
+            medrms = ma.median(rms)
             chanmask = (rms > rmsfac*medrms)
             n = sum(chanmask)
             self.spec[pol].mask *= chanmask

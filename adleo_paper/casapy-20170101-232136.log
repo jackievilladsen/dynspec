@@ -1,0 +1,1256 @@
+2017-01-01 23:21:37	INFO	casa::::	---
+2017-01-01 23:21:37	INFO	casa::::	CASA Version 4.6.0-REL (r36590)
+2017-01-01 23:21:37	INFO	casa::::	  Tagged on: 2016-04-01 11:11:00 -0400 (Fri, 01 Apr 2016)
+2017-01-01 23:21:42	INFO	clean::::	
+2017-01-01 23:21:42	INFO	clean::::+	##########################################
+2017-01-01 23:21:42	INFO	clean::::+	##### Begin Task: clean              #####
+2017-01-01 23:21:42	INFO	clean::::	clean(vis="/data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms",imagename="/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive",outlierfile="",field="",spw="",
+2017-01-01 23:21:42	INFO	clean::::+	        selectdata=True,timerange="",uvrange="",antenna="",scan="",
+2017-01-01 23:21:42	INFO	clean::::+	        observation="",intent="",mode="mfs",resmooth=False,gridmode="",
+2017-01-01 23:21:42	INFO	clean::::+	        wprojplanes=-1,facets=1,cfcache="cfcache.dir",rotpainc=5.0,painc=360.0,
+2017-01-01 23:21:42	INFO	clean::::+	        aterm=True,psterm=False,mterm=True,wbawp=False,conjbeams=True,
+2017-01-01 23:21:42	INFO	clean::::+	        epjtable="",interpolation="linear",niter=500,gain=0.1,threshold="0.0mJy",
+2017-01-01 23:21:42	INFO	clean::::+	        psfmode="clark",imagermode="csclean",ftmachine="mosaic",mosweight=False,scaletype="SAULT",
+2017-01-01 23:21:42	INFO	clean::::+	        multiscale=[0],negcomponent=-1,smallscalebias=0.6,interactive=True,mask=[],
+2017-01-01 23:21:42	INFO	clean::::+	        nchan=-1,start=0,width=1,outframe="",veltype="radio",
+2017-01-01 23:21:42	INFO	clean::::+	        imsize=[256, 256],cell="0.00028arcsec",phasecenter="",restfreq="",stokes="I",
+2017-01-01 23:21:42	INFO	clean::::+	        weighting="natural",robust=0.0,uvtaper=False,outertaper=[''],innertaper=['1.0'],
+2017-01-01 23:21:42	INFO	clean::::+	        modelimage="",restoringbeam=[''],pbcor=False,minpb=0.2,usescratch=False,
+2017-01-01 23:21:42	INFO	clean::::+	        noise="1.0Jy",npixels=0,npercycle=10,cyclefactor=5,cyclespeedup=-1,
+2017-01-01 23:21:42	INFO	clean::::+	        nterms=1,reffreq="",chaniter=False,flatnoise=True,allowchunk=False)
+2017-01-01 23:21:42	INFO	clean::::	nchan=-1 start=0 width=1
+2017-01-01 23:21:42	INFO	clean::::	Use default channelization for clean
+2017-01-01 23:21:42	INFO	clean::::	clean image: /data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive
+2017-01-01 23:21:42	INFO	clean::::	FTMachine used is  ft 
+2017-01-01 23:21:43	INFO	imager::setDataOnThisMS()	Performing selection on MeasurementSet : /data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms
+2017-01-01 23:21:43	INFO	imager::setDataOnThisMS()	Selecting on fields : 0
+2017-01-01 23:21:43	INFO	imager::setDataOnThisMS()	Selecting on spectral windows expression :*
+2017-01-01 23:21:43	INFO	imager::setDataOnThisMS()	Selected all 1393824 rows
+2017-01-01 23:21:43	INFO	imager::setDataOnThisMS()	Selected : [4 chans in spw 0] [4 chans in spw 1] [4 chans in spw 2] [4 chans in spw 3] [4 chans in spw 4] [4 chans in spw 5] [4 chans in spw 6] [4 chans in spw 7]
+2017-01-01 23:21:44	INFO	imager::defineimage()	Defining image properties:nx=256 ny=256 cellx='0.00028arcsec' celly='0.00028arcsec' stokes=I' mode=MFS nchan=-1 start=0 step=1 spwids=[-1] fieldid=-1 facets=1 frame=5 distance='0'
+2017-01-01 23:21:44	INFO	imager::defineimage()	 phaseCenter='10:19:35.72,   19.52.11.37, ' mStart='Radialvelocity: 0' qStep='0 '' mFreqStart='Frequency: 0
+2017-01-01 23:21:44	SEVERE	MeasTable::dUTC(Double) (file /var/rpmbuild/BUILD/casa-prerelease/casa-prerelease-4.6.0/casacore/measures/Measures/MeasTable.cc, line 4396)	Leap second table TAI_UTC seems out-of-date. 
+2017-01-01 23:21:44	SEVERE	MeasTable::dUTC(Double) (file /var/rpmbuild/BUILD/casa-prerelease/casa-prerelease-4.6.0/casacore/measures/Measures/MeasTable.cc, line 4396)+	Until the table is updated (see the CASA documentation or your system admin),
+2017-01-01 23:21:44	SEVERE	MeasTable::dUTC(Double) (file /var/rpmbuild/BUILD/casa-prerelease/casa-prerelease-4.6.0/casacore/measures/Measures/MeasTable.cc, line 4396)+	times and coordinates derived from UTC could be wrong by 1s or more.
+2017-01-01 23:21:45	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:21:45	INFO	Imager::setvp() 	Sky position tolerance is 180 degrees
+2017-01-01 23:21:45	INFO	Imager::setvp() 	Using system default voltage patterns for each telescope
+2017-01-01 23:21:45	INFO	imager::makeimage() 	Calculating image (without full skyequation)
+2017-01-01 23:21:48	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:21:48	INFO	imager::weight()	Weighting MS: Imaging weights will be changed
+2017-01-01 23:21:48	INFO	imager::weight()	Natural weighting
+2017-01-01 23:21:48	INFO	clean::::	Used mask(s) : [''] to create mask image(s) : /data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask
+2017-01-01 23:21:48	INFO	imager::setoptions() 	Setting processing options
+2017-01-01 23:21:48	INFO	clean::::	No model found. Making empty initial model : /data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.model
+2017-01-01 23:21:50	INFO	imager::clean()	Using multifield Clark clean
+2017-01-01 23:21:50	INFO	imager::createFTMachine() 	Multiple fields or facets: transforms will be padded by a factor 1.2
+2017-01-01 23:21:50	INFO	imager::createFTMachine() 	Performing interferometric gridding...
+2017-01-01 23:21:50	INFO	imager::clean()	Clean gain = 0.1, Niter = 0, Threshold = 0 mJy
+2017-01-01 23:21:50	INFO	imager::clean()	Continuing deconvolution
+2017-01-01 23:22:02	INFO	ImageSkyModel::makeApproxPSFs	bmaj: 0.00208072", bmin: 0.000895543", bpa: -4.28827 deg
+2017-01-01 23:22:14	INFO	MFCleanImageSkyModel::solve	Final maximum residual = 0.00114308
+2017-01-01 23:22:14	INFO	MFCleanImageSkyModel::solve	Model 0: max, min residuals = 0.00114308, -0.000229504 clean flux 0
+2017-01-01 23:22:14	INFO	imager::clean()	Threshhold not reached yet.
+2017-01-01 23:22:14	INFO	imager::clean()	Fitted beam used in restoration: 0.00208072 by 0.000895543 (arcsec) at pa -4.28827 (deg) 
+2017-01-01 23:22:36	INFO	Imager::imagecoordinates() 	Center frequency = 8.41657 GHz, synthesized continuum bandwidth = 0.256023 GHz
+2017-01-01 23:22:36	INFO	imager::clean()	Clean gain = 0.1, Niter = 10, Threshold = 0 mJy
+2017-01-01 23:22:36	INFO	imager::clean()	Starting deconvolution
+2017-01-01 23:22:36	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 0
+2017-01-01 23:22:36	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0  ,   peak residual x 0.8 ] 
+2017-01-01 23:22:36	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.00114308, cleaning down to 0.000914462
+2017-01-01 23:22:36	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:22:36	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.00114308
+2017-01-01 23:22:36	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:22:36	INFO	MFCleanImageSkyModel::solve	Clean used 3 iterations to approach a threshhold of 0.000914462
+2017-01-01 23:22:36	INFO	MFCleanImageSkyModel::solve	0.000310586 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.000310586Jy)
+2017-01-01 23:22:36	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 1
+2017-01-01 23:22:58	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0  ,   peak residual x 0.8 ] 
+2017-01-01 23:22:58	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000856109, cleaning down to 0.000684887
+2017-01-01 23:22:58	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:22:58	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000856109
+2017-01-01 23:22:58	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:22:58	INFO	MFCleanImageSkyModel::solve	Clean used 6 iterations to approach a threshhold of 0.000684887
+2017-01-01 23:22:58	INFO	MFCleanImageSkyModel::solve	0.000234523 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00054511Jy)
+2017-01-01 23:22:58	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 2
+2017-01-01 23:23:20	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0  ,   peak residual x 0.8 ] 
+2017-01-01 23:23:20	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000647712, cleaning down to 0.00051817
+2017-01-01 23:23:20	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:23:20	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000647712
+2017-01-01 23:23:20	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:23:20	INFO	MFCleanImageSkyModel::solve	Clean used 10 iterations to approach a threshhold of 0.00051817
+2017-01-01 23:23:20	INFO	MFCleanImageSkyModel::solve	0.000232883 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.000777993Jy)
+2017-01-01 23:23:43	INFO	MFCleanImageSkyModel::solve	Final maximum residual = 0.000492487
+2017-01-01 23:23:43	INFO	MFCleanImageSkyModel::solve	Model 0: max, min residuals = 0.000492487, 7.77615e-05 clean flux 0.000777993
+2017-01-01 23:23:43	INFO	imager::clean()	Threshhold not reached yet.
+2017-01-01 23:23:43	INFO	imager::clean()	Beam used in restoration: 0.00208072 by 0.000895543 (arcsec) at pa -4.28827 (deg) 
+2017-01-01 23:24:00	INFO	imager::iClean()	Restoring Image(s) with the clean-beam
+2017-01-01 23:24:00	INFO	clean::::	##### End Task: clean                #####
+2017-01-01 23:24:00	INFO	clean::::+	##########################################
+2017-01-01 23:24:00	INFO	clean::::	
+2017-01-01 23:24:00	INFO	clean::::+	##########################################
+2017-01-01 23:24:00	INFO	clean::::+	##### Begin Task: clean              #####
+2017-01-01 23:24:00	INFO	clean::::	clean(vis="/data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms",imagename="/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan0_25",outlierfile="",field="",spw="",
+2017-01-01 23:24:00	INFO	clean::::+	        selectdata=True,timerange="",uvrange="",antenna="",scan="0~25",
+2017-01-01 23:24:00	INFO	clean::::+	        observation="",intent="",mode="mfs",resmooth=False,gridmode="",
+2017-01-01 23:24:00	INFO	clean::::+	        wprojplanes=-1,facets=1,cfcache="cfcache.dir",rotpainc=5.0,painc=360.0,
+2017-01-01 23:24:00	INFO	clean::::+	        aterm=True,psterm=False,mterm=True,wbawp=False,conjbeams=True,
+2017-01-01 23:24:00	INFO	clean::::+	        epjtable="",interpolation="linear",niter=500,gain=0.1,threshold="0.3mJy",
+2017-01-01 23:24:00	INFO	clean::::+	        psfmode="clark",imagermode="csclean",ftmachine="mosaic",mosweight=False,scaletype="SAULT",
+2017-01-01 23:24:00	INFO	clean::::+	        multiscale=[0],negcomponent=-1,smallscalebias=0.6,interactive=False,mask="/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask",
+2017-01-01 23:24:00	INFO	clean::::+	        nchan=-1,start=0,width=1,outframe="",veltype="radio",
+2017-01-01 23:24:00	INFO	clean::::+	        imsize=[256, 256],cell="0.00028arcsec",phasecenter="",restfreq="",stokes="I",
+2017-01-01 23:24:00	INFO	clean::::+	        weighting="natural",robust=0.0,uvtaper=False,outertaper=[''],innertaper=['1.0'],
+2017-01-01 23:24:00	INFO	clean::::+	        modelimage="",restoringbeam=[''],pbcor=False,minpb=0.2,usescratch=False,
+2017-01-01 23:24:00	INFO	clean::::+	        noise="1.0Jy",npixels=0,npercycle=100,cyclefactor=5,cyclespeedup=-1,
+2017-01-01 23:24:00	INFO	clean::::+	        nterms=1,reffreq="",chaniter=False,flatnoise=True,allowchunk=False)
+2017-01-01 23:24:00	INFO	clean::::	nchan=-1 start=0 width=1
+2017-01-01 23:24:00	INFO	clean::::	Use default channelization for clean
+2017-01-01 23:24:00	INFO	clean::::	clean image: /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan0_25
+2017-01-01 23:24:00	INFO	clean::::	FTMachine used is  ft 
+2017-01-01 23:24:00	INFO	imager::setDataOnThisMS()	Performing selection on MeasurementSet : /data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms
+2017-01-01 23:24:00	INFO	imager::setDataOnThisMS()	Selecting on fields : 0
+2017-01-01 23:24:00	INFO	imager::setDataOnThisMS()	Selecting on spectral windows expression :*
+2017-01-01 23:24:00	INFO	imager::setDataOnThisMS()	Selecting on scan : 0~25
+2017-01-01 23:24:01	INFO	imager::setDataOnThisMS()	Selected 467064 out of  1393824 rows.
+2017-01-01 23:24:01	INFO	imager::setDataOnThisMS()	Selected : [4 chans in spw 0] [4 chans in spw 1] [4 chans in spw 2] [4 chans in spw 3] [4 chans in spw 4] [4 chans in spw 5] [4 chans in spw 6] [4 chans in spw 7]
+2017-01-01 23:24:01	INFO	imager::defineimage()	Defining image properties:nx=256 ny=256 cellx='0.00028arcsec' celly='0.00028arcsec' stokes=I' mode=MFS nchan=-1 start=0 step=1 spwids=[-1] fieldid=-1 facets=1 frame=5 distance='0'
+2017-01-01 23:24:01	INFO	imager::defineimage()	 phaseCenter='10:19:35.72,   19.52.11.37, ' mStart='Radialvelocity: 0' qStep='0 '' mFreqStart='Frequency: 0
+2017-01-01 23:24:01	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:24:01	INFO	Imager::setvp() 	Sky position tolerance is 180 degrees
+2017-01-01 23:24:01	INFO	Imager::setvp() 	Using system default voltage patterns for each telescope
+2017-01-01 23:24:01	INFO	imager::makeimage() 	Calculating image (without full skyequation)
+2017-01-01 23:24:02	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:24:02	INFO	imager::weight()	Weighting MS: Imaging weights will be changed
+2017-01-01 23:24:02	INFO	imager::weight()	Natural weighting
+2017-01-01 23:24:03	WARN	image::open (file /var/rpmbuild/BUILD/casa-prerelease/casa-prerelease-4.6.0/gcwrap/tools/images/image_cmpt.cc, line 3472)	Another image is already open, closing first
+2017-01-01 23:24:03	INFO	CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2017-01-01 23:24:03	INFO	CasacRegionManager::fromBCS	Using all spectral channels.
+2017-01-01 23:24:03	INFO	CasacRegionManager::fromBCS	Using polarizations ALL
+2017-01-01 23:24:03	INFO	ImageMaskAttacher::makeMask	Created and initialized mask `mask0'
+2017-01-01 23:24:03	INFO	SubImageFactory::createImage	Creating image '__temp_mask' of shape [256, 256, 1, 1]
+2017-01-01 23:24:03	WARN	ImageExprCalculator::compute	image units are not the same: '' vs 'Jy/beam'
+2017-01-01 23:24:03	INFO	ImageExprCalculator::_imagecalc	Creating image `/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan0_25.mask' of shape [256, 256, 1, 1]
+2017-01-01 23:24:03	WARN	ImageExprCalculator::compute2	Overwriting pixel values of the currently attached image
+2017-01-01 23:24:03	INFO	clean::::	Used mask(s) : ['/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask'] to create mask image(s) : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan0_25.mask
+2017-01-01 23:24:03	INFO	imager::setoptions() 	Setting processing options
+2017-01-01 23:24:03	INFO	clean::::	No model found. Making empty initial model : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan0_25.model
+2017-01-01 23:24:03	INFO	Imager::imagecoordinates() 	Center frequency = 8.41657 GHz, synthesized continuum bandwidth = 0.256022 GHz
+2017-01-01 23:24:03	INFO	imager::clean()	Using multifield Clark clean
+2017-01-01 23:24:03	INFO	imager::createFTMachine() 	Multiple fields or facets: transforms will be padded by a factor 1.2
+2017-01-01 23:24:03	INFO	imager::createFTMachine() 	Performing interferometric gridding...
+2017-01-01 23:24:03	INFO	imager::clean()	Clean gain = 0.1, Niter = 500, Threshold = 0.3 mJy
+2017-01-01 23:24:03	INFO	imager::clean()	Starting deconvolution
+2017-01-01 23:24:07	INFO	ImageSkyModel::makeApproxPSFs	bmaj: 0.00210088", bmin: 0.000867852", bpa: 3.05389 deg
+2017-01-01 23:24:07	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 0
+2017-01-01 23:24:11	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:24:11	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.00105994, cleaning down to 0.000847951
+2017-01-01 23:24:11	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:24:11	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.00105994
+2017-01-01 23:24:11	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:24:11	INFO	MFCleanImageSkyModel::solve	Clean used 3 iterations to approach a threshhold of 0.000847951
+2017-01-01 23:24:11	INFO	MFCleanImageSkyModel::solve	0.000288643 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.000288643Jy)
+2017-01-01 23:24:11	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 1
+2017-01-01 23:24:19	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:24:19	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000801533, cleaning down to 0.000641226
+2017-01-01 23:24:19	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:24:19	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000801533
+2017-01-01 23:24:19	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:24:19	INFO	MFCleanImageSkyModel::solve	Clean used 6 iterations to approach a threshhold of 0.000641226
+2017-01-01 23:24:19	INFO	MFCleanImageSkyModel::solve	0.000220392 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.000509035Jy)
+2017-01-01 23:24:19	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 2
+2017-01-01 23:24:26	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:24:26	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.00061187, cleaning down to 0.000489496
+2017-01-01 23:24:26	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:24:26	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.00061187
+2017-01-01 23:24:26	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:24:26	INFO	MFCleanImageSkyModel::solve	Clean used 9 iterations to approach a threshhold of 0.000489496
+2017-01-01 23:24:26	INFO	MFCleanImageSkyModel::solve	0.000168874 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.000677909Jy)
+2017-01-01 23:24:26	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 3
+2017-01-01 23:24:34	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:24:34	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000473217, cleaning down to 0.000378573
+2017-01-01 23:24:34	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:24:34	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000473217
+2017-01-01 23:24:34	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:24:34	INFO	MFCleanImageSkyModel::solve	Clean used 12 iterations to approach a threshhold of 0.000378573
+2017-01-01 23:24:34	INFO	MFCleanImageSkyModel::solve	0.000131595 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.000809504Jy)
+2017-01-01 23:24:34	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 4
+2017-01-01 23:24:41	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:24:41	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000377832, cleaning down to 0.000302265
+2017-01-01 23:24:41	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:24:41	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000377832
+2017-01-01 23:24:41	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:24:41	INFO	MFCleanImageSkyModel::solve	Clean used 16 iterations to approach a threshhold of 0.000302265
+2017-01-01 23:24:41	INFO	MFCleanImageSkyModel::solve	0.000139378 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.000948882Jy)
+2017-01-01 23:24:41	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 5
+2017-01-01 23:24:48	INFO	MFCleanImageSkyModel::solve	Reached stopping peak residual = 0.000293935
+2017-01-01 23:24:56	INFO	MFCleanImageSkyModel::solve	Final maximum residual = 0.000293935
+2017-01-01 23:24:56	INFO	MFCleanImageSkyModel::solve	Model 0: max, min residuals = 0.000293935, -2.35181e-05 clean flux 0.000948882
+2017-01-01 23:24:56	INFO	imager::clean()	Successfully deconvolved image
+2017-01-01 23:24:56	INFO	imager::clean()	Fitted beam used in restoration: 0.00210088 by 0.000867852 (arcsec) at pa 3.05389 (deg) 
+2017-01-01 23:24:56	INFO	imager::iClean()	Restoring Image(s) with the clean-beam
+2017-01-01 23:24:56	INFO	clean::::	##### End Task: clean                #####
+2017-01-01 23:24:56	INFO	clean::::+	##########################################
+2017-01-01 23:24:56	INFO	clean::::	
+2017-01-01 23:24:56	INFO	clean::::+	##########################################
+2017-01-01 23:24:56	INFO	clean::::+	##### Begin Task: clean              #####
+2017-01-01 23:24:56	INFO	clean::::	clean(vis="/data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms",imagename="/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan0_25",outlierfile="",field="",spw="",
+2017-01-01 23:24:56	INFO	clean::::+	        selectdata=True,timerange="",uvrange="",antenna="",scan="0~25",
+2017-01-01 23:24:56	INFO	clean::::+	        observation="",intent="",mode="mfs",resmooth=False,gridmode="",
+2017-01-01 23:24:56	INFO	clean::::+	        wprojplanes=-1,facets=1,cfcache="cfcache.dir",rotpainc=5.0,painc=360.0,
+2017-01-01 23:24:56	INFO	clean::::+	        aterm=True,psterm=False,mterm=True,wbawp=False,conjbeams=True,
+2017-01-01 23:24:56	INFO	clean::::+	        epjtable="",interpolation="linear",niter=500,gain=0.1,threshold="0.3mJy",
+2017-01-01 23:24:56	INFO	clean::::+	        psfmode="clark",imagermode="csclean",ftmachine="mosaic",mosweight=False,scaletype="SAULT",
+2017-01-01 23:24:56	INFO	clean::::+	        multiscale=[0],negcomponent=-1,smallscalebias=0.6,interactive=False,mask="/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask",
+2017-01-01 23:24:56	INFO	clean::::+	        nchan=-1,start=0,width=1,outframe="",veltype="radio",
+2017-01-01 23:24:56	INFO	clean::::+	        imsize=[256, 256],cell="0.00028arcsec",phasecenter="",restfreq="",stokes="V",
+2017-01-01 23:24:56	INFO	clean::::+	        weighting="natural",robust=0.0,uvtaper=False,outertaper=[''],innertaper=['1.0'],
+2017-01-01 23:24:56	INFO	clean::::+	        modelimage="",restoringbeam=[''],pbcor=False,minpb=0.2,usescratch=False,
+2017-01-01 23:24:56	INFO	clean::::+	        noise="1.0Jy",npixels=0,npercycle=100,cyclefactor=5,cyclespeedup=-1,
+2017-01-01 23:24:56	INFO	clean::::+	        nterms=1,reffreq="",chaniter=False,flatnoise=True,allowchunk=False)
+2017-01-01 23:24:56	INFO	clean::::	nchan=-1 start=0 width=1
+2017-01-01 23:24:56	INFO	clean::::	Use default channelization for clean
+2017-01-01 23:24:56	INFO	clean::::	clean image: /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan0_25
+2017-01-01 23:24:56	INFO	clean::::	FTMachine used is  ft 
+2017-01-01 23:24:56	INFO	imager::setDataOnThisMS()	Performing selection on MeasurementSet : /data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms
+2017-01-01 23:24:56	INFO	imager::setDataOnThisMS()	Selecting on fields : 0
+2017-01-01 23:24:56	INFO	imager::setDataOnThisMS()	Selecting on spectral windows expression :*
+2017-01-01 23:24:56	INFO	imager::setDataOnThisMS()	Selecting on scan : 0~25
+2017-01-01 23:24:57	INFO	imager::setDataOnThisMS()	Selected 467064 out of  1393824 rows.
+2017-01-01 23:24:57	INFO	imager::setDataOnThisMS()	Selected : [4 chans in spw 0] [4 chans in spw 1] [4 chans in spw 2] [4 chans in spw 3] [4 chans in spw 4] [4 chans in spw 5] [4 chans in spw 6] [4 chans in spw 7]
+2017-01-01 23:24:57	INFO	imager::defineimage()	Defining image properties:nx=256 ny=256 cellx='0.00028arcsec' celly='0.00028arcsec' stokes=V' mode=MFS nchan=-1 start=0 step=1 spwids=[-1] fieldid=-1 facets=1 frame=5 distance='0'
+2017-01-01 23:24:57	INFO	imager::defineimage()	 phaseCenter='10:19:35.72,   19.52.11.37, ' mStart='Radialvelocity: 0' qStep='0 '' mFreqStart='Frequency: 0
+2017-01-01 23:24:57	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:24:57	INFO	Imager::setvp() 	Sky position tolerance is 180 degrees
+2017-01-01 23:24:57	INFO	Imager::setvp() 	Using system default voltage patterns for each telescope
+2017-01-01 23:24:57	INFO	imager::makeimage() 	Calculating image (without full skyequation)
+2017-01-01 23:24:58	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:24:58	INFO	imager::weight()	Weighting MS: Imaging weights will be changed
+2017-01-01 23:24:58	INFO	imager::weight()	Natural weighting
+2017-01-01 23:24:59	WARN	image::open (file /var/rpmbuild/BUILD/casa-prerelease/casa-prerelease-4.6.0/gcwrap/tools/images/image_cmpt.cc, line 3472)	Another image is already open, closing first
+2017-01-01 23:24:59	INFO	CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2017-01-01 23:24:59	INFO	CasacRegionManager::fromBCS	Using all spectral channels.
+2017-01-01 23:24:59	INFO	CasacRegionManager::fromBCS	Using polarizations ALL
+2017-01-01 23:24:59	INFO	ImageMaskAttacher::makeMask	Created and initialized mask `mask0'
+2017-01-01 23:24:59	INFO	SubImageFactory::createImage	Creating image '__temp_mask' of shape [256, 256, 1, 1]
+2017-01-01 23:24:59	WARN	ImageExprCalculator::compute	image units are not the same: '' vs 'Jy/beam'
+2017-01-01 23:24:59	INFO	ImageExprCalculator::_imagecalc	Creating image `/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan0_25.mask' of shape [256, 256, 1, 1]
+2017-01-01 23:24:59	WARN	ImageExprCalculator::compute2	Overwriting pixel values of the currently attached image
+2017-01-01 23:24:59	INFO	clean::::	Used mask(s) : ['/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask'] to create mask image(s) : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan0_25.mask
+2017-01-01 23:24:59	INFO	imager::setoptions() 	Setting processing options
+2017-01-01 23:24:59	INFO	clean::::	No model found. Making empty initial model : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan0_25.model
+2017-01-01 23:24:59	INFO	Imager::imagecoordinates() 	Center frequency = 8.41657 GHz, synthesized continuum bandwidth = 0.256022 GHz
+2017-01-01 23:24:59	INFO	imager::clean()	Using multifield Clark clean
+2017-01-01 23:24:59	INFO	imager::createFTMachine() 	Multiple fields or facets: transforms will be padded by a factor 1.2
+2017-01-01 23:24:59	INFO	imager::createFTMachine() 	Performing interferometric gridding...
+2017-01-01 23:24:59	INFO	imager::clean()	Clean gain = 0.1, Niter = 500, Threshold = 0.3 mJy
+2017-01-01 23:24:59	INFO	imager::clean()	Starting deconvolution
+2017-01-01 23:25:03	INFO	ImageSkyModel::makeApproxPSFs	bmaj: 0.00210088", bmin: 0.000867852", bpa: 3.05389 deg
+2017-01-01 23:25:03	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 0
+2017-01-01 23:25:07	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:25:07	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000324634, cleaning down to 0.000285
+2017-01-01 23:25:07	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:25:07	INFO	MFCleanImageSkyModel::solve	Doing stokes V image
+2017-01-01 23:25:07	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000324634
+2017-01-01 23:25:07	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:25:07	INFO	MFCleanImageSkyModel::solve	Clean used 2 iterations to approach a threshhold of 0.000285
+2017-01-01 23:25:07	INFO	MFCleanImageSkyModel::solve	-6.22391e-05 Jy <- cleaned in this cycle for  model 0 (Total flux : -6.22391e-05Jy)
+2017-01-01 23:25:07	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 1
+2017-01-01 23:25:15	INFO	MFCleanImageSkyModel::solve	Reached stopping peak residual = 0.000273354
+2017-01-01 23:25:22	INFO	MFCleanImageSkyModel::solve	Final maximum residual = 0.000273354
+2017-01-01 23:25:22	INFO	MFCleanImageSkyModel::solve	Model 0: max, min residuals = 4.27014e-05, -0.000273354 clean flux -6.22391e-05
+2017-01-01 23:25:22	INFO	imager::clean()	Successfully deconvolved image
+2017-01-01 23:25:22	INFO	imager::clean()	Fitted beam used in restoration: 0.00210088 by 0.000867852 (arcsec) at pa 3.05389 (deg) 
+2017-01-01 23:25:22	INFO	imager::iClean()	Restoring Image(s) with the clean-beam
+2017-01-01 23:25:22	INFO	clean::::	##### End Task: clean                #####
+2017-01-01 23:25:22	INFO	clean::::+	##########################################
+2017-01-01 23:25:23	INFO	clean::::	
+2017-01-01 23:25:23	INFO	clean::::+	##########################################
+2017-01-01 23:25:23	INFO	clean::::+	##### Begin Task: clean              #####
+2017-01-01 23:25:23	INFO	clean::::	clean(vis="/data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms",imagename="/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan26_49",outlierfile="",field="",spw="",
+2017-01-01 23:25:23	INFO	clean::::+	        selectdata=True,timerange="",uvrange="",antenna="",scan="26~49",
+2017-01-01 23:25:23	INFO	clean::::+	        observation="",intent="",mode="mfs",resmooth=False,gridmode="",
+2017-01-01 23:25:23	INFO	clean::::+	        wprojplanes=-1,facets=1,cfcache="cfcache.dir",rotpainc=5.0,painc=360.0,
+2017-01-01 23:25:23	INFO	clean::::+	        aterm=True,psterm=False,mterm=True,wbawp=False,conjbeams=True,
+2017-01-01 23:25:23	INFO	clean::::+	        epjtable="",interpolation="linear",niter=500,gain=0.1,threshold="0.3mJy",
+2017-01-01 23:25:23	INFO	clean::::+	        psfmode="clark",imagermode="csclean",ftmachine="mosaic",mosweight=False,scaletype="SAULT",
+2017-01-01 23:25:23	INFO	clean::::+	        multiscale=[0],negcomponent=-1,smallscalebias=0.6,interactive=False,mask="/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask",
+2017-01-01 23:25:23	INFO	clean::::+	        nchan=-1,start=0,width=1,outframe="",veltype="radio",
+2017-01-01 23:25:23	INFO	clean::::+	        imsize=[256, 256],cell="0.00028arcsec",phasecenter="",restfreq="",stokes="I",
+2017-01-01 23:25:23	INFO	clean::::+	        weighting="natural",robust=0.0,uvtaper=False,outertaper=[''],innertaper=['1.0'],
+2017-01-01 23:25:23	INFO	clean::::+	        modelimage="",restoringbeam=[''],pbcor=False,minpb=0.2,usescratch=False,
+2017-01-01 23:25:23	INFO	clean::::+	        noise="1.0Jy",npixels=0,npercycle=100,cyclefactor=5,cyclespeedup=-1,
+2017-01-01 23:25:23	INFO	clean::::+	        nterms=1,reffreq="",chaniter=False,flatnoise=True,allowchunk=False)
+2017-01-01 23:25:23	INFO	clean::::	nchan=-1 start=0 width=1
+2017-01-01 23:25:23	INFO	clean::::	Use default channelization for clean
+2017-01-01 23:25:23	INFO	clean::::	clean image: /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan26_49
+2017-01-01 23:25:23	INFO	clean::::	FTMachine used is  ft 
+2017-01-01 23:25:23	INFO	imager::setDataOnThisMS()	Performing selection on MeasurementSet : /data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms
+2017-01-01 23:25:23	INFO	imager::setDataOnThisMS()	Selecting on fields : 0
+2017-01-01 23:25:23	INFO	imager::setDataOnThisMS()	Selecting on spectral windows expression :*
+2017-01-01 23:25:23	INFO	imager::setDataOnThisMS()	Selecting on scan : 26~49
+2017-01-01 23:25:23	INFO	imager::setDataOnThisMS()	Selected 441144 out of  1393824 rows.
+2017-01-01 23:25:23	INFO	imager::setDataOnThisMS()	Selected : [4 chans in spw 0] [4 chans in spw 1] [4 chans in spw 2] [4 chans in spw 3] [4 chans in spw 4] [4 chans in spw 5] [4 chans in spw 6] [4 chans in spw 7]
+2017-01-01 23:25:23	INFO	imager::defineimage()	Defining image properties:nx=256 ny=256 cellx='0.00028arcsec' celly='0.00028arcsec' stokes=I' mode=MFS nchan=-1 start=0 step=1 spwids=[-1] fieldid=-1 facets=1 frame=5 distance='0'
+2017-01-01 23:25:23	INFO	imager::defineimage()	 phaseCenter='10:19:35.72,   19.52.11.37, ' mStart='Radialvelocity: 0' qStep='0 '' mFreqStart='Frequency: 0
+2017-01-01 23:25:23	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:25:23	INFO	Imager::setvp() 	Sky position tolerance is 180 degrees
+2017-01-01 23:25:23	INFO	Imager::setvp() 	Using system default voltage patterns for each telescope
+2017-01-01 23:25:23	INFO	imager::makeimage() 	Calculating image (without full skyequation)
+2017-01-01 23:25:24	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:25:24	INFO	imager::weight()	Weighting MS: Imaging weights will be changed
+2017-01-01 23:25:24	INFO	imager::weight()	Natural weighting
+2017-01-01 23:25:25	WARN	image::open (file /var/rpmbuild/BUILD/casa-prerelease/casa-prerelease-4.6.0/gcwrap/tools/images/image_cmpt.cc, line 3472)	Another image is already open, closing first
+2017-01-01 23:25:25	INFO	CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2017-01-01 23:25:25	INFO	CasacRegionManager::fromBCS	Using all spectral channels.
+2017-01-01 23:25:25	INFO	CasacRegionManager::fromBCS	Using polarizations ALL
+2017-01-01 23:25:25	INFO	ImageMaskAttacher::makeMask	Created and initialized mask `mask0'
+2017-01-01 23:25:25	INFO	SubImageFactory::createImage	Creating image '__temp_mask' of shape [256, 256, 1, 1]
+2017-01-01 23:25:25	WARN	ImageExprCalculator::compute	image units are not the same: '' vs 'Jy/beam'
+2017-01-01 23:25:25	INFO	ImageExprCalculator::_imagecalc	Creating image `/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan26_49.mask' of shape [256, 256, 1, 1]
+2017-01-01 23:25:25	WARN	ImageExprCalculator::compute2	Overwriting pixel values of the currently attached image
+2017-01-01 23:25:25	INFO	clean::::	Used mask(s) : ['/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask'] to create mask image(s) : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan26_49.mask
+2017-01-01 23:25:25	INFO	imager::setoptions() 	Setting processing options
+2017-01-01 23:25:25	INFO	clean::::	No model found. Making empty initial model : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan26_49.model
+2017-01-01 23:25:25	INFO	Imager::imagecoordinates() 	Center frequency = 8.41657 GHz, synthesized continuum bandwidth = 0.256022 GHz
+2017-01-01 23:25:26	INFO	imager::clean()	Using multifield Clark clean
+2017-01-01 23:25:26	INFO	imager::createFTMachine() 	Multiple fields or facets: transforms will be padded by a factor 1.2
+2017-01-01 23:25:26	INFO	imager::createFTMachine() 	Performing interferometric gridding...
+2017-01-01 23:25:26	INFO	imager::clean()	Clean gain = 0.1, Niter = 500, Threshold = 0.3 mJy
+2017-01-01 23:25:26	INFO	imager::clean()	Starting deconvolution
+2017-01-01 23:25:29	INFO	ImageSkyModel::makeApproxPSFs	bmaj: 0.00207983", bmin: 0.000848524", bpa: -3.38203 deg
+2017-01-01 23:25:29	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 0
+2017-01-01 23:25:33	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:25:33	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.00115076, cleaning down to 0.000920607
+2017-01-01 23:25:33	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:25:33	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.00115076
+2017-01-01 23:25:33	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:25:33	INFO	MFCleanImageSkyModel::solve	Clean used 3 iterations to approach a threshhold of 0.000920607
+2017-01-01 23:25:33	INFO	MFCleanImageSkyModel::solve	0.000313266 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.000313266Jy)
+2017-01-01 23:25:33	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 1
+2017-01-01 23:25:40	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:25:40	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000865145, cleaning down to 0.000692116
+2017-01-01 23:25:40	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:25:40	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000865145
+2017-01-01 23:25:40	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:25:40	INFO	MFCleanImageSkyModel::solve	Clean used 6 iterations to approach a threshhold of 0.000692116
+2017-01-01 23:25:40	INFO	MFCleanImageSkyModel::solve	0.000237831 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.000551097Jy)
+2017-01-01 23:25:40	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 2
+2017-01-01 23:25:47	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:25:47	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.00066393, cleaning down to 0.000531144
+2017-01-01 23:25:47	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:25:47	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.00066393
+2017-01-01 23:25:47	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:25:47	INFO	MFCleanImageSkyModel::solve	Clean used 9 iterations to approach a threshhold of 0.000531144
+2017-01-01 23:25:47	INFO	MFCleanImageSkyModel::solve	0.000182098 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.000733194Jy)
+2017-01-01 23:25:47	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 3
+2017-01-01 23:25:54	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:25:54	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000502631, cleaning down to 0.000402105
+2017-01-01 23:25:54	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:25:54	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000502631
+2017-01-01 23:25:54	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:25:54	INFO	MFCleanImageSkyModel::solve	Clean used 13 iterations to approach a threshhold of 0.000402105
+2017-01-01 23:25:54	INFO	MFCleanImageSkyModel::solve	0.000181398 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.000914592Jy)
+2017-01-01 23:25:54	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 4
+2017-01-01 23:26:01	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:26:01	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000388731, cleaning down to 0.000310985
+2017-01-01 23:26:01	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:26:01	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000388731
+2017-01-01 23:26:01	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:26:01	INFO	MFCleanImageSkyModel::solve	Clean used 18 iterations to approach a threshhold of 0.000310985
+2017-01-01 23:26:01	INFO	MFCleanImageSkyModel::solve	0.000174751 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00108934Jy)
+2017-01-01 23:26:01	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 5
+2017-01-01 23:26:08	INFO	MFCleanImageSkyModel::solve	Reached stopping peak residual = 0.000293856
+2017-01-01 23:26:15	INFO	MFCleanImageSkyModel::solve	Final maximum residual = 0.000293856
+2017-01-01 23:26:15	INFO	MFCleanImageSkyModel::solve	Model 0: max, min residuals = 0.000293856, 4.61415e-05 clean flux 0.00108934
+2017-01-01 23:26:15	INFO	imager::clean()	Successfully deconvolved image
+2017-01-01 23:26:15	INFO	imager::clean()	Fitted beam used in restoration: 0.00207983 by 0.000848524 (arcsec) at pa -3.38203 (deg) 
+2017-01-01 23:26:16	INFO	imager::iClean()	Restoring Image(s) with the clean-beam
+2017-01-01 23:26:16	INFO	clean::::	##### End Task: clean                #####
+2017-01-01 23:26:16	INFO	clean::::+	##########################################
+2017-01-01 23:26:16	INFO	clean::::	
+2017-01-01 23:26:16	INFO	clean::::+	##########################################
+2017-01-01 23:26:16	INFO	clean::::+	##### Begin Task: clean              #####
+2017-01-01 23:26:16	INFO	clean::::	clean(vis="/data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms",imagename="/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan26_49",outlierfile="",field="",spw="",
+2017-01-01 23:26:16	INFO	clean::::+	        selectdata=True,timerange="",uvrange="",antenna="",scan="26~49",
+2017-01-01 23:26:16	INFO	clean::::+	        observation="",intent="",mode="mfs",resmooth=False,gridmode="",
+2017-01-01 23:26:16	INFO	clean::::+	        wprojplanes=-1,facets=1,cfcache="cfcache.dir",rotpainc=5.0,painc=360.0,
+2017-01-01 23:26:16	INFO	clean::::+	        aterm=True,psterm=False,mterm=True,wbawp=False,conjbeams=True,
+2017-01-01 23:26:16	INFO	clean::::+	        epjtable="",interpolation="linear",niter=500,gain=0.1,threshold="0.3mJy",
+2017-01-01 23:26:16	INFO	clean::::+	        psfmode="clark",imagermode="csclean",ftmachine="mosaic",mosweight=False,scaletype="SAULT",
+2017-01-01 23:26:16	INFO	clean::::+	        multiscale=[0],negcomponent=-1,smallscalebias=0.6,interactive=False,mask="/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask",
+2017-01-01 23:26:16	INFO	clean::::+	        nchan=-1,start=0,width=1,outframe="",veltype="radio",
+2017-01-01 23:26:16	INFO	clean::::+	        imsize=[256, 256],cell="0.00028arcsec",phasecenter="",restfreq="",stokes="V",
+2017-01-01 23:26:16	INFO	clean::::+	        weighting="natural",robust=0.0,uvtaper=False,outertaper=[''],innertaper=['1.0'],
+2017-01-01 23:26:16	INFO	clean::::+	        modelimage="",restoringbeam=[''],pbcor=False,minpb=0.2,usescratch=False,
+2017-01-01 23:26:16	INFO	clean::::+	        noise="1.0Jy",npixels=0,npercycle=100,cyclefactor=5,cyclespeedup=-1,
+2017-01-01 23:26:16	INFO	clean::::+	        nterms=1,reffreq="",chaniter=False,flatnoise=True,allowchunk=False)
+2017-01-01 23:26:16	INFO	clean::::	nchan=-1 start=0 width=1
+2017-01-01 23:26:16	INFO	clean::::	Use default channelization for clean
+2017-01-01 23:26:16	INFO	clean::::	clean image: /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan26_49
+2017-01-01 23:26:16	INFO	clean::::	FTMachine used is  ft 
+2017-01-01 23:26:16	INFO	imager::setDataOnThisMS()	Performing selection on MeasurementSet : /data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms
+2017-01-01 23:26:16	INFO	imager::setDataOnThisMS()	Selecting on fields : 0
+2017-01-01 23:26:16	INFO	imager::setDataOnThisMS()	Selecting on spectral windows expression :*
+2017-01-01 23:26:16	INFO	imager::setDataOnThisMS()	Selecting on scan : 26~49
+2017-01-01 23:26:16	INFO	imager::setDataOnThisMS()	Selected 441144 out of  1393824 rows.
+2017-01-01 23:26:16	INFO	imager::setDataOnThisMS()	Selected : [4 chans in spw 0] [4 chans in spw 1] [4 chans in spw 2] [4 chans in spw 3] [4 chans in spw 4] [4 chans in spw 5] [4 chans in spw 6] [4 chans in spw 7]
+2017-01-01 23:26:16	INFO	imager::defineimage()	Defining image properties:nx=256 ny=256 cellx='0.00028arcsec' celly='0.00028arcsec' stokes=V' mode=MFS nchan=-1 start=0 step=1 spwids=[-1] fieldid=-1 facets=1 frame=5 distance='0'
+2017-01-01 23:26:16	INFO	imager::defineimage()	 phaseCenter='10:19:35.72,   19.52.11.37, ' mStart='Radialvelocity: 0' qStep='0 '' mFreqStart='Frequency: 0
+2017-01-01 23:26:16	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:26:16	INFO	Imager::setvp() 	Sky position tolerance is 180 degrees
+2017-01-01 23:26:16	INFO	Imager::setvp() 	Using system default voltage patterns for each telescope
+2017-01-01 23:26:16	INFO	imager::makeimage() 	Calculating image (without full skyequation)
+2017-01-01 23:26:17	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:26:17	INFO	imager::weight()	Weighting MS: Imaging weights will be changed
+2017-01-01 23:26:17	INFO	imager::weight()	Natural weighting
+2017-01-01 23:26:18	WARN	image::open (file /var/rpmbuild/BUILD/casa-prerelease/casa-prerelease-4.6.0/gcwrap/tools/images/image_cmpt.cc, line 3472)	Another image is already open, closing first
+2017-01-01 23:26:18	INFO	CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2017-01-01 23:26:18	INFO	CasacRegionManager::fromBCS	Using all spectral channels.
+2017-01-01 23:26:18	INFO	CasacRegionManager::fromBCS	Using polarizations ALL
+2017-01-01 23:26:18	INFO	ImageMaskAttacher::makeMask	Created and initialized mask `mask0'
+2017-01-01 23:26:18	INFO	SubImageFactory::createImage	Creating image '__temp_mask' of shape [256, 256, 1, 1]
+2017-01-01 23:26:18	WARN	ImageExprCalculator::compute	image units are not the same: '' vs 'Jy/beam'
+2017-01-01 23:26:18	INFO	ImageExprCalculator::_imagecalc	Creating image `/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan26_49.mask' of shape [256, 256, 1, 1]
+2017-01-01 23:26:18	WARN	ImageExprCalculator::compute2	Overwriting pixel values of the currently attached image
+2017-01-01 23:26:18	INFO	clean::::	Used mask(s) : ['/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask'] to create mask image(s) : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan26_49.mask
+2017-01-01 23:26:18	INFO	imager::setoptions() 	Setting processing options
+2017-01-01 23:26:18	INFO	clean::::	No model found. Making empty initial model : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan26_49.model
+2017-01-01 23:26:19	INFO	Imager::imagecoordinates() 	Center frequency = 8.41657 GHz, synthesized continuum bandwidth = 0.256022 GHz
+2017-01-01 23:26:19	INFO	imager::clean()	Using multifield Clark clean
+2017-01-01 23:26:19	INFO	imager::createFTMachine() 	Multiple fields or facets: transforms will be padded by a factor 1.2
+2017-01-01 23:26:19	INFO	imager::createFTMachine() 	Performing interferometric gridding...
+2017-01-01 23:26:19	INFO	imager::clean()	Clean gain = 0.1, Niter = 500, Threshold = 0.3 mJy
+2017-01-01 23:26:19	INFO	imager::clean()	Starting deconvolution
+2017-01-01 23:26:22	INFO	ImageSkyModel::makeApproxPSFs	bmaj: 0.00207983", bmin: 0.000848524", bpa: -3.38203 deg
+2017-01-01 23:26:22	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 0
+2017-01-01 23:26:26	INFO	MFCleanImageSkyModel::solve	Reached stopping peak residual = 0.000257577
+2017-01-01 23:26:26	INFO	imager::clean()	Successfully deconvolved image
+2017-01-01 23:26:26	INFO	imager::clean()	Fitted beam used in restoration: 0.00207983 by 0.000848524 (arcsec) at pa -3.38203 (deg) 
+2017-01-01 23:26:26	INFO	imager::iClean()	Restoring Image(s) with the clean-beam
+2017-01-01 23:26:26	INFO	clean::::	##### End Task: clean                #####
+2017-01-01 23:26:26	INFO	clean::::+	##########################################
+2017-01-01 23:26:26	INFO	clean::::	
+2017-01-01 23:26:26	INFO	clean::::+	##########################################
+2017-01-01 23:26:26	INFO	clean::::+	##### Begin Task: clean              #####
+2017-01-01 23:26:26	INFO	clean::::	clean(vis="/data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms",imagename="/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan50_51",outlierfile="",field="",spw="",
+2017-01-01 23:26:26	INFO	clean::::+	        selectdata=True,timerange="",uvrange="",antenna="",scan="50~51",
+2017-01-01 23:26:26	INFO	clean::::+	        observation="",intent="",mode="mfs",resmooth=False,gridmode="",
+2017-01-01 23:26:26	INFO	clean::::+	        wprojplanes=-1,facets=1,cfcache="cfcache.dir",rotpainc=5.0,painc=360.0,
+2017-01-01 23:26:26	INFO	clean::::+	        aterm=True,psterm=False,mterm=True,wbawp=False,conjbeams=True,
+2017-01-01 23:26:26	INFO	clean::::+	        epjtable="",interpolation="linear",niter=500,gain=0.1,threshold="0.3mJy",
+2017-01-01 23:26:26	INFO	clean::::+	        psfmode="clark",imagermode="csclean",ftmachine="mosaic",mosweight=False,scaletype="SAULT",
+2017-01-01 23:26:26	INFO	clean::::+	        multiscale=[0],negcomponent=-1,smallscalebias=0.6,interactive=False,mask="/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask",
+2017-01-01 23:26:26	INFO	clean::::+	        nchan=-1,start=0,width=1,outframe="",veltype="radio",
+2017-01-01 23:26:26	INFO	clean::::+	        imsize=[256, 256],cell="0.00028arcsec",phasecenter="",restfreq="",stokes="I",
+2017-01-01 23:26:26	INFO	clean::::+	        weighting="natural",robust=0.0,uvtaper=False,outertaper=[''],innertaper=['1.0'],
+2017-01-01 23:26:26	INFO	clean::::+	        modelimage="",restoringbeam=[''],pbcor=False,minpb=0.2,usescratch=False,
+2017-01-01 23:26:26	INFO	clean::::+	        noise="1.0Jy",npixels=0,npercycle=100,cyclefactor=5,cyclespeedup=-1,
+2017-01-01 23:26:26	INFO	clean::::+	        nterms=1,reffreq="",chaniter=False,flatnoise=True,allowchunk=False)
+2017-01-01 23:26:26	INFO	clean::::	nchan=-1 start=0 width=1
+2017-01-01 23:26:26	INFO	clean::::	Use default channelization for clean
+2017-01-01 23:26:26	INFO	clean::::	clean image: /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan50_51
+2017-01-01 23:26:26	INFO	clean::::	FTMachine used is  ft 
+2017-01-01 23:26:26	INFO	imager::setDataOnThisMS()	Performing selection on MeasurementSet : /data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms
+2017-01-01 23:26:26	INFO	imager::setDataOnThisMS()	Selecting on fields : 0
+2017-01-01 23:26:26	INFO	imager::setDataOnThisMS()	Selecting on spectral windows expression :*
+2017-01-01 23:26:26	INFO	imager::setDataOnThisMS()	Selecting on scan : 50~51
+2017-01-01 23:26:27	INFO	imager::setDataOnThisMS()	Selected 38904 out of  1393824 rows.
+2017-01-01 23:26:27	INFO	imager::setDataOnThisMS()	Selected : [4 chans in spw 0] [4 chans in spw 1] [4 chans in spw 2] [4 chans in spw 3] [4 chans in spw 4] [4 chans in spw 5] [4 chans in spw 6] [4 chans in spw 7]
+2017-01-01 23:26:27	INFO	imager::defineimage()	Defining image properties:nx=256 ny=256 cellx='0.00028arcsec' celly='0.00028arcsec' stokes=I' mode=MFS nchan=-1 start=0 step=1 spwids=[-1] fieldid=-1 facets=1 frame=5 distance='0'
+2017-01-01 23:26:27	INFO	imager::defineimage()	 phaseCenter='10:19:35.72,   19.52.11.37, ' mStart='Radialvelocity: 0' qStep='0 '' mFreqStart='Frequency: 0
+2017-01-01 23:26:27	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:26:27	INFO	Imager::setvp() 	Sky position tolerance is 180 degrees
+2017-01-01 23:26:27	INFO	Imager::setvp() 	Using system default voltage patterns for each telescope
+2017-01-01 23:26:27	INFO	imager::makeimage() 	Calculating image (without full skyequation)
+2017-01-01 23:26:27	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:26:27	INFO	imager::weight()	Weighting MS: Imaging weights will be changed
+2017-01-01 23:26:27	INFO	imager::weight()	Natural weighting
+2017-01-01 23:26:27	WARN	image::open (file /var/rpmbuild/BUILD/casa-prerelease/casa-prerelease-4.6.0/gcwrap/tools/images/image_cmpt.cc, line 3472)	Another image is already open, closing first
+2017-01-01 23:26:27	INFO	CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2017-01-01 23:26:27	INFO	CasacRegionManager::fromBCS	Using all spectral channels.
+2017-01-01 23:26:27	INFO	CasacRegionManager::fromBCS	Using polarizations ALL
+2017-01-01 23:26:27	INFO	ImageMaskAttacher::makeMask	Created and initialized mask `mask0'
+2017-01-01 23:26:27	INFO	SubImageFactory::createImage	Creating image '__temp_mask' of shape [256, 256, 1, 1]
+2017-01-01 23:26:27	WARN	ImageExprCalculator::compute	image units are not the same: '' vs 'Jy/beam'
+2017-01-01 23:26:27	INFO	ImageExprCalculator::_imagecalc	Creating image `/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan50_51.mask' of shape [256, 256, 1, 1]
+2017-01-01 23:26:27	WARN	ImageExprCalculator::compute2	Overwriting pixel values of the currently attached image
+2017-01-01 23:26:27	INFO	clean::::	Used mask(s) : ['/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask'] to create mask image(s) : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan50_51.mask
+2017-01-01 23:26:27	INFO	imager::setoptions() 	Setting processing options
+2017-01-01 23:26:27	INFO	clean::::	No model found. Making empty initial model : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan50_51.model
+2017-01-01 23:26:27	INFO	Imager::imagecoordinates() 	Center frequency = 8.41657 GHz, synthesized continuum bandwidth = 0.256021 GHz
+2017-01-01 23:26:27	INFO	imager::clean()	Using multifield Clark clean
+2017-01-01 23:26:27	INFO	imager::createFTMachine() 	Multiple fields or facets: transforms will be padded by a factor 1.2
+2017-01-01 23:26:27	INFO	imager::createFTMachine() 	Performing interferometric gridding...
+2017-01-01 23:26:27	INFO	imager::clean()	Clean gain = 0.1, Niter = 500, Threshold = 0.3 mJy
+2017-01-01 23:26:27	INFO	imager::clean()	Starting deconvolution
+2017-01-01 23:26:28	INFO	ImageSkyModel::makeApproxPSFs	bmaj: 0.00213089", bmin: 0.000883737", bpa: -7.51828 deg
+2017-01-01 23:26:28	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 0
+2017-01-01 23:26:28	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:26:28	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.00282477, cleaning down to 0.00225982
+2017-01-01 23:26:28	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:26:28	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.00282477
+2017-01-01 23:26:28	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:26:28	INFO	MFCleanImageSkyModel::solve	Clean used 3 iterations to approach a threshhold of 0.00225982
+2017-01-01 23:26:28	INFO	MFCleanImageSkyModel::solve	0.000766974 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.000766974Jy)
+2017-01-01 23:26:28	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 1
+2017-01-01 23:26:29	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:26:29	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.00207147, cleaning down to 0.00165717
+2017-01-01 23:26:29	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:26:29	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.00207147
+2017-01-01 23:26:29	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:26:29	INFO	MFCleanImageSkyModel::solve	Clean used 6 iterations to approach a threshhold of 0.00165717
+2017-01-01 23:26:29	INFO	MFCleanImageSkyModel::solve	0.000563061 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00133004Jy)
+2017-01-01 23:26:29	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 2
+2017-01-01 23:26:30	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:26:30	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.0015253, cleaning down to 0.00122024
+2017-01-01 23:26:30	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:26:30	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.0015253
+2017-01-01 23:26:30	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:26:30	INFO	MFCleanImageSkyModel::solve	Clean used 9 iterations to approach a threshhold of 0.00122024
+2017-01-01 23:26:30	INFO	MFCleanImageSkyModel::solve	0.000413981 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00174402Jy)
+2017-01-01 23:26:30	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 3
+2017-01-01 23:26:30	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:26:30	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.00111757, cleaning down to 0.000894052
+2017-01-01 23:26:30	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:26:30	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.00111757
+2017-01-01 23:26:30	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:26:30	INFO	MFCleanImageSkyModel::solve	Clean used 12 iterations to approach a threshhold of 0.000894052
+2017-01-01 23:26:30	INFO	MFCleanImageSkyModel::solve	0.000304743 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00204876Jy)
+2017-01-01 23:26:30	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 4
+2017-01-01 23:26:31	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:26:31	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000845811, cleaning down to 0.000676648
+2017-01-01 23:26:31	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:26:31	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000845811
+2017-01-01 23:26:31	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:26:31	INFO	MFCleanImageSkyModel::solve	Clean used 15 iterations to approach a threshhold of 0.000676648
+2017-01-01 23:26:31	INFO	MFCleanImageSkyModel::solve	0.000234194 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00228295Jy)
+2017-01-01 23:26:31	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 5
+2017-01-01 23:26:31	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:26:31	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000667109, cleaning down to 0.000533687
+2017-01-01 23:26:31	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:26:31	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000667109
+2017-01-01 23:26:31	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:26:31	INFO	MFCleanImageSkyModel::solve	Clean used 19 iterations to approach a threshhold of 0.000533687
+2017-01-01 23:26:32	INFO	MFCleanImageSkyModel::solve	0.000248201 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00253115Jy)
+2017-01-01 23:26:32	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 6
+2017-01-01 23:26:32	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:26:32	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000528273, cleaning down to 0.000422618
+2017-01-01 23:26:32	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:26:32	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000528273
+2017-01-01 23:26:32	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:26:32	INFO	MFCleanImageSkyModel::solve	Clean used 24 iterations to approach a threshhold of 0.000422618
+2017-01-01 23:26:32	INFO	MFCleanImageSkyModel::solve	0.000239162 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00277032Jy)
+2017-01-01 23:26:32	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 7
+2017-01-01 23:26:33	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:26:33	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000405956, cleaning down to 0.000324765
+2017-01-01 23:26:33	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:26:33	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000405956
+2017-01-01 23:26:33	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:26:33	INFO	MFCleanImageSkyModel::solve	Clean used 30 iterations to approach a threshhold of 0.000324765
+2017-01-01 23:26:33	INFO	MFCleanImageSkyModel::solve	0.000219119 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00298943Jy)
+2017-01-01 23:26:33	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 8
+2017-01-01 23:26:33	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:26:33	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000319208, cleaning down to 0.000285
+2017-01-01 23:26:33	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:26:33	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000319208
+2017-01-01 23:26:33	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:26:33	INFO	MFCleanImageSkyModel::solve	Clean used 34 iterations to approach a threshhold of 0.000285
+2017-01-01 23:26:33	INFO	MFCleanImageSkyModel::solve	0.000119592 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00310903Jy)
+2017-01-01 23:26:33	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 9
+2017-01-01 23:26:34	INFO	MFCleanImageSkyModel::solve	Reached stopping peak residual = 0.000284581
+2017-01-01 23:26:35	INFO	MFCleanImageSkyModel::solve	Final maximum residual = 0.000284581
+2017-01-01 23:26:35	INFO	MFCleanImageSkyModel::solve	Model 0: max, min residuals = 0.000284581, -0.000133741 clean flux 0.00310903
+2017-01-01 23:26:35	INFO	imager::clean()	Successfully deconvolved image
+2017-01-01 23:26:35	INFO	imager::clean()	Fitted beam used in restoration: 0.00213089 by 0.000883737 (arcsec) at pa -7.51828 (deg) 
+2017-01-01 23:26:35	INFO	imager::iClean()	Restoring Image(s) with the clean-beam
+2017-01-01 23:26:35	INFO	clean::::	##### End Task: clean                #####
+2017-01-01 23:26:35	INFO	clean::::+	##########################################
+2017-01-01 23:26:35	INFO	clean::::	
+2017-01-01 23:26:35	INFO	clean::::+	##########################################
+2017-01-01 23:26:35	INFO	clean::::+	##### Begin Task: clean              #####
+2017-01-01 23:26:35	INFO	clean::::	clean(vis="/data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms",imagename="/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan50_51",outlierfile="",field="",spw="",
+2017-01-01 23:26:35	INFO	clean::::+	        selectdata=True,timerange="",uvrange="",antenna="",scan="50~51",
+2017-01-01 23:26:35	INFO	clean::::+	        observation="",intent="",mode="mfs",resmooth=False,gridmode="",
+2017-01-01 23:26:35	INFO	clean::::+	        wprojplanes=-1,facets=1,cfcache="cfcache.dir",rotpainc=5.0,painc=360.0,
+2017-01-01 23:26:35	INFO	clean::::+	        aterm=True,psterm=False,mterm=True,wbawp=False,conjbeams=True,
+2017-01-01 23:26:35	INFO	clean::::+	        epjtable="",interpolation="linear",niter=500,gain=0.1,threshold="0.3mJy",
+2017-01-01 23:26:35	INFO	clean::::+	        psfmode="clark",imagermode="csclean",ftmachine="mosaic",mosweight=False,scaletype="SAULT",
+2017-01-01 23:26:35	INFO	clean::::+	        multiscale=[0],negcomponent=-1,smallscalebias=0.6,interactive=False,mask="/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask",
+2017-01-01 23:26:35	INFO	clean::::+	        nchan=-1,start=0,width=1,outframe="",veltype="radio",
+2017-01-01 23:26:35	INFO	clean::::+	        imsize=[256, 256],cell="0.00028arcsec",phasecenter="",restfreq="",stokes="V",
+2017-01-01 23:26:35	INFO	clean::::+	        weighting="natural",robust=0.0,uvtaper=False,outertaper=[''],innertaper=['1.0'],
+2017-01-01 23:26:35	INFO	clean::::+	        modelimage="",restoringbeam=[''],pbcor=False,minpb=0.2,usescratch=False,
+2017-01-01 23:26:35	INFO	clean::::+	        noise="1.0Jy",npixels=0,npercycle=100,cyclefactor=5,cyclespeedup=-1,
+2017-01-01 23:26:35	INFO	clean::::+	        nterms=1,reffreq="",chaniter=False,flatnoise=True,allowchunk=False)
+2017-01-01 23:26:35	INFO	clean::::	nchan=-1 start=0 width=1
+2017-01-01 23:26:35	INFO	clean::::	Use default channelization for clean
+2017-01-01 23:26:35	INFO	clean::::	clean image: /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan50_51
+2017-01-01 23:26:35	INFO	clean::::	FTMachine used is  ft 
+2017-01-01 23:26:35	INFO	imager::setDataOnThisMS()	Performing selection on MeasurementSet : /data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms
+2017-01-01 23:26:35	INFO	imager::setDataOnThisMS()	Selecting on fields : 0
+2017-01-01 23:26:35	INFO	imager::setDataOnThisMS()	Selecting on spectral windows expression :*
+2017-01-01 23:26:35	INFO	imager::setDataOnThisMS()	Selecting on scan : 50~51
+2017-01-01 23:26:35	INFO	imager::setDataOnThisMS()	Selected 38904 out of  1393824 rows.
+2017-01-01 23:26:35	INFO	imager::setDataOnThisMS()	Selected : [4 chans in spw 0] [4 chans in spw 1] [4 chans in spw 2] [4 chans in spw 3] [4 chans in spw 4] [4 chans in spw 5] [4 chans in spw 6] [4 chans in spw 7]
+2017-01-01 23:26:35	INFO	imager::defineimage()	Defining image properties:nx=256 ny=256 cellx='0.00028arcsec' celly='0.00028arcsec' stokes=V' mode=MFS nchan=-1 start=0 step=1 spwids=[-1] fieldid=-1 facets=1 frame=5 distance='0'
+2017-01-01 23:26:35	INFO	imager::defineimage()	 phaseCenter='10:19:35.72,   19.52.11.37, ' mStart='Radialvelocity: 0' qStep='0 '' mFreqStart='Frequency: 0
+2017-01-01 23:26:35	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:26:35	INFO	Imager::setvp() 	Sky position tolerance is 180 degrees
+2017-01-01 23:26:35	INFO	Imager::setvp() 	Using system default voltage patterns for each telescope
+2017-01-01 23:26:35	INFO	imager::makeimage() 	Calculating image (without full skyequation)
+2017-01-01 23:26:36	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:26:36	INFO	imager::weight()	Weighting MS: Imaging weights will be changed
+2017-01-01 23:26:36	INFO	imager::weight()	Natural weighting
+2017-01-01 23:26:36	WARN	image::open (file /var/rpmbuild/BUILD/casa-prerelease/casa-prerelease-4.6.0/gcwrap/tools/images/image_cmpt.cc, line 3472)	Another image is already open, closing first
+2017-01-01 23:26:36	INFO	CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2017-01-01 23:26:36	INFO	CasacRegionManager::fromBCS	Using all spectral channels.
+2017-01-01 23:26:36	INFO	CasacRegionManager::fromBCS	Using polarizations ALL
+2017-01-01 23:26:36	INFO	ImageMaskAttacher::makeMask	Created and initialized mask `mask0'
+2017-01-01 23:26:36	INFO	SubImageFactory::createImage	Creating image '__temp_mask' of shape [256, 256, 1, 1]
+2017-01-01 23:26:36	WARN	ImageExprCalculator::compute	image units are not the same: '' vs 'Jy/beam'
+2017-01-01 23:26:36	INFO	ImageExprCalculator::_imagecalc	Creating image `/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan50_51.mask' of shape [256, 256, 1, 1]
+2017-01-01 23:26:36	WARN	ImageExprCalculator::compute2	Overwriting pixel values of the currently attached image
+2017-01-01 23:26:36	INFO	clean::::	Used mask(s) : ['/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask'] to create mask image(s) : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan50_51.mask
+2017-01-01 23:26:36	INFO	imager::setoptions() 	Setting processing options
+2017-01-01 23:26:36	INFO	clean::::	No model found. Making empty initial model : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan50_51.model
+2017-01-01 23:26:36	INFO	Imager::imagecoordinates() 	Center frequency = 8.41657 GHz, synthesized continuum bandwidth = 0.256021 GHz
+2017-01-01 23:26:36	INFO	imager::clean()	Using multifield Clark clean
+2017-01-01 23:26:36	INFO	imager::createFTMachine() 	Multiple fields or facets: transforms will be padded by a factor 1.2
+2017-01-01 23:26:36	INFO	imager::createFTMachine() 	Performing interferometric gridding...
+2017-01-01 23:26:36	INFO	imager::clean()	Clean gain = 0.1, Niter = 500, Threshold = 0.3 mJy
+2017-01-01 23:26:36	INFO	imager::clean()	Starting deconvolution
+2017-01-01 23:26:36	INFO	ImageSkyModel::makeApproxPSFs	bmaj: 0.00213089", bmin: 0.000883737", bpa: -7.51828 deg
+2017-01-01 23:26:36	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 0
+2017-01-01 23:26:37	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:26:37	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000511914, cleaning down to 0.000409531
+2017-01-01 23:26:37	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:26:37	INFO	MFCleanImageSkyModel::solve	Doing stokes V image
+2017-01-01 23:26:37	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000511914
+2017-01-01 23:26:37	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:26:37	INFO	MFCleanImageSkyModel::solve	Clean used 3 iterations to approach a threshhold of 0.000409531
+2017-01-01 23:26:37	INFO	MFCleanImageSkyModel::solve	-0.000138729 Jy <- cleaned in this cycle for  model 0 (Total flux : -0.000138729Jy)
+2017-01-01 23:26:37	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 1
+2017-01-01 23:26:37	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:26:37	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000373185, cleaning down to 0.000298548
+2017-01-01 23:26:37	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:26:37	INFO	MFCleanImageSkyModel::solve	Doing stokes V image
+2017-01-01 23:26:37	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000373185
+2017-01-01 23:26:37	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:26:37	INFO	MFCleanImageSkyModel::solve	Clean used 9 iterations to approach a threshhold of 0.000298548
+2017-01-01 23:26:37	INFO	MFCleanImageSkyModel::solve	-6.69352e-08 Jy <- cleaned in this cycle for  model 0 (Total flux : -0.000138796Jy)
+2017-01-01 23:26:37	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 2
+2017-01-01 23:26:38	INFO	MFCleanImageSkyModel::solve	Reached stopping peak residual = 0.000283487
+2017-01-01 23:26:39	INFO	MFCleanImageSkyModel::solve	Final maximum residual = 0.000283487
+2017-01-01 23:26:39	INFO	MFCleanImageSkyModel::solve	Model 0: max, min residuals = 0.000283487, -0.00027559 clean flux -0.000138796
+2017-01-01 23:26:39	INFO	imager::clean()	Successfully deconvolved image
+2017-01-01 23:26:39	INFO	imager::clean()	Fitted beam used in restoration: 0.00213089 by 0.000883737 (arcsec) at pa -7.51828 (deg) 
+2017-01-01 23:26:39	INFO	imager::iClean()	Restoring Image(s) with the clean-beam
+2017-01-01 23:26:39	INFO	clean::::	##### End Task: clean                #####
+2017-01-01 23:26:39	INFO	clean::::+	##########################################
+2017-01-01 23:26:39	INFO	clean::::	
+2017-01-01 23:26:39	INFO	clean::::+	##########################################
+2017-01-01 23:26:39	INFO	clean::::+	##### Begin Task: clean              #####
+2017-01-01 23:26:39	INFO	clean::::	clean(vis="/data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms",imagename="/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan52_56",outlierfile="",field="",spw="",
+2017-01-01 23:26:39	INFO	clean::::+	        selectdata=True,timerange="",uvrange="",antenna="",scan="52~56",
+2017-01-01 23:26:39	INFO	clean::::+	        observation="",intent="",mode="mfs",resmooth=False,gridmode="",
+2017-01-01 23:26:39	INFO	clean::::+	        wprojplanes=-1,facets=1,cfcache="cfcache.dir",rotpainc=5.0,painc=360.0,
+2017-01-01 23:26:39	INFO	clean::::+	        aterm=True,psterm=False,mterm=True,wbawp=False,conjbeams=True,
+2017-01-01 23:26:39	INFO	clean::::+	        epjtable="",interpolation="linear",niter=500,gain=0.1,threshold="0.3mJy",
+2017-01-01 23:26:39	INFO	clean::::+	        psfmode="clark",imagermode="csclean",ftmachine="mosaic",mosweight=False,scaletype="SAULT",
+2017-01-01 23:26:39	INFO	clean::::+	        multiscale=[0],negcomponent=-1,smallscalebias=0.6,interactive=False,mask="/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask",
+2017-01-01 23:26:39	INFO	clean::::+	        nchan=-1,start=0,width=1,outframe="",veltype="radio",
+2017-01-01 23:26:39	INFO	clean::::+	        imsize=[256, 256],cell="0.00028arcsec",phasecenter="",restfreq="",stokes="I",
+2017-01-01 23:26:39	INFO	clean::::+	        weighting="natural",robust=0.0,uvtaper=False,outertaper=[''],innertaper=['1.0'],
+2017-01-01 23:26:39	INFO	clean::::+	        modelimage="",restoringbeam=[''],pbcor=False,minpb=0.2,usescratch=False,
+2017-01-01 23:26:39	INFO	clean::::+	        noise="1.0Jy",npixels=0,npercycle=100,cyclefactor=5,cyclespeedup=-1,
+2017-01-01 23:26:39	INFO	clean::::+	        nterms=1,reffreq="",chaniter=False,flatnoise=True,allowchunk=False)
+2017-01-01 23:26:39	INFO	clean::::	nchan=-1 start=0 width=1
+2017-01-01 23:26:39	INFO	clean::::	Use default channelization for clean
+2017-01-01 23:26:39	INFO	clean::::	clean image: /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan52_56
+2017-01-01 23:26:39	INFO	clean::::	FTMachine used is  ft 
+2017-01-01 23:26:39	INFO	imager::setDataOnThisMS()	Performing selection on MeasurementSet : /data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms
+2017-01-01 23:26:39	INFO	imager::setDataOnThisMS()	Selecting on fields : 0
+2017-01-01 23:26:39	INFO	imager::setDataOnThisMS()	Selecting on spectral windows expression :*
+2017-01-01 23:26:39	INFO	imager::setDataOnThisMS()	Selecting on scan : 52~56
+2017-01-01 23:26:39	INFO	imager::setDataOnThisMS()	Selected 97472 out of  1393824 rows.
+2017-01-01 23:26:39	INFO	imager::setDataOnThisMS()	Selected : [4 chans in spw 0] [4 chans in spw 1] [4 chans in spw 2] [4 chans in spw 3] [4 chans in spw 4] [4 chans in spw 5] [4 chans in spw 6] [4 chans in spw 7]
+2017-01-01 23:26:39	INFO	imager::defineimage()	Defining image properties:nx=256 ny=256 cellx='0.00028arcsec' celly='0.00028arcsec' stokes=I' mode=MFS nchan=-1 start=0 step=1 spwids=[-1] fieldid=-1 facets=1 frame=5 distance='0'
+2017-01-01 23:26:39	INFO	imager::defineimage()	 phaseCenter='10:19:35.72,   19.52.11.37, ' mStart='Radialvelocity: 0' qStep='0 '' mFreqStart='Frequency: 0
+2017-01-01 23:26:39	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:26:39	INFO	Imager::setvp() 	Sky position tolerance is 180 degrees
+2017-01-01 23:26:39	INFO	Imager::setvp() 	Using system default voltage patterns for each telescope
+2017-01-01 23:26:39	INFO	imager::makeimage() 	Calculating image (without full skyequation)
+2017-01-01 23:26:40	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:26:40	INFO	imager::weight()	Weighting MS: Imaging weights will be changed
+2017-01-01 23:26:40	INFO	imager::weight()	Natural weighting
+2017-01-01 23:26:40	WARN	image::open (file /var/rpmbuild/BUILD/casa-prerelease/casa-prerelease-4.6.0/gcwrap/tools/images/image_cmpt.cc, line 3472)	Another image is already open, closing first
+2017-01-01 23:26:40	INFO	CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2017-01-01 23:26:40	INFO	CasacRegionManager::fromBCS	Using all spectral channels.
+2017-01-01 23:26:40	INFO	CasacRegionManager::fromBCS	Using polarizations ALL
+2017-01-01 23:26:40	INFO	ImageMaskAttacher::makeMask	Created and initialized mask `mask0'
+2017-01-01 23:26:40	INFO	SubImageFactory::createImage	Creating image '__temp_mask' of shape [256, 256, 1, 1]
+2017-01-01 23:26:40	WARN	ImageExprCalculator::compute	image units are not the same: '' vs 'Jy/beam'
+2017-01-01 23:26:40	INFO	ImageExprCalculator::_imagecalc	Creating image `/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan52_56.mask' of shape [256, 256, 1, 1]
+2017-01-01 23:26:40	WARN	ImageExprCalculator::compute2	Overwriting pixel values of the currently attached image
+2017-01-01 23:26:40	INFO	clean::::	Used mask(s) : ['/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask'] to create mask image(s) : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan52_56.mask
+2017-01-01 23:26:40	INFO	imager::setoptions() 	Setting processing options
+2017-01-01 23:26:40	INFO	clean::::	No model found. Making empty initial model : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan52_56.model
+2017-01-01 23:26:40	INFO	Imager::imagecoordinates() 	Center frequency = 8.41657 GHz, synthesized continuum bandwidth = 0.256021 GHz
+2017-01-01 23:26:40	INFO	imager::clean()	Using multifield Clark clean
+2017-01-01 23:26:40	INFO	imager::createFTMachine() 	Multiple fields or facets: transforms will be padded by a factor 1.2
+2017-01-01 23:26:40	INFO	imager::createFTMachine() 	Performing interferometric gridding...
+2017-01-01 23:26:40	INFO	imager::clean()	Clean gain = 0.1, Niter = 500, Threshold = 0.3 mJy
+2017-01-01 23:26:40	INFO	imager::clean()	Starting deconvolution
+2017-01-01 23:26:41	INFO	ImageSkyModel::makeApproxPSFs	bmaj: 0.00227433", bmin: 0.000918687", bpa: -9.99164 deg
+2017-01-01 23:26:41	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 0
+2017-01-01 23:26:42	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:26:42	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.00113864, cleaning down to 0.000910908
+2017-01-01 23:26:42	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:26:42	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.00113864
+2017-01-01 23:26:42	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:26:42	INFO	MFCleanImageSkyModel::solve	Clean used 3 iterations to approach a threshhold of 0.000910908
+2017-01-01 23:26:42	INFO	MFCleanImageSkyModel::solve	0.000312722 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.000312722Jy)
+2017-01-01 23:26:42	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 1
+2017-01-01 23:26:44	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:26:44	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000863813, cleaning down to 0.00069105
+2017-01-01 23:26:44	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:26:44	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000863813
+2017-01-01 23:26:44	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:26:44	INFO	MFCleanImageSkyModel::solve	Clean used 6 iterations to approach a threshhold of 0.00069105
+2017-01-01 23:26:44	INFO	MFCleanImageSkyModel::solve	0.000236842 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.000549564Jy)
+2017-01-01 23:26:44	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 2
+2017-01-01 23:26:45	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:26:45	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000654481, cleaning down to 0.000523585
+2017-01-01 23:26:45	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:26:45	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000654481
+2017-01-01 23:26:45	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:26:45	INFO	MFCleanImageSkyModel::solve	Clean used 9 iterations to approach a threshhold of 0.000523585
+2017-01-01 23:26:45	INFO	MFCleanImageSkyModel::solve	0.000179482 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.000729045Jy)
+2017-01-01 23:26:45	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 3
+2017-01-01 23:26:47	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:26:47	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000495968, cleaning down to 0.000396774
+2017-01-01 23:26:47	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:26:47	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000495968
+2017-01-01 23:26:47	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:26:47	INFO	MFCleanImageSkyModel::solve	Clean used 14 iterations to approach a threshhold of 0.000396774
+2017-01-01 23:26:47	INFO	MFCleanImageSkyModel::solve	0.00022242 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.000951465Jy)
+2017-01-01 23:26:47	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 4
+2017-01-01 23:26:48	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:26:48	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000366791, cleaning down to 0.000293433
+2017-01-01 23:26:48	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:26:48	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000366791
+2017-01-01 23:26:48	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:26:48	INFO	MFCleanImageSkyModel::solve	Clean used 19 iterations to approach a threshhold of 0.000293433
+2017-01-01 23:26:48	INFO	MFCleanImageSkyModel::solve	0.000167684 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00111915Jy)
+2017-01-01 23:26:48	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 5
+2017-01-01 23:26:50	INFO	MFCleanImageSkyModel::solve	Reached stopping peak residual = 0.000284001
+2017-01-01 23:26:51	INFO	MFCleanImageSkyModel::solve	Final maximum residual = 0.000284001
+2017-01-01 23:26:51	INFO	MFCleanImageSkyModel::solve	Model 0: max, min residuals = 0.000284001, -0.000105998 clean flux 0.00111915
+2017-01-01 23:26:51	INFO	imager::clean()	Successfully deconvolved image
+2017-01-01 23:26:51	INFO	imager::clean()	Fitted beam used in restoration: 0.00227433 by 0.000918687 (arcsec) at pa -9.99164 (deg) 
+2017-01-01 23:26:51	INFO	imager::iClean()	Restoring Image(s) with the clean-beam
+2017-01-01 23:26:52	INFO	clean::::	##### End Task: clean                #####
+2017-01-01 23:26:52	INFO	clean::::+	##########################################
+2017-01-01 23:26:52	INFO	clean::::	
+2017-01-01 23:26:52	INFO	clean::::+	##########################################
+2017-01-01 23:26:52	INFO	clean::::+	##### Begin Task: clean              #####
+2017-01-01 23:26:52	INFO	clean::::	clean(vis="/data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms",imagename="/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan52_56",outlierfile="",field="",spw="",
+2017-01-01 23:26:52	INFO	clean::::+	        selectdata=True,timerange="",uvrange="",antenna="",scan="52~56",
+2017-01-01 23:26:52	INFO	clean::::+	        observation="",intent="",mode="mfs",resmooth=False,gridmode="",
+2017-01-01 23:26:52	INFO	clean::::+	        wprojplanes=-1,facets=1,cfcache="cfcache.dir",rotpainc=5.0,painc=360.0,
+2017-01-01 23:26:52	INFO	clean::::+	        aterm=True,psterm=False,mterm=True,wbawp=False,conjbeams=True,
+2017-01-01 23:26:52	INFO	clean::::+	        epjtable="",interpolation="linear",niter=500,gain=0.1,threshold="0.3mJy",
+2017-01-01 23:26:52	INFO	clean::::+	        psfmode="clark",imagermode="csclean",ftmachine="mosaic",mosweight=False,scaletype="SAULT",
+2017-01-01 23:26:52	INFO	clean::::+	        multiscale=[0],negcomponent=-1,smallscalebias=0.6,interactive=False,mask="/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask",
+2017-01-01 23:26:52	INFO	clean::::+	        nchan=-1,start=0,width=1,outframe="",veltype="radio",
+2017-01-01 23:26:52	INFO	clean::::+	        imsize=[256, 256],cell="0.00028arcsec",phasecenter="",restfreq="",stokes="V",
+2017-01-01 23:26:52	INFO	clean::::+	        weighting="natural",robust=0.0,uvtaper=False,outertaper=[''],innertaper=['1.0'],
+2017-01-01 23:26:52	INFO	clean::::+	        modelimage="",restoringbeam=[''],pbcor=False,minpb=0.2,usescratch=False,
+2017-01-01 23:26:52	INFO	clean::::+	        noise="1.0Jy",npixels=0,npercycle=100,cyclefactor=5,cyclespeedup=-1,
+2017-01-01 23:26:52	INFO	clean::::+	        nterms=1,reffreq="",chaniter=False,flatnoise=True,allowchunk=False)
+2017-01-01 23:26:52	INFO	clean::::	nchan=-1 start=0 width=1
+2017-01-01 23:26:52	INFO	clean::::	Use default channelization for clean
+2017-01-01 23:26:52	INFO	clean::::	clean image: /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan52_56
+2017-01-01 23:26:52	INFO	clean::::	FTMachine used is  ft 
+2017-01-01 23:26:52	INFO	imager::setDataOnThisMS()	Performing selection on MeasurementSet : /data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms
+2017-01-01 23:26:52	INFO	imager::setDataOnThisMS()	Selecting on fields : 0
+2017-01-01 23:26:52	INFO	imager::setDataOnThisMS()	Selecting on spectral windows expression :*
+2017-01-01 23:26:52	INFO	imager::setDataOnThisMS()	Selecting on scan : 52~56
+2017-01-01 23:26:52	INFO	imager::setDataOnThisMS()	Selected 97472 out of  1393824 rows.
+2017-01-01 23:26:52	INFO	imager::setDataOnThisMS()	Selected : [4 chans in spw 0] [4 chans in spw 1] [4 chans in spw 2] [4 chans in spw 3] [4 chans in spw 4] [4 chans in spw 5] [4 chans in spw 6] [4 chans in spw 7]
+2017-01-01 23:26:52	INFO	imager::defineimage()	Defining image properties:nx=256 ny=256 cellx='0.00028arcsec' celly='0.00028arcsec' stokes=V' mode=MFS nchan=-1 start=0 step=1 spwids=[-1] fieldid=-1 facets=1 frame=5 distance='0'
+2017-01-01 23:26:52	INFO	imager::defineimage()	 phaseCenter='10:19:35.72,   19.52.11.37, ' mStart='Radialvelocity: 0' qStep='0 '' mFreqStart='Frequency: 0
+2017-01-01 23:26:52	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:26:52	INFO	Imager::setvp() 	Sky position tolerance is 180 degrees
+2017-01-01 23:26:52	INFO	Imager::setvp() 	Using system default voltage patterns for each telescope
+2017-01-01 23:26:52	INFO	imager::makeimage() 	Calculating image (without full skyequation)
+2017-01-01 23:26:52	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:26:52	INFO	imager::weight()	Weighting MS: Imaging weights will be changed
+2017-01-01 23:26:52	INFO	imager::weight()	Natural weighting
+2017-01-01 23:26:53	WARN	image::open (file /var/rpmbuild/BUILD/casa-prerelease/casa-prerelease-4.6.0/gcwrap/tools/images/image_cmpt.cc, line 3472)	Another image is already open, closing first
+2017-01-01 23:26:53	INFO	CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2017-01-01 23:26:53	INFO	CasacRegionManager::fromBCS	Using all spectral channels.
+2017-01-01 23:26:53	INFO	CasacRegionManager::fromBCS	Using polarizations ALL
+2017-01-01 23:26:53	INFO	ImageMaskAttacher::makeMask	Created and initialized mask `mask0'
+2017-01-01 23:26:53	INFO	SubImageFactory::createImage	Creating image '__temp_mask' of shape [256, 256, 1, 1]
+2017-01-01 23:26:53	WARN	ImageExprCalculator::compute	image units are not the same: '' vs 'Jy/beam'
+2017-01-01 23:26:53	INFO	ImageExprCalculator::_imagecalc	Creating image `/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan52_56.mask' of shape [256, 256, 1, 1]
+2017-01-01 23:26:53	WARN	ImageExprCalculator::compute2	Overwriting pixel values of the currently attached image
+2017-01-01 23:26:53	INFO	clean::::	Used mask(s) : ['/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask'] to create mask image(s) : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan52_56.mask
+2017-01-01 23:26:53	INFO	imager::setoptions() 	Setting processing options
+2017-01-01 23:26:53	INFO	clean::::	No model found. Making empty initial model : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan52_56.model
+2017-01-01 23:26:53	INFO	Imager::imagecoordinates() 	Center frequency = 8.41657 GHz, synthesized continuum bandwidth = 0.256021 GHz
+2017-01-01 23:26:53	INFO	imager::clean()	Using multifield Clark clean
+2017-01-01 23:26:53	INFO	imager::createFTMachine() 	Multiple fields or facets: transforms will be padded by a factor 1.2
+2017-01-01 23:26:53	INFO	imager::createFTMachine() 	Performing interferometric gridding...
+2017-01-01 23:26:53	INFO	imager::clean()	Clean gain = 0.1, Niter = 500, Threshold = 0.3 mJy
+2017-01-01 23:26:53	INFO	imager::clean()	Starting deconvolution
+2017-01-01 23:26:54	INFO	ImageSkyModel::makeApproxPSFs	bmaj: 0.00227433", bmin: 0.000918687", bpa: -9.99164 deg
+2017-01-01 23:26:54	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 0
+2017-01-01 23:26:55	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:26:55	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.00045484, cleaning down to 0.000363872
+2017-01-01 23:26:55	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:26:55	INFO	MFCleanImageSkyModel::solve	Doing stokes V image
+2017-01-01 23:26:55	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.00045484
+2017-01-01 23:26:55	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:26:55	INFO	MFCleanImageSkyModel::solve	Clean used 3 iterations to approach a threshhold of 0.000363872
+2017-01-01 23:26:55	INFO	MFCleanImageSkyModel::solve	-0.000123262 Jy <- cleaned in this cycle for  model 0 (Total flux : -0.000123262Jy)
+2017-01-01 23:26:55	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 1
+2017-01-01 23:26:57	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:26:57	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000332272, cleaning down to 0.000285
+2017-01-01 23:26:57	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:26:57	INFO	MFCleanImageSkyModel::solve	Doing stokes V image
+2017-01-01 23:26:57	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000332272
+2017-01-01 23:26:57	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:26:57	INFO	MFCleanImageSkyModel::solve	Clean used 5 iterations to approach a threshhold of 0.000285
+2017-01-01 23:26:57	INFO	MFCleanImageSkyModel::solve	-6.32172e-05 Jy <- cleaned in this cycle for  model 0 (Total flux : -0.000186479Jy)
+2017-01-01 23:26:57	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 2
+2017-01-01 23:26:58	INFO	MFCleanImageSkyModel::solve	Reached stopping peak residual = 0.000270537
+2017-01-01 23:27:00	INFO	MFCleanImageSkyModel::solve	Final maximum residual = 0.000270537
+2017-01-01 23:27:00	INFO	MFCleanImageSkyModel::solve	Model 0: max, min residuals = 0.000151117, -0.000270537 clean flux -0.000186479
+2017-01-01 23:27:00	INFO	imager::clean()	Successfully deconvolved image
+2017-01-01 23:27:00	INFO	imager::clean()	Fitted beam used in restoration: 0.00227433 by 0.000918687 (arcsec) at pa -9.99164 (deg) 
+2017-01-01 23:27:00	INFO	imager::iClean()	Restoring Image(s) with the clean-beam
+2017-01-01 23:27:00	INFO	clean::::	##### End Task: clean                #####
+2017-01-01 23:27:00	INFO	clean::::+	##########################################
+2017-01-01 23:27:00	INFO	clean::::	
+2017-01-01 23:27:00	INFO	clean::::+	##########################################
+2017-01-01 23:27:00	INFO	clean::::+	##### Begin Task: clean              #####
+2017-01-01 23:27:00	INFO	clean::::	clean(vis="/data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms",imagename="/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan57_58",outlierfile="",field="",spw="",
+2017-01-01 23:27:00	INFO	clean::::+	        selectdata=True,timerange="",uvrange="",antenna="",scan="57~58",
+2017-01-01 23:27:00	INFO	clean::::+	        observation="",intent="",mode="mfs",resmooth=False,gridmode="",
+2017-01-01 23:27:00	INFO	clean::::+	        wprojplanes=-1,facets=1,cfcache="cfcache.dir",rotpainc=5.0,painc=360.0,
+2017-01-01 23:27:00	INFO	clean::::+	        aterm=True,psterm=False,mterm=True,wbawp=False,conjbeams=True,
+2017-01-01 23:27:00	INFO	clean::::+	        epjtable="",interpolation="linear",niter=500,gain=0.1,threshold="0.3mJy",
+2017-01-01 23:27:00	INFO	clean::::+	        psfmode="clark",imagermode="csclean",ftmachine="mosaic",mosweight=False,scaletype="SAULT",
+2017-01-01 23:27:00	INFO	clean::::+	        multiscale=[0],negcomponent=-1,smallscalebias=0.6,interactive=False,mask="/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask",
+2017-01-01 23:27:00	INFO	clean::::+	        nchan=-1,start=0,width=1,outframe="",veltype="radio",
+2017-01-01 23:27:00	INFO	clean::::+	        imsize=[256, 256],cell="0.00028arcsec",phasecenter="",restfreq="",stokes="I",
+2017-01-01 23:27:00	INFO	clean::::+	        weighting="natural",robust=0.0,uvtaper=False,outertaper=[''],innertaper=['1.0'],
+2017-01-01 23:27:00	INFO	clean::::+	        modelimage="",restoringbeam=[''],pbcor=False,minpb=0.2,usescratch=False,
+2017-01-01 23:27:00	INFO	clean::::+	        noise="1.0Jy",npixels=0,npercycle=100,cyclefactor=5,cyclespeedup=-1,
+2017-01-01 23:27:00	INFO	clean::::+	        nterms=1,reffreq="",chaniter=False,flatnoise=True,allowchunk=False)
+2017-01-01 23:27:00	INFO	clean::::	nchan=-1 start=0 width=1
+2017-01-01 23:27:00	INFO	clean::::	Use default channelization for clean
+2017-01-01 23:27:00	INFO	clean::::	clean image: /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan57_58
+2017-01-01 23:27:00	INFO	clean::::	FTMachine used is  ft 
+2017-01-01 23:27:00	INFO	imager::setDataOnThisMS()	Performing selection on MeasurementSet : /data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms
+2017-01-01 23:27:00	INFO	imager::setDataOnThisMS()	Selecting on fields : 0
+2017-01-01 23:27:00	INFO	imager::setDataOnThisMS()	Selecting on spectral windows expression :*
+2017-01-01 23:27:00	INFO	imager::setDataOnThisMS()	Selecting on scan : 57~58
+2017-01-01 23:27:01	INFO	imager::setDataOnThisMS()	Selected 38896 out of  1393824 rows.
+2017-01-01 23:27:01	INFO	imager::setDataOnThisMS()	Selected : [4 chans in spw 0] [4 chans in spw 1] [4 chans in spw 2] [4 chans in spw 3] [4 chans in spw 4] [4 chans in spw 5] [4 chans in spw 6] [4 chans in spw 7]
+2017-01-01 23:27:01	INFO	imager::defineimage()	Defining image properties:nx=256 ny=256 cellx='0.00028arcsec' celly='0.00028arcsec' stokes=I' mode=MFS nchan=-1 start=0 step=1 spwids=[-1] fieldid=-1 facets=1 frame=5 distance='0'
+2017-01-01 23:27:01	INFO	imager::defineimage()	 phaseCenter='10:19:35.72,   19.52.11.37, ' mStart='Radialvelocity: 0' qStep='0 '' mFreqStart='Frequency: 0
+2017-01-01 23:27:01	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:27:01	INFO	Imager::setvp() 	Sky position tolerance is 180 degrees
+2017-01-01 23:27:01	INFO	Imager::setvp() 	Using system default voltage patterns for each telescope
+2017-01-01 23:27:01	INFO	imager::makeimage() 	Calculating image (without full skyequation)
+2017-01-01 23:27:01	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:27:01	INFO	imager::weight()	Weighting MS: Imaging weights will be changed
+2017-01-01 23:27:01	INFO	imager::weight()	Natural weighting
+2017-01-01 23:27:01	WARN	image::open (file /var/rpmbuild/BUILD/casa-prerelease/casa-prerelease-4.6.0/gcwrap/tools/images/image_cmpt.cc, line 3472)	Another image is already open, closing first
+2017-01-01 23:27:01	INFO	CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2017-01-01 23:27:01	INFO	CasacRegionManager::fromBCS	Using all spectral channels.
+2017-01-01 23:27:01	INFO	CasacRegionManager::fromBCS	Using polarizations ALL
+2017-01-01 23:27:01	INFO	ImageMaskAttacher::makeMask	Created and initialized mask `mask0'
+2017-01-01 23:27:01	INFO	SubImageFactory::createImage	Creating image '__temp_mask' of shape [256, 256, 1, 1]
+2017-01-01 23:27:01	WARN	ImageExprCalculator::compute	image units are not the same: '' vs 'Jy/beam'
+2017-01-01 23:27:01	INFO	ImageExprCalculator::_imagecalc	Creating image `/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan57_58.mask' of shape [256, 256, 1, 1]
+2017-01-01 23:27:01	WARN	ImageExprCalculator::compute2	Overwriting pixel values of the currently attached image
+2017-01-01 23:27:01	INFO	clean::::	Used mask(s) : ['/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask'] to create mask image(s) : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan57_58.mask
+2017-01-01 23:27:01	INFO	imager::setoptions() 	Setting processing options
+2017-01-01 23:27:01	INFO	clean::::	No model found. Making empty initial model : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan57_58.model
+2017-01-01 23:27:01	INFO	Imager::imagecoordinates() 	Center frequency = 8.41657 GHz, synthesized continuum bandwidth = 0.256021 GHz
+2017-01-01 23:27:01	INFO	imager::clean()	Using multifield Clark clean
+2017-01-01 23:27:01	INFO	imager::createFTMachine() 	Multiple fields or facets: transforms will be padded by a factor 1.2
+2017-01-01 23:27:01	INFO	imager::createFTMachine() 	Performing interferometric gridding...
+2017-01-01 23:27:01	INFO	imager::clean()	Clean gain = 0.1, Niter = 500, Threshold = 0.3 mJy
+2017-01-01 23:27:01	INFO	imager::clean()	Starting deconvolution
+2017-01-01 23:27:02	INFO	ImageSkyModel::makeApproxPSFs	bmaj: 0.00233896", bmin: 0.000965987", bpa: -10.5361 deg
+2017-01-01 23:27:02	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 0
+2017-01-01 23:27:02	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:27:02	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.00290595, cleaning down to 0.00232476
+2017-01-01 23:27:02	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:27:02	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.00290595
+2017-01-01 23:27:02	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:27:02	INFO	MFCleanImageSkyModel::solve	Clean used 3 iterations to approach a threshhold of 0.00232476
+2017-01-01 23:27:02	INFO	MFCleanImageSkyModel::solve	0.000787511 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.000787511Jy)
+2017-01-01 23:27:02	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 1
+2017-01-01 23:27:03	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:27:03	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.00213687, cleaning down to 0.00170949
+2017-01-01 23:27:03	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:27:03	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.00213687
+2017-01-01 23:27:03	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:27:03	INFO	MFCleanImageSkyModel::solve	Clean used 6 iterations to approach a threshhold of 0.00170949
+2017-01-01 23:27:03	INFO	MFCleanImageSkyModel::solve	0.000585134 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00137265Jy)
+2017-01-01 23:27:03	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 2
+2017-01-01 23:27:03	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:27:03	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.00161096, cleaning down to 0.00128876
+2017-01-01 23:27:03	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:27:03	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.00161096
+2017-01-01 23:27:03	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:27:03	INFO	MFCleanImageSkyModel::solve	Clean used 9 iterations to approach a threshhold of 0.00128876
+2017-01-01 23:27:03	INFO	MFCleanImageSkyModel::solve	0.000441583 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00181423Jy)
+2017-01-01 23:27:03	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 3
+2017-01-01 23:27:04	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:27:04	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.00121796, cleaning down to 0.000974371
+2017-01-01 23:27:04	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:27:04	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.00121796
+2017-01-01 23:27:04	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:27:04	INFO	MFCleanImageSkyModel::solve	Clean used 13 iterations to approach a threshhold of 0.000974371
+2017-01-01 23:27:04	INFO	MFCleanImageSkyModel::solve	0.000439858 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00225409Jy)
+2017-01-01 23:27:04	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 4
+2017-01-01 23:27:05	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:27:05	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000948601, cleaning down to 0.000758881
+2017-01-01 23:27:05	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:27:05	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000948601
+2017-01-01 23:27:05	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:27:05	INFO	MFCleanImageSkyModel::solve	Clean used 18 iterations to approach a threshhold of 0.000758881
+2017-01-01 23:27:05	INFO	MFCleanImageSkyModel::solve	0.000424027 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00267811Jy)
+2017-01-01 23:27:05	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 5
+2017-01-01 23:27:05	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:27:05	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000715664, cleaning down to 0.000572531
+2017-01-01 23:27:05	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:27:05	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000715664
+2017-01-01 23:27:05	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:27:05	INFO	MFCleanImageSkyModel::solve	Clean used 23 iterations to approach a threshhold of 0.000572531
+2017-01-01 23:27:05	INFO	MFCleanImageSkyModel::solve	0.000322637 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00300075Jy)
+2017-01-01 23:27:05	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 6
+2017-01-01 23:27:06	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:27:06	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000543999, cleaning down to 0.000435199
+2017-01-01 23:27:06	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:27:06	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000543999
+2017-01-01 23:27:06	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:27:06	INFO	MFCleanImageSkyModel::solve	Clean used 28 iterations to approach a threshhold of 0.000435199
+2017-01-01 23:27:06	INFO	MFCleanImageSkyModel::solve	0.000250036 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00325079Jy)
+2017-01-01 23:27:06	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 7
+2017-01-01 23:27:07	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:27:07	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000430699, cleaning down to 0.000344559
+2017-01-01 23:27:07	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:27:07	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000430699
+2017-01-01 23:27:07	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:27:07	INFO	MFCleanImageSkyModel::solve	Clean used 34 iterations to approach a threshhold of 0.000344559
+2017-01-01 23:27:07	INFO	MFCleanImageSkyModel::solve	0.000230957 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00348174Jy)
+2017-01-01 23:27:07	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 8
+2017-01-01 23:27:07	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:27:07	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000324138, cleaning down to 0.000285
+2017-01-01 23:27:07	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:27:07	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000324138
+2017-01-01 23:27:07	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:27:07	INFO	MFCleanImageSkyModel::solve	Clean used 38 iterations to approach a threshhold of 0.000285
+2017-01-01 23:27:07	INFO	MFCleanImageSkyModel::solve	0.000122637 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00360438Jy)
+2017-01-01 23:27:07	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 9
+2017-01-01 23:27:08	INFO	MFCleanImageSkyModel::solve	Reached stopping peak residual = 0.000272803
+2017-01-01 23:27:09	INFO	MFCleanImageSkyModel::solve	Final maximum residual = 0.000272803
+2017-01-01 23:27:09	INFO	MFCleanImageSkyModel::solve	Model 0: max, min residuals = 0.000272803, -0.000256796 clean flux 0.00360438
+2017-01-01 23:27:09	INFO	imager::clean()	Successfully deconvolved image
+2017-01-01 23:27:09	INFO	imager::clean()	Fitted beam used in restoration: 0.00233896 by 0.000965987 (arcsec) at pa -10.5361 (deg) 
+2017-01-01 23:27:09	INFO	imager::iClean()	Restoring Image(s) with the clean-beam
+2017-01-01 23:27:09	INFO	clean::::	##### End Task: clean                #####
+2017-01-01 23:27:09	INFO	clean::::+	##########################################
+2017-01-01 23:27:09	INFO	clean::::	
+2017-01-01 23:27:09	INFO	clean::::+	##########################################
+2017-01-01 23:27:09	INFO	clean::::+	##### Begin Task: clean              #####
+2017-01-01 23:27:09	INFO	clean::::	clean(vis="/data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms",imagename="/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan57_58",outlierfile="",field="",spw="",
+2017-01-01 23:27:09	INFO	clean::::+	        selectdata=True,timerange="",uvrange="",antenna="",scan="57~58",
+2017-01-01 23:27:09	INFO	clean::::+	        observation="",intent="",mode="mfs",resmooth=False,gridmode="",
+2017-01-01 23:27:09	INFO	clean::::+	        wprojplanes=-1,facets=1,cfcache="cfcache.dir",rotpainc=5.0,painc=360.0,
+2017-01-01 23:27:09	INFO	clean::::+	        aterm=True,psterm=False,mterm=True,wbawp=False,conjbeams=True,
+2017-01-01 23:27:09	INFO	clean::::+	        epjtable="",interpolation="linear",niter=500,gain=0.1,threshold="0.3mJy",
+2017-01-01 23:27:09	INFO	clean::::+	        psfmode="clark",imagermode="csclean",ftmachine="mosaic",mosweight=False,scaletype="SAULT",
+2017-01-01 23:27:09	INFO	clean::::+	        multiscale=[0],negcomponent=-1,smallscalebias=0.6,interactive=False,mask="/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask",
+2017-01-01 23:27:09	INFO	clean::::+	        nchan=-1,start=0,width=1,outframe="",veltype="radio",
+2017-01-01 23:27:09	INFO	clean::::+	        imsize=[256, 256],cell="0.00028arcsec",phasecenter="",restfreq="",stokes="V",
+2017-01-01 23:27:09	INFO	clean::::+	        weighting="natural",robust=0.0,uvtaper=False,outertaper=[''],innertaper=['1.0'],
+2017-01-01 23:27:09	INFO	clean::::+	        modelimage="",restoringbeam=[''],pbcor=False,minpb=0.2,usescratch=False,
+2017-01-01 23:27:09	INFO	clean::::+	        noise="1.0Jy",npixels=0,npercycle=100,cyclefactor=5,cyclespeedup=-1,
+2017-01-01 23:27:09	INFO	clean::::+	        nterms=1,reffreq="",chaniter=False,flatnoise=True,allowchunk=False)
+2017-01-01 23:27:09	INFO	clean::::	nchan=-1 start=0 width=1
+2017-01-01 23:27:09	INFO	clean::::	Use default channelization for clean
+2017-01-01 23:27:09	INFO	clean::::	clean image: /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan57_58
+2017-01-01 23:27:09	INFO	clean::::	FTMachine used is  ft 
+2017-01-01 23:27:09	INFO	imager::setDataOnThisMS()	Performing selection on MeasurementSet : /data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms
+2017-01-01 23:27:09	INFO	imager::setDataOnThisMS()	Selecting on fields : 0
+2017-01-01 23:27:09	INFO	imager::setDataOnThisMS()	Selecting on spectral windows expression :*
+2017-01-01 23:27:09	INFO	imager::setDataOnThisMS()	Selecting on scan : 57~58
+2017-01-01 23:27:09	INFO	imager::setDataOnThisMS()	Selected 38896 out of  1393824 rows.
+2017-01-01 23:27:09	INFO	imager::setDataOnThisMS()	Selected : [4 chans in spw 0] [4 chans in spw 1] [4 chans in spw 2] [4 chans in spw 3] [4 chans in spw 4] [4 chans in spw 5] [4 chans in spw 6] [4 chans in spw 7]
+2017-01-01 23:27:09	INFO	imager::defineimage()	Defining image properties:nx=256 ny=256 cellx='0.00028arcsec' celly='0.00028arcsec' stokes=V' mode=MFS nchan=-1 start=0 step=1 spwids=[-1] fieldid=-1 facets=1 frame=5 distance='0'
+2017-01-01 23:27:09	INFO	imager::defineimage()	 phaseCenter='10:19:35.72,   19.52.11.37, ' mStart='Radialvelocity: 0' qStep='0 '' mFreqStart='Frequency: 0
+2017-01-01 23:27:09	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:27:09	INFO	Imager::setvp() 	Sky position tolerance is 180 degrees
+2017-01-01 23:27:09	INFO	Imager::setvp() 	Using system default voltage patterns for each telescope
+2017-01-01 23:27:09	INFO	imager::makeimage() 	Calculating image (without full skyequation)
+2017-01-01 23:27:09	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:27:09	INFO	imager::weight()	Weighting MS: Imaging weights will be changed
+2017-01-01 23:27:09	INFO	imager::weight()	Natural weighting
+2017-01-01 23:27:10	WARN	image::open (file /var/rpmbuild/BUILD/casa-prerelease/casa-prerelease-4.6.0/gcwrap/tools/images/image_cmpt.cc, line 3472)	Another image is already open, closing first
+2017-01-01 23:27:10	INFO	CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2017-01-01 23:27:10	INFO	CasacRegionManager::fromBCS	Using all spectral channels.
+2017-01-01 23:27:10	INFO	CasacRegionManager::fromBCS	Using polarizations ALL
+2017-01-01 23:27:10	INFO	ImageMaskAttacher::makeMask	Created and initialized mask `mask0'
+2017-01-01 23:27:10	INFO	SubImageFactory::createImage	Creating image '__temp_mask' of shape [256, 256, 1, 1]
+2017-01-01 23:27:10	WARN	ImageExprCalculator::compute	image units are not the same: '' vs 'Jy/beam'
+2017-01-01 23:27:10	INFO	ImageExprCalculator::_imagecalc	Creating image `/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan57_58.mask' of shape [256, 256, 1, 1]
+2017-01-01 23:27:10	WARN	ImageExprCalculator::compute2	Overwriting pixel values of the currently attached image
+2017-01-01 23:27:10	INFO	clean::::	Used mask(s) : ['/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask'] to create mask image(s) : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan57_58.mask
+2017-01-01 23:27:10	INFO	imager::setoptions() 	Setting processing options
+2017-01-01 23:27:10	INFO	clean::::	No model found. Making empty initial model : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan57_58.model
+2017-01-01 23:27:10	INFO	Imager::imagecoordinates() 	Center frequency = 8.41657 GHz, synthesized continuum bandwidth = 0.256021 GHz
+2017-01-01 23:27:10	INFO	imager::clean()	Using multifield Clark clean
+2017-01-01 23:27:10	INFO	imager::createFTMachine() 	Multiple fields or facets: transforms will be padded by a factor 1.2
+2017-01-01 23:27:10	INFO	imager::createFTMachine() 	Performing interferometric gridding...
+2017-01-01 23:27:10	INFO	imager::clean()	Clean gain = 0.1, Niter = 500, Threshold = 0.3 mJy
+2017-01-01 23:27:10	INFO	imager::clean()	Starting deconvolution
+2017-01-01 23:27:10	INFO	ImageSkyModel::makeApproxPSFs	bmaj: 0.00233896", bmin: 0.000965987", bpa: -10.5361 deg
+2017-01-01 23:27:10	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 0
+2017-01-01 23:27:11	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:27:11	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000907974, cleaning down to 0.000726379
+2017-01-01 23:27:11	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:27:11	INFO	MFCleanImageSkyModel::solve	Doing stokes V image
+2017-01-01 23:27:11	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000907974
+2017-01-01 23:27:11	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:27:11	INFO	MFCleanImageSkyModel::solve	Clean used 3 iterations to approach a threshhold of 0.000726379
+2017-01-01 23:27:11	INFO	MFCleanImageSkyModel::solve	-0.000246282 Jy <- cleaned in this cycle for  model 0 (Total flux : -0.000246282Jy)
+2017-01-01 23:27:11	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 1
+2017-01-01 23:27:11	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:27:11	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000665004, cleaning down to 0.000532003
+2017-01-01 23:27:11	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:27:11	INFO	MFCleanImageSkyModel::solve	Doing stokes V image
+2017-01-01 23:27:11	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000665004
+2017-01-01 23:27:11	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:27:11	INFO	MFCleanImageSkyModel::solve	Clean used 6 iterations to approach a threshhold of 0.000532003
+2017-01-01 23:27:11	INFO	MFCleanImageSkyModel::solve	-0.000180655 Jy <- cleaned in this cycle for  model 0 (Total flux : -0.000426937Jy)
+2017-01-01 23:27:11	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 2
+2017-01-01 23:27:12	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:27:12	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000488664, cleaning down to 0.000390931
+2017-01-01 23:27:12	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:27:12	INFO	MFCleanImageSkyModel::solve	Doing stokes V image
+2017-01-01 23:27:12	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000488664
+2017-01-01 23:27:12	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:27:12	INFO	MFCleanImageSkyModel::solve	Clean used 9 iterations to approach a threshhold of 0.000390931
+2017-01-01 23:27:12	INFO	MFCleanImageSkyModel::solve	-0.000132678 Jy <- cleaned in this cycle for  model 0 (Total flux : -0.000559615Jy)
+2017-01-01 23:27:12	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 3
+2017-01-01 23:27:13	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:27:13	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000362542, cleaning down to 0.000290033
+2017-01-01 23:27:13	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:27:13	INFO	MFCleanImageSkyModel::solve	Doing stokes V image
+2017-01-01 23:27:13	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000362542
+2017-01-01 23:27:13	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:27:13	INFO	MFCleanImageSkyModel::solve	Clean used 12 iterations to approach a threshhold of 0.000290033
+2017-01-01 23:27:13	INFO	MFCleanImageSkyModel::solve	-0.000100845 Jy <- cleaned in this cycle for  model 0 (Total flux : -0.00066046Jy)
+2017-01-01 23:27:13	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 4
+2017-01-01 23:27:13	INFO	MFCleanImageSkyModel::solve	Reached stopping peak residual = 0.000285874
+2017-01-01 23:27:14	INFO	MFCleanImageSkyModel::solve	Final maximum residual = 0.000285874
+2017-01-01 23:27:14	INFO	MFCleanImageSkyModel::solve	Model 0: max, min residuals = 2.87472e-05, -0.000285874 clean flux -0.00066046
+2017-01-01 23:27:14	INFO	imager::clean()	Successfully deconvolved image
+2017-01-01 23:27:14	INFO	imager::clean()	Fitted beam used in restoration: 0.00233896 by 0.000965987 (arcsec) at pa -10.5361 (deg) 
+2017-01-01 23:27:14	INFO	imager::iClean()	Restoring Image(s) with the clean-beam
+2017-01-01 23:27:14	INFO	clean::::	##### End Task: clean                #####
+2017-01-01 23:27:14	INFO	clean::::+	##########################################
+2017-01-01 23:27:14	INFO	clean::::	
+2017-01-01 23:27:14	INFO	clean::::+	##########################################
+2017-01-01 23:27:14	INFO	clean::::+	##### Begin Task: clean              #####
+2017-01-01 23:27:14	INFO	clean::::	clean(vis="/data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms",imagename="/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan59_75",outlierfile="",field="",spw="",
+2017-01-01 23:27:14	INFO	clean::::+	        selectdata=True,timerange="",uvrange="",antenna="",scan="59~75",
+2017-01-01 23:27:14	INFO	clean::::+	        observation="",intent="",mode="mfs",resmooth=False,gridmode="",
+2017-01-01 23:27:14	INFO	clean::::+	        wprojplanes=-1,facets=1,cfcache="cfcache.dir",rotpainc=5.0,painc=360.0,
+2017-01-01 23:27:14	INFO	clean::::+	        aterm=True,psterm=False,mterm=True,wbawp=False,conjbeams=True,
+2017-01-01 23:27:14	INFO	clean::::+	        epjtable="",interpolation="linear",niter=500,gain=0.1,threshold="0.3mJy",
+2017-01-01 23:27:14	INFO	clean::::+	        psfmode="clark",imagermode="csclean",ftmachine="mosaic",mosweight=False,scaletype="SAULT",
+2017-01-01 23:27:14	INFO	clean::::+	        multiscale=[0],negcomponent=-1,smallscalebias=0.6,interactive=False,mask="/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask",
+2017-01-01 23:27:14	INFO	clean::::+	        nchan=-1,start=0,width=1,outframe="",veltype="radio",
+2017-01-01 23:27:14	INFO	clean::::+	        imsize=[256, 256],cell="0.00028arcsec",phasecenter="",restfreq="",stokes="I",
+2017-01-01 23:27:14	INFO	clean::::+	        weighting="natural",robust=0.0,uvtaper=False,outertaper=[''],innertaper=['1.0'],
+2017-01-01 23:27:14	INFO	clean::::+	        modelimage="",restoringbeam=[''],pbcor=False,minpb=0.2,usescratch=False,
+2017-01-01 23:27:14	INFO	clean::::+	        noise="1.0Jy",npixels=0,npercycle=100,cyclefactor=5,cyclespeedup=-1,
+2017-01-01 23:27:14	INFO	clean::::+	        nterms=1,reffreq="",chaniter=False,flatnoise=True,allowchunk=False)
+2017-01-01 23:27:14	INFO	clean::::	nchan=-1 start=0 width=1
+2017-01-01 23:27:14	INFO	clean::::	Use default channelization for clean
+2017-01-01 23:27:14	INFO	clean::::	clean image: /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan59_75
+2017-01-01 23:27:14	INFO	clean::::	FTMachine used is  ft 
+2017-01-01 23:27:14	INFO	imager::setDataOnThisMS()	Performing selection on MeasurementSet : /data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms
+2017-01-01 23:27:14	INFO	imager::setDataOnThisMS()	Selecting on fields : 0
+2017-01-01 23:27:14	INFO	imager::setDataOnThisMS()	Selecting on spectral windows expression :*
+2017-01-01 23:27:14	INFO	imager::setDataOnThisMS()	Selecting on scan : 59~75
+2017-01-01 23:27:15	INFO	imager::setDataOnThisMS()	Selected 310344 out of  1393824 rows.
+2017-01-01 23:27:15	INFO	imager::setDataOnThisMS()	Selected : [4 chans in spw 0] [4 chans in spw 1] [4 chans in spw 2] [4 chans in spw 3] [4 chans in spw 4] [4 chans in spw 5] [4 chans in spw 6] [4 chans in spw 7]
+2017-01-01 23:27:15	INFO	imager::defineimage()	Defining image properties:nx=256 ny=256 cellx='0.00028arcsec' celly='0.00028arcsec' stokes=I' mode=MFS nchan=-1 start=0 step=1 spwids=[-1] fieldid=-1 facets=1 frame=5 distance='0'
+2017-01-01 23:27:15	INFO	imager::defineimage()	 phaseCenter='10:19:35.72,   19.52.11.37, ' mStart='Radialvelocity: 0' qStep='0 '' mFreqStart='Frequency: 0
+2017-01-01 23:27:15	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:27:15	INFO	Imager::setvp() 	Sky position tolerance is 180 degrees
+2017-01-01 23:27:15	INFO	Imager::setvp() 	Using system default voltage patterns for each telescope
+2017-01-01 23:27:15	INFO	imager::makeimage() 	Calculating image (without full skyequation)
+2017-01-01 23:27:16	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:27:16	INFO	imager::weight()	Weighting MS: Imaging weights will be changed
+2017-01-01 23:27:16	INFO	imager::weight()	Natural weighting
+2017-01-01 23:27:16	WARN	image::open (file /var/rpmbuild/BUILD/casa-prerelease/casa-prerelease-4.6.0/gcwrap/tools/images/image_cmpt.cc, line 3472)	Another image is already open, closing first
+2017-01-01 23:27:16	INFO	CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2017-01-01 23:27:16	INFO	CasacRegionManager::fromBCS	Using all spectral channels.
+2017-01-01 23:27:16	INFO	CasacRegionManager::fromBCS	Using polarizations ALL
+2017-01-01 23:27:16	INFO	ImageMaskAttacher::makeMask	Created and initialized mask `mask0'
+2017-01-01 23:27:16	INFO	SubImageFactory::createImage	Creating image '__temp_mask' of shape [256, 256, 1, 1]
+2017-01-01 23:27:16	WARN	ImageExprCalculator::compute	image units are not the same: '' vs 'Jy/beam'
+2017-01-01 23:27:16	INFO	ImageExprCalculator::_imagecalc	Creating image `/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan59_75.mask' of shape [256, 256, 1, 1]
+2017-01-01 23:27:16	WARN	ImageExprCalculator::compute2	Overwriting pixel values of the currently attached image
+2017-01-01 23:27:16	INFO	clean::::	Used mask(s) : ['/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask'] to create mask image(s) : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan59_75.mask
+2017-01-01 23:27:16	INFO	imager::setoptions() 	Setting processing options
+2017-01-01 23:27:16	INFO	clean::::	No model found. Making empty initial model : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanI_scan59_75.model
+2017-01-01 23:27:17	INFO	Imager::imagecoordinates() 	Center frequency = 8.41657 GHz, synthesized continuum bandwidth = 0.256021 GHz
+2017-01-01 23:27:17	INFO	imager::clean()	Using multifield Clark clean
+2017-01-01 23:27:17	INFO	imager::createFTMachine() 	Multiple fields or facets: transforms will be padded by a factor 1.2
+2017-01-01 23:27:17	INFO	imager::createFTMachine() 	Performing interferometric gridding...
+2017-01-01 23:27:17	INFO	imager::clean()	Clean gain = 0.1, Niter = 500, Threshold = 0.3 mJy
+2017-01-01 23:27:17	INFO	imager::clean()	Starting deconvolution
+2017-01-01 23:27:19	INFO	ImageSkyModel::makeApproxPSFs	bmaj: 0.00230849", bmin: 0.000938204", bpa: -16.5166 deg
+2017-01-01 23:27:19	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 0
+2017-01-01 23:27:22	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:27:22	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.00108063, cleaning down to 0.000864506
+2017-01-01 23:27:22	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:27:22	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.00108063
+2017-01-01 23:27:22	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:27:22	INFO	MFCleanImageSkyModel::solve	Clean used 4 iterations to approach a threshhold of 0.000864506
+2017-01-01 23:27:22	INFO	MFCleanImageSkyModel::solve	0.000384814 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.000384814Jy)
+2017-01-01 23:27:22	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 1
+2017-01-01 23:27:27	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:27:27	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000814266, cleaning down to 0.000651413
+2017-01-01 23:27:27	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:27:27	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000814266
+2017-01-01 23:27:27	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:27:27	INFO	MFCleanImageSkyModel::solve	Clean used 9 iterations to approach a threshhold of 0.000651413
+2017-01-01 23:27:27	INFO	MFCleanImageSkyModel::solve	0.000364499 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.000749313Jy)
+2017-01-01 23:27:27	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 2
+2017-01-01 23:27:32	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:27:32	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000611254, cleaning down to 0.000489003
+2017-01-01 23:27:32	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:27:32	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000611254
+2017-01-01 23:27:32	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:27:32	INFO	MFCleanImageSkyModel::solve	Clean used 13 iterations to approach a threshhold of 0.000489003
+2017-01-01 23:27:32	INFO	MFCleanImageSkyModel::solve	0.000226712 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.000976025Jy)
+2017-01-01 23:27:32	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 3
+2017-01-01 23:27:37	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:27:37	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000487292, cleaning down to 0.000389833
+2017-01-01 23:27:37	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:27:37	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000487292
+2017-01-01 23:27:37	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:27:37	INFO	MFCleanImageSkyModel::solve	Clean used 18 iterations to approach a threshhold of 0.000389833
+2017-01-01 23:27:37	INFO	MFCleanImageSkyModel::solve	0.000224394 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00120042Jy)
+2017-01-01 23:27:37	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 4
+2017-01-01 23:27:41	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:27:41	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000378556, cleaning down to 0.000302845
+2017-01-01 23:27:41	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:27:41	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000378556
+2017-01-01 23:27:41	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:27:41	INFO	MFCleanImageSkyModel::solve	Clean used 23 iterations to approach a threshhold of 0.000302845
+2017-01-01 23:27:41	INFO	MFCleanImageSkyModel::solve	0.000175687 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00137611Jy)
+2017-01-01 23:27:41	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 5
+2017-01-01 23:27:46	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:27:46	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000300158, cleaning down to 0.000285
+2017-01-01 23:27:46	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:27:46	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000300158
+2017-01-01 23:27:46	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:27:46	INFO	MFCleanImageSkyModel::solve	Clean used 25 iterations to approach a threshhold of 0.000285
+2017-01-01 23:27:46	INFO	MFCleanImageSkyModel::solve	5.95629e-05 Jy <- cleaned in this cycle for  model 0 (Total flux : 0.00143567Jy)
+2017-01-01 23:27:46	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 6
+2017-01-01 23:27:51	INFO	MFCleanImageSkyModel::solve	Reached stopping peak residual = 0.000279694
+2017-01-01 23:27:56	INFO	MFCleanImageSkyModel::solve	Final maximum residual = 0.000279694
+2017-01-01 23:27:56	INFO	MFCleanImageSkyModel::solve	Model 0: max, min residuals = 0.000279694, 7.69578e-05 clean flux 0.00143567
+2017-01-01 23:27:56	INFO	imager::clean()	Successfully deconvolved image
+2017-01-01 23:27:56	INFO	imager::clean()	Fitted beam used in restoration: 0.00230849 by 0.000938204 (arcsec) at pa -16.5166 (deg) 
+2017-01-01 23:27:56	INFO	imager::iClean()	Restoring Image(s) with the clean-beam
+2017-01-01 23:27:56	INFO	clean::::	##### End Task: clean                #####
+2017-01-01 23:27:56	INFO	clean::::+	##########################################
+2017-01-01 23:27:56	INFO	clean::::	
+2017-01-01 23:27:56	INFO	clean::::+	##########################################
+2017-01-01 23:27:56	INFO	clean::::+	##### Begin Task: clean              #####
+2017-01-01 23:27:56	INFO	clean::::	clean(vis="/data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms",imagename="/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan59_75",outlierfile="",field="",spw="",
+2017-01-01 23:27:56	INFO	clean::::+	        selectdata=True,timerange="",uvrange="",antenna="",scan="59~75",
+2017-01-01 23:27:56	INFO	clean::::+	        observation="",intent="",mode="mfs",resmooth=False,gridmode="",
+2017-01-01 23:27:56	INFO	clean::::+	        wprojplanes=-1,facets=1,cfcache="cfcache.dir",rotpainc=5.0,painc=360.0,
+2017-01-01 23:27:56	INFO	clean::::+	        aterm=True,psterm=False,mterm=True,wbawp=False,conjbeams=True,
+2017-01-01 23:27:56	INFO	clean::::+	        epjtable="",interpolation="linear",niter=500,gain=0.1,threshold="0.3mJy",
+2017-01-01 23:27:56	INFO	clean::::+	        psfmode="clark",imagermode="csclean",ftmachine="mosaic",mosweight=False,scaletype="SAULT",
+2017-01-01 23:27:56	INFO	clean::::+	        multiscale=[0],negcomponent=-1,smallscalebias=0.6,interactive=False,mask="/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask",
+2017-01-01 23:27:56	INFO	clean::::+	        nchan=-1,start=0,width=1,outframe="",veltype="radio",
+2017-01-01 23:27:56	INFO	clean::::+	        imsize=[256, 256],cell="0.00028arcsec",phasecenter="",restfreq="",stokes="V",
+2017-01-01 23:27:56	INFO	clean::::+	        weighting="natural",robust=0.0,uvtaper=False,outertaper=[''],innertaper=['1.0'],
+2017-01-01 23:27:56	INFO	clean::::+	        modelimage="",restoringbeam=[''],pbcor=False,minpb=0.2,usescratch=False,
+2017-01-01 23:27:56	INFO	clean::::+	        noise="1.0Jy",npixels=0,npercycle=100,cyclefactor=5,cyclespeedup=-1,
+2017-01-01 23:27:56	INFO	clean::::+	        nterms=1,reffreq="",chaniter=False,flatnoise=True,allowchunk=False)
+2017-01-01 23:27:56	INFO	clean::::	nchan=-1 start=0 width=1
+2017-01-01 23:27:56	INFO	clean::::	Use default channelization for clean
+2017-01-01 23:27:56	INFO	clean::::	clean image: /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan59_75
+2017-01-01 23:27:56	INFO	clean::::	FTMachine used is  ft 
+2017-01-01 23:27:56	INFO	imager::setDataOnThisMS()	Performing selection on MeasurementSet : /data/jrv/BV071/ADLeo/3/ADLeo.postcal.ms
+2017-01-01 23:27:56	INFO	imager::setDataOnThisMS()	Selecting on fields : 0
+2017-01-01 23:27:56	INFO	imager::setDataOnThisMS()	Selecting on spectral windows expression :*
+2017-01-01 23:27:56	INFO	imager::setDataOnThisMS()	Selecting on scan : 59~75
+2017-01-01 23:27:57	INFO	imager::setDataOnThisMS()	Selected 310344 out of  1393824 rows.
+2017-01-01 23:27:57	INFO	imager::setDataOnThisMS()	Selected : [4 chans in spw 0] [4 chans in spw 1] [4 chans in spw 2] [4 chans in spw 3] [4 chans in spw 4] [4 chans in spw 5] [4 chans in spw 6] [4 chans in spw 7]
+2017-01-01 23:27:57	INFO	imager::defineimage()	Defining image properties:nx=256 ny=256 cellx='0.00028arcsec' celly='0.00028arcsec' stokes=V' mode=MFS nchan=-1 start=0 step=1 spwids=[-1] fieldid=-1 facets=1 frame=5 distance='0'
+2017-01-01 23:27:57	INFO	imager::defineimage()	 phaseCenter='10:19:35.72,   19.52.11.37, ' mStart='Radialvelocity: 0' qStep='0 '' mFreqStart='Frequency: 0
+2017-01-01 23:27:57	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:27:57	INFO	Imager::setvp() 	Sky position tolerance is 180 degrees
+2017-01-01 23:27:57	INFO	Imager::setvp() 	Using system default voltage patterns for each telescope
+2017-01-01 23:27:57	INFO	imager::makeimage() 	Calculating image (without full skyequation)
+2017-01-01 23:27:58	INFO	Imager::setvp() 	Setting voltage pattern parameters
+2017-01-01 23:27:58	INFO	imager::weight()	Weighting MS: Imaging weights will be changed
+2017-01-01 23:27:58	INFO	imager::weight()	Natural weighting
+2017-01-01 23:27:58	WARN	image::open (file /var/rpmbuild/BUILD/casa-prerelease/casa-prerelease-4.6.0/gcwrap/tools/images/image_cmpt.cc, line 3472)	Another image is already open, closing first
+2017-01-01 23:27:58	INFO	CasacRegionManager::fromBCS	No directional region specified. Using full positional plane.
+2017-01-01 23:27:58	INFO	CasacRegionManager::fromBCS	Using all spectral channels.
+2017-01-01 23:27:58	INFO	CasacRegionManager::fromBCS	Using polarizations ALL
+2017-01-01 23:27:58	INFO	ImageMaskAttacher::makeMask	Created and initialized mask `mask0'
+2017-01-01 23:27:58	INFO	SubImageFactory::createImage	Creating image '__temp_mask' of shape [256, 256, 1, 1]
+2017-01-01 23:27:58	WARN	ImageExprCalculator::compute	image units are not the same: '' vs 'Jy/beam'
+2017-01-01 23:27:58	INFO	ImageExprCalculator::_imagecalc	Creating image `/data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan59_75.mask' of shape [256, 256, 1, 1]
+2017-01-01 23:27:58	WARN	ImageExprCalculator::compute2	Overwriting pixel values of the currently attached image
+2017-01-01 23:27:58	INFO	clean::::	Used mask(s) : ['/data/jrv/BV071/ADLeo/3/images/ADLeo_Iinteractive.mask'] to create mask image(s) : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan59_75.mask
+2017-01-01 23:27:58	INFO	imager::setoptions() 	Setting processing options
+2017-01-01 23:27:58	INFO	clean::::	No model found. Making empty initial model : /data/jrv/BV071/ADLeo/3/images/postcal/imflare/cleanV_scan59_75.model
+2017-01-01 23:27:59	INFO	Imager::imagecoordinates() 	Center frequency = 8.41657 GHz, synthesized continuum bandwidth = 0.256021 GHz
+2017-01-01 23:27:59	INFO	imager::clean()	Using multifield Clark clean
+2017-01-01 23:27:59	INFO	imager::createFTMachine() 	Multiple fields or facets: transforms will be padded by a factor 1.2
+2017-01-01 23:27:59	INFO	imager::createFTMachine() 	Performing interferometric gridding...
+2017-01-01 23:27:59	INFO	imager::clean()	Clean gain = 0.1, Niter = 500, Threshold = 0.3 mJy
+2017-01-01 23:27:59	INFO	imager::clean()	Starting deconvolution
+2017-01-01 23:28:01	INFO	ImageSkyModel::makeApproxPSFs	bmaj: 0.00230849", bmin: 0.000938204", bpa: -16.5166 deg
+2017-01-01 23:28:01	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 0
+2017-01-01 23:28:04	INFO	MFCleanImageSkyModel::solve	The minor-cycle threshold is MAX[ 0.95 x 0.0003  ,   peak residual x 0.8 ] 
+2017-01-01 23:28:04	INFO	MFCleanImageSkyModel::solve	Maximum residual = 0.000361594, cleaning down to 0.000289275
+2017-01-01 23:28:04	INFO	MFCleanImageSkyModel::solve	Processing model 0
+2017-01-01 23:28:04	INFO	MFCleanImageSkyModel::solve	Doing stokes V image
+2017-01-01 23:28:04	INFO	ClarkCleanModel::singleSolve	Initial maximum residual: 0.000361594
+2017-01-01 23:28:04	INFO	MFCleanImageSkyModel::solve	Finished Clark clean inner cycle 
+2017-01-01 23:28:04	INFO	MFCleanImageSkyModel::solve	Clean used 3 iterations to approach a threshhold of 0.000289275
+2017-01-01 23:28:04	INFO	MFCleanImageSkyModel::solve	-9.7992e-05 Jy <- cleaned in this cycle for  model 0 (Total flux : -9.7992e-05Jy)
+2017-01-01 23:28:04	INFO	MFCleanImageSkyModel::solve	*** Starting major cycle 1
+2017-01-01 23:28:09	INFO	MFCleanImageSkyModel::solve	Reached stopping peak residual = 0.000263602
+2017-01-01 23:28:14	INFO	MFCleanImageSkyModel::solve	Final maximum residual = 0.000263602
+2017-01-01 23:28:14	INFO	MFCleanImageSkyModel::solve	Model 0: max, min residuals = 8.3434e-05, -0.000263602 clean flux -9.7992e-05
+2017-01-01 23:28:14	INFO	imager::clean()	Successfully deconvolved image
+2017-01-01 23:28:14	INFO	imager::clean()	Fitted beam used in restoration: 0.00230849 by 0.000938204 (arcsec) at pa -16.5166 (deg) 
+2017-01-01 23:28:14	INFO	imager::iClean()	Restoring Image(s) with the clean-beam
+2017-01-01 23:28:14	INFO	clean::::	##### End Task: clean                #####
+2017-01-01 23:28:14	INFO	clean::::+	##########################################

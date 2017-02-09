@@ -9,7 +9,8 @@ from pylab import *
 import os
 import pickle
 
-src = 'UVCet'
+src = 'ADLeo'
+#src = 'UVCet'
 epochlist = ['3','4','5']
 bandlist = ['L','S','P','X']
 
@@ -49,6 +50,7 @@ for epoch in epochlist:
 
         # bin bands to have matching time-freq resolution - otherwise add_dynspec inserts blanks which makes file large
         if band=='P': # bin P band to 2-MHz resolution to match S band
+            ds_band.mask_RFI(rmsfac=1.5)
             ds_band = ds_band.bin_dynspec(nt=1,nf=16,mask_partial=0.5)
         elif band=='S': # bin S band to 2-MHz resolution, 6-sec integrations to match current version of P band data reduction
             ds_band = ds_band.bin_dynspec(nt=6,nf=2,mask_partial=0.75) # 50% masked already in S band b/c every other 1-MHz channel blank

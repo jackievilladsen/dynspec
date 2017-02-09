@@ -77,7 +77,7 @@ for src in srclist:
             # plot Stokes I real
             i = offset + 0
             subplot(gs[i])
-            pp = {'pol':'i','smin':smin,'smax':smax,'trim_mask':False,'axis_labels':['ylabel','cbar']}
+            pp = {'pol':'i','smin':smin,'smax':smax,'trim_mask':False,'axis_labels':['ylabel','cbar'],'dy':0.05}
             ds.plot_dynspec(plot_params=pp)
             cb = gca().images[-1].colorbar
             cb.remove()

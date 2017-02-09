@@ -65,6 +65,7 @@ for obs in filelist:
         del ds.spec['yy']
         del ds.spec['xy']
         del ds.spec['yx']
+    ds.mask_RFI(rmsfac=1.5)
     ds = ds.bin_dynspec(nt=nt,nf=nf)
     ds_list[obs] = ds
 
