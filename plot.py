@@ -363,15 +363,28 @@ class Dynspec:
             return rms
         
     def mask_RFI(self,rmsfac=5.):
+        print 'Warning: mask_RFI handles the masking wrong, need to fix this!'
         print 'masking chans w/ rms >',rmsfac,'* median rms'
         for pol in self.spec.keys():
             rms = std(imag(self.spec[pol]),0)  # rms vs freq
             medrms = ma.median(rms)
             chanmask = (rms > rmsfac*medrms)
             n = sum(chanmask)
-            self.spec[pol].mask *= chanmask
+            mask0 = self.spec[pol].mask
+            self.spec[pol].mask = ~ (~mask0 * ~chanmask)
             self.spec[pol] = self.spec[pol] * (1-chanmask)
             print n, 'channels masked for', pol, '- new RMS:', self.get_rms(pol)*1000, 'mJy'
+
+    def mask_RFI_pixels(self,rmsfac=5.):
+        print 'masking dynspec pixels >',rmsfac,'* median rms'
+        for pol in self.spec.keys():
+            rms = std(imag(self.spec[pol]),0)  # rms vs freq
+            medrms = ma.median(rms)
+            mask = abs(self.spec[pol]) > rmsfac*medrms
+            n = sum(mask)
+            self.spec[pol].mask = ma.mask_or(self.spec[pol].mask,mask)
+            self.spec[pol] = self.spec[pol] * (1-mask)
+            print n, 'pixels masked for', pol, '- new RMS:', self.get_rms(pol)*1000, 'mJy'
 
     def mask_SNR(self,rmsfac=3.,func=real):
         # returns dynspec with pixels masked that have SNR < rmsfac (where SNR is calculated relative to channel RMS in Imag component)
