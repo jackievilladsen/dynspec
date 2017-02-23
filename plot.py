@@ -17,9 +17,9 @@ class TimeSec(Time):
     # modify class Time to support using units of MJD in seconds (units of CASA's TIME column)
     def __init__(self,t,format='mjds'):
         if format=='mjds':
-            Time.__init__(self,t/24./3600.,format='mjd')
+            Time.__init__(self,t/24./3600.,format='mjd',scale='utc')
         else:
-            Time.__init__(self,t,format=format)    
+            Time.__init__(self,t,format=format,scale='utc')
     def mjds(self):
         return self.mjd * 24. * 3600.
 
