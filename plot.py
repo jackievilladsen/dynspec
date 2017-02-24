@@ -59,7 +59,8 @@ def rebin2d_ma(b,binsize):
 
 def make_ma(a):
     # make a into a masked array where all zero values are masked
-    return ma.masked_array(a,mask=(a==0))
+    mask = logical_or.reduce((a==0,isinf(a),isnan(a)))
+    return ma.masked_array(a,mask=mask)
 
 def add_band(ma_big,t,f,ma_band,t_band,f_band):
     # add a band to our dynamic spectrum
