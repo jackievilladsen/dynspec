@@ -55,6 +55,7 @@ for epoch in epochlist:
         elif band=='S': # bin S band to 2-MHz resolution, 6-sec integrations to match current version of P band data reduction
             ds_band = ds_band.bin_dynspec(nt=6,nf=2,mask_partial=0.75) # 50% masked already in S band b/c every other 1-MHz channel blank
         elif band=='L': # bin L band to 2-MHz resolution, 6-sec integrations to match current version of P band data reduction
+            ds_band.mask_RFI(rmsfac=3.) # testing this 
             ds_band = ds_band.bin_dynspec(nt=6,nf=2,mask_partial=0.5)
         # add bands together
         if ds is None:

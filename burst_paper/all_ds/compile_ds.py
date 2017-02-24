@@ -44,7 +44,8 @@ savefile = '/data/jrv/burst_paper/all_dynspec.npy'
 filelist = load_filelist()
 
 # for testing:
-#filelist={'/data/jrv/15A-416/YZCMi/1': ['/data/jrv/15A-416/YZCMi/1/L/YZCMi_1L.tbavg.ms.dynspec', '/data/jrv/15A-416/YZCMi/1/S/YZCMi_1S.tbavg.ms.dynspec']}
+filelist={'/data/jrv/15A-416/YZCMi/1': ['/data/jrv/15A-416/YZCMi/1/L/YZCMi_1L.tbavg.ms.dynspec', '/data/jrv/15A-416/YZCMi/1/S/YZCMi_1S.tbavg.ms.dynspec'],
+          '/data/jrv/15A-416/YZCMi/2': ['/data/jrv/15A-416/YZCMi/2/L/YZCMi_2L.tbavg.ms.dynspec', '/data/jrv/15A-416/YZCMi/2/S/YZCMi_2S.tbavg.ms.dynspec']}
 #keys = filelist.keys()[2:4]
 #filelist = {k:filelist[k] for k in keys}
 #print filelist
@@ -70,6 +71,7 @@ for obs in filelist:
         else:
             ds_obs.add_dynspec(ds)
         del ds
+    ds_obs.mask_RFI(rmsfac=3.) # so far have only plotted YZ CMi dynspec w/ this - only makes a minor diff - maybe bigger when there is less binning?
     ds_obs = ds_obs.bin_dynspec(nt=nt,nf=nf)
     ds_list[obs] = ds_obs
 

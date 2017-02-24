@@ -19,8 +19,8 @@ survey_list = ['VAST','ThunderKAT','VLASS','Lband','Pband']
 leg_list = ['L band/VAST','L band/ThunderKAT','S band/VLASS','L band','P band']
 plot_file_root = 'band_'
 
-survey_list = ['Phi','Llo','Lhi','Slo','Shi']
-leg_list = ['340-480 MHz','1-1.4 GHz','1.4-2 GHz','2-2.8 GHz','2.8-4 GHz']
+survey_list = ['Plo','Phi','Llo','Lhi','Slo','Shi']
+leg_list = ['240-340 MHz','340-480 MHz','1-1.4 GHz','1.4-2 GHz','2-2.8 GHz','2.8-4 GHz']
 plot_file_root = 'halfband_'
 
 params = {'legend.fontsize': 'small',
@@ -95,8 +95,8 @@ for survey in survey_list:
     semilogx(Srange[survey],dN_dS[survey],'.-')
 #legend(leg_list)
 gca().set_prop_cycle(None)
-#for survey in survey_list:
-#    semilogx(Srange[survey],dN_dS_imag[survey],'-')
+for survey in survey_list:
+    semilogx(Srange[survey],dN_dS_imag[survey],'-')
 axis([smin,2,0,0.3])
 xlabel('Flux S (Jy) at 1 pc')
 ylabel('Fraction of time brighter than S')

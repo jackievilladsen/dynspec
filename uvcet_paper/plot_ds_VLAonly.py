@@ -18,7 +18,7 @@ smin = 0.002
 scale = 'log'
 
 obs_dict = {'2013':['1'],'2015':['2']}
-obs_dict = {'2015':['2']}
+#obs_dict = {'2015':['2']}
 bandlist = ['L','S','C','P']
 
 params = {'legend.fontsize': 'small',
@@ -50,6 +50,7 @@ for year in obs_dict:
             Pband = True
         else:
             ds = ds_full
+            Pband = False
 
         # bin dynspec to improve signal-to-noise ratio
         nt_VLA = int(round(n_sec_VLA/ds.dt()))

@@ -41,6 +41,7 @@ close('all')
 ### PLOT INDIVIDUAL OBSERVATIONS ###
 
 srclist = [('ADLeo','13A-423'),('ADLeo','15A-416'),('UVCet','13A-423'),('UVCet','15A-416'),('EQPeg','15A-416'),('EVLac','15A-416'),('YZCMi','15A-416')]
+srclist = [('YZCMi','15A-416')]
 
 figure(figsize=(6,8.5))
 

@@ -1,5 +1,5 @@
 '''
-burst_rate.py
+calc_burst_rate.py
 
 Purpose: Calculate instantaneous # of bursts per solid angle vs. flux for various transient surveys.
 

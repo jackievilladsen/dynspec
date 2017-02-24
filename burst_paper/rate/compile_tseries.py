@@ -1,12 +1,13 @@
 """
-test_plot.py: Script to test functionality of the Dynspec class as I'm
-              modifying it to use complex visibilities.
+
+compile_tseries.py: Script to compile Stokes I tseries for all P,L,S band data from VLA survey.
+
 """
 
 import os
 from dynspec.plot import *
 integration_time = 600
-survey = 'Phi'
+survey = 'Plo'
 
 # tested spline interpolation to smooth tseries
 # From time series z (a masked array):
@@ -79,6 +80,7 @@ for f in filelist:
     ds = Dynspec(params)
     if ds.f[-1]<1.e9: # P band
         ds.spec['i'] = (ds.spec['xx']+ds.spec['yy'])/2
+        #ds.mask_RFI(rmsfac=1.5) - conclusion: better w/o RFI masking
         #ds.spec['v'] = (ds.spec['xy']-ds.spec['yx'])/(2.j)
         del ds.spec['xx']
         del ds.spec['yy']

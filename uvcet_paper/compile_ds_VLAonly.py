@@ -11,7 +11,7 @@ import pickle
 
 src = 'UVCet'
 obs_dict = {'2013':['1'],'2015':['2']}
-obs_dict = {'2015':['2']}
+#obs_dict = {'2015':['2']}
 proj_dict = {'2013':'13A-423','2015':'15A-416'}
 bandlist = ['L','S','C','P']
 
@@ -62,7 +62,7 @@ for year in obs_dict:
             elif band=='S': # bin S band to 2-MHz resolution, 6-sec integrations to match current version of P band data reduction
                 ds_band = ds_band.bin_dynspec(nt=6,nf=2,mask_partial=0.75) # 50% masked already in S band b/c every other 1-MHz channel blank
             elif band=='L': # bin L band to 2-MHz resolution, 6-sec integrations to match current version of P band data reduction
-                #ds_band.mask_RFI(rmsfac=3.)
+                ds_band.mask_RFI(rmsfac=3.)
                 ds_band = ds_band.bin_dynspec(nt=6,nf=2,mask_partial=0.5)
             elif band=='C': # bin C band to 6-sec integations (should already have 2-MHz resolution)
                 ds_band = ds_band.bin_dynspec(nt=6,nf=1,mask_partial=0.5)
