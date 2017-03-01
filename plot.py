@@ -13,6 +13,8 @@ import os
 from astropy.time import Time
 from copy import deepcopy
 
+mpl.rcParams['image.interpolation'] = 'hanning'
+
 class TimeSec(Time):
     # modify class Time to support using units of MJD in seconds (units of CASA's TIME column)
     def __init__(self,t,format='mjds'):
@@ -59,7 +61,8 @@ def rebin2d_ma(b,binsize):
 
 def make_ma(a):
     # make a into a masked array where all zero values are masked
-    return ma.masked_array(a,mask=(a==0))
+    mask = logical_or.reduce((a==0,isinf(a),isnan(a)))
+    return ma.masked_array(a,mask=mask)
 
 def add_band(ma_big,t,f,ma_band,t_band,f_band):
     # add a band to our dynamic spectrum
@@ -356,31 +359,42 @@ class Dynspec:
         # and func can be any function converting complex numbers to real numbers (such as imag, real, abs, angle)
         if pol == '':
             pol = self.spec.keys()[0]
+        if func==imag and type(self.spec[pol][0,0]) != 'complex':
+            func = real
+            print '(using real(vis))'
         rms = ma.median(ma.std(func(self.spec[pol]),0)).data
         try:
             return rms[0] # in case rms is a single-valued array - this happens sometimes but not always, not sure why
         except:
             return rms
+
+    def rms_spec(self,pol='i',func=imag):
+        # return the RMS spectrum (RMS in each channel) in the complex func of the specified pol
+        #  default is RMS of imag(I)
+        if func==imag and type(self.spec[pol][0,0]) != 'complex':
+            func = real
+            print '(using real(vis) for RMS spec)'
+        return std(func(self.spec[pol]),0)
         
     def mask_RFI(self,rmsfac=5.):
-        print 'Warning: mask_RFI handles the masking wrong, need to fix this!'
         print 'masking chans w/ rms >',rmsfac,'* median rms'
         for pol in self.spec.keys():
-            rms = std(imag(self.spec[pol]),0)  # rms vs freq
-            medrms = ma.median(rms)
-            chanmask = (rms > rmsfac*medrms)
+            rms_spec = self.rms_spec(pol=pol)
+            medrms = ma.median(rms_spec)
+            chanmask = (rms_spec > rmsfac*medrms)
             n = sum(chanmask)
             mask0 = self.spec[pol].mask
             self.spec[pol].mask = ~ (~mask0 * ~chanmask)
             self.spec[pol] = self.spec[pol] * (1-chanmask)
             print n, 'channels masked for', pol, '- new RMS:', self.get_rms(pol)*1000, 'mJy'
-
+    
     def mask_RFI_pixels(self,rmsfac=5.):
         print 'masking dynspec pixels >',rmsfac,'* median rms'
         for pol in self.spec.keys():
-            rms = std(imag(self.spec[pol]),0)  # rms vs freq
-            medrms = ma.median(rms)
-            mask = abs(self.spec[pol]) > rmsfac*medrms
+            rms_spec = self.rms_spec(pol=pol)
+            medrms = ma.median(rms_spec)
+            med_flux = ma.median(abs(self.spec[pol]))
+            mask = abs(self.spec[pol]) > rmsfac*medrms+med_fluxexit(
             n = sum(mask)
             self.spec[pol].mask = ma.mask_or(self.spec[pol].mask,mask)
             self.spec[pol] = self.spec[pol] * (1-mask)
@@ -543,12 +557,7 @@ class Dynspec:
         ds.time = TimeSec(t_mjds,format='mjds')
         
         return ds
-
-    def rms_spec(self,pol='i',func=imag):
-        # return the RMS spectrum (RMS in each channel) in the complex func of the specified pol
-        #  default is RMS of imag(I)
-        return std(func(self.spec[pol]),0)
-
+    
     def tseries(self,fmin=0,fmax=1.e12,weight_mode='rms',trim_mask=False):
         # return a Dynspec object that is a time series integrated from fmin to fmax
         # weight_mode: 'rms' --> weight by 1/rms^2; anything else --> no weights
