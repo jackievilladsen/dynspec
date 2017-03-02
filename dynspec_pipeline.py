@@ -242,7 +242,7 @@ for (ms,tb) in zip(mslist,tblist):
         os.system('rm -rf '+tb)
     print 'running tbavg on', ms, '(bg subtracted) to create', tb
     try:
-        tbavg(split,ms,tb,speed='fast',weight_mode='flat',datacolumn='corrected')
+        tbavg(ms,tb,speed='fast',weight_mode='flat',datacolumn='corrected')
     except:
         print 'tbavg failed, probably b/c table',tb, 'is already open in the CASA cache - restart CASA to fix this problem'
 

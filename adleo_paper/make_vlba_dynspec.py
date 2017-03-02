@@ -129,7 +129,7 @@ print 'Check',star_im_dirty,'to verify star at center.'
 if os.path.exists(ms_tbavg):
 	os.system('rm -rf '+ms_tbavg)
 
-tbavg(split, ms_uvrange, ms_tbavg)
+tbavg(ms_uvrange, ms_tbavg)
 
 if os.path.exists(ms_tbavg+'.dynspec'):
 	os.system('rm -rf '+ms_tbavg+'.dynspec')

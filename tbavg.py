@@ -9,7 +9,7 @@
 #
 # Modified version:
 # Jackie Villadsen
-# 5/30/2016
+# 3/2/2017
 
 '''
 Notes:
@@ -22,10 +22,12 @@ Notes:
 - SPEED: Currently tbavg pulls up one spw/time at a time and avg's over baselines for that, then goes to next.
    Consider re-writing this function to apply weights to whole ms at once (all spws/times), then avg over baselines
    either using split or by calling up one baseline (all spws/times) at a time and summing up data & weights over all baselines.
+   Michael Crosley says can collapse ND numpy array along an axis to average over all baselines.
 '''
 
 import time as timemod
 from taskinit import tbtool
+from tasks import split
 import numpy
 
 def table(tablename, readonly=True):
@@ -47,7 +49,7 @@ def unique_col_values(tab, colname):
     """Return a numpy array of the unique values in the column"""
     return tab.query('', columns='DISTINCT '+colname).getcol(colname)
 
-def tbavg(split, msname, savename, speed='fast',weight_mode='',datacolumn='data'):
+def tbavg(msname, savename, speed='fast',weight_mode='',datacolumn='data'):
     """
     Create a new MS with all baselines averaged together.
     
@@ -57,7 +59,7 @@ def tbavg(split, msname, savename, speed='fast',weight_mode='',datacolumn='data'
     Parameter datacolumn can be used to select which column to average over, 'data' (default) or 'corrected'.
     """
     if speed=='fast':
-        tbavg_fast(split,msname,savename,weight_mode,datacolumn)
+        tbavg_fast(msname,savename,weight_mode,datacolumn)
     elif speed=='slow':
         dc_dict = {'corrected':'CORRECTED_DATA','data':'DATA'}
         tbavg_slow(msname,savename,weight_mode,dc_dict[datacolumn])    
@@ -157,9 +159,9 @@ def tbavg_slow(msname, savename, weight_mode='', datacolumn='DATA'):
     t2=timemod.time()
     print 'Duration:', t2-t1, 's'
 
-def tbavg_fast(split, msname, savename, weight_mode='', datacolumn='DATA'):
+def tbavg_fast(msname, savename, weight_mode='', datacolumn='DATA'):
     """
-    tbavg2(split, msname, savename, weight_mode='', datacolumn='DATA')
+    tbavg2(msname, savename, weight_mode='', datacolumn='DATA')
     
     Create a new MS with all baselines averaged together.
     
@@ -168,8 +170,6 @@ def tbavg_fast(split, msname, savename, weight_mode='', datacolumn='DATA'):
     Parameter datacolumn can be used to select which column to average over (default
     is DATA, the raw data column).  The column (or columns) must have the format of visibility
     data: options are DATA, MODEL_DATA, CORRECTED_DATA, FLOAT_DATA, LAG_DATA, and/or all.
-
-    Have to pass the function split to tbavg2 - I tried using ms.split but it just returns the first baseline for each time/channel.
     """
 
     # track how long this takes (in seconds)

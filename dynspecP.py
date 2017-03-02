@@ -231,7 +231,7 @@ if os.path.exists(srctbavg):
     os.system('rm -rf '+srctbavg)
 print 'running tbavg on', srcms, '(bg subtracted) to create', srctbavg
 try:
-    tbavg(split,srcms,srctbavg,speed='fast',weight_mode='flat',datacolumn='corrected')
+    tbavg(srcms,srctbavg,speed='fast',weight_mode='flat',datacolumn='corrected')
 except:
     print 'tbavg failed, probably b/c table',srctbavg, 'is already open in the CASA cache - restart CASA to fix this problem'
 
