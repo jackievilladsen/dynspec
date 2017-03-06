@@ -394,7 +394,7 @@ class Dynspec:
             rms_spec = self.rms_spec(pol=pol)
             medrms = ma.median(rms_spec)
             med_flux = ma.median(abs(self.spec[pol]))
-            mask = abs(self.spec[pol]) > rmsfac*medrms+med_fluxexit(
+            mask = abs(self.spec[pol]) > rmsfac*medrms+med_flux
             n = sum(mask)
             self.spec[pol].mask = ma.mask_or(self.spec[pol].mask,mask)
             self.spec[pol] = self.spec[pol] * (1-mask)

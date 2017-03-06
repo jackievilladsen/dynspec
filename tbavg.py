@@ -212,6 +212,7 @@ def tbavg_fast(msname, savename, weight_mode='', datacolumn='DATA'):
         intab.putcol('WEIGHT',wt)
     
     intab.unlock()
+    intab.close()
     
     t2=timemod.time()
     print 'tbavg duration:', t2-t1, 's'
@@ -232,9 +233,13 @@ def interpolate(times):
     return out_times
 
 def dyn_spec(msname, ddids=None, interpolate_times=False):
+    '''
+    Note: dyn_spec has a bug that it sometimes replicates frequency list many times over (why?) -
+    something to do with ddids not containing a unique list of spw's
+    '''
     tab = table(msname)
     if ddids is None:
-        ddids = numpy.arange(subtable(tab, 'DATA_DESCRIPTION').nrows())
+        ddids = numpy.arange(subtable(tab,'SPECTRAL_WINDOW').nrows())
     else:
         ddids = numpy.array(ddids)
     times = unique_col_values(tab, 'TIME')
