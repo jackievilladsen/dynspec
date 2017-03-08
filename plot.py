@@ -13,7 +13,13 @@ import os
 from astropy.time import Time
 from copy import deepcopy
 
-mpl.rcParams['image.interpolation'] = 'hanning'
+params = {'legend.fontsize': 'small',
+          'axes.titlesize': 'small',
+          'axes.labelsize': 'x-small',
+          'xtick.labelsize': 'xx-small',
+          'ytick.labelsize': 'xx-small',
+          'image.interpolation': 'hanning'}
+mpl.rcParams.update(params)
 
 class TimeSec(Time):
     # modify class Time to support using units of MJD in seconds (units of CASA's TIME column)
@@ -183,14 +189,15 @@ class Dynspec:
         #   params['uniform']: regrid to uniform time/frequency sampling after loading dynspec (default False)
         filename = params.get('filename','')
         uniform = params.get('uniform',False)
-        return filename,uniform
+        convert_stokes=params.get('convert_stokes',False)
+        return filename,uniform,convert_stokes
     
     def load_dynspec(self,params):
         # if filename is a valid file, then loads dynspec (rr,ll,t,f) from that directory
         # self.spec['rr'] and self.spec['ll'] are loaded as masked arrays
         # optional parameter i is used to tell it to load the dynspec starting from time with index i
         # future modification: enable imax as well?
-        filename,uniform=self.read_params(params)
+        filename,uniform,convert_stokes=self.read_params(params)
         if not os.path.exists(filename):
             print 'Warning: bad dynspec filename:', filename
         else:
@@ -200,7 +207,7 @@ class Dynspec:
                     print 'loading', fname
                     self.spec[pol] = make_ma(load(fname))
                     print pol,'rms:', self.get_rms(pol)*1000, 'mJy'
-                        
+            
             self.f=array(loadtxt(filename+'/freq.dat'))       # units: Hz
             
             t=array(loadtxt(filename+'/times.dat'))  # units: MJD in seconds
@@ -209,7 +216,42 @@ class Dynspec:
             if uniform:
                 self.regrid_uniform()                # regrid to uniform time and frequency sampling
             
+            if convert_stokes:
+                self.convert2stokes()
     
+    def get_pol_type(self):
+        # returns type of polarization in self.spec ('circular','linear', or 'stokes')
+        circ_keys = ['rr','ll','lr','rl']
+        lin_keys = ['xx','yy','xy','yx']
+        stokes_keys = ['i','q','u','v']
+        spec_keys = self.spec.keys()
+        if set(spec_keys) & set(circ_keys):
+            return 'circular'
+        elif set(spec_keys) & set(lin_keys):
+            return 'linear'
+        elif set(spec_keys) & set(stokes_keys):
+            return 'stokes'
+        return ''
+            
+    def convert2stokes(self):
+        # converts self.spec from linear or circular polarization terms to stokes terms
+        # Generates as many stokes terms as are possible (I,Q,U,V if full pol), may want to use 'del ds.spec['q']' etc afterwards to reduce size
+        spec_keys = self.spec.keys()
+        new_spec = {}
+        if set(['xx','yy']) <= set(spec_keys):
+            new_spec['i'] = (self.spec['xx']+self.spec['yy'])/2
+            new_spec['q'] = (self.spec['xx']-self.spec['yy'])/2
+        if set(['xy','yx']) <= set(spec_keys):
+            new_spec['u'] = (self.spec['xy']+self.spec['yx'])/2
+            new_spec['v'] = (self.spec['xy']-self.spec['yx'])/(2.j)
+        if set(['rr','ll']) <= set(spec_keys):
+            new_spec['i'] = (self.spec['rr']+self.spec['ll'])/2
+            new_spec['v'] = (self.spec['rr']-self.spec['ll'])/2
+        if set(['rl','lr']) <= set(spec_keys):
+            new_spec['q'] = (self.spec['rl']+self.spec['lr'])/2
+            new_spec['u'] = (self.spec['rl']-self.spec['lr'])/(2.j)
+        self.spec=new_spec
+        
     def make_xlist(self,x,dx,x0=None):
         # xlist: for each element in x, count how many units of dx it is away from x0 (or x[0] if x0 is not defined)
         if x0 is None:
@@ -359,10 +401,12 @@ class Dynspec:
         # and func can be any function converting complex numbers to real numbers (such as imag, real, abs, angle)
         if pol == '':
             pol = self.spec.keys()[0]
-        if func==imag and type(self.spec[pol][0,0]) != 'complex':
+        if func==imag and isreal(ma.sum(self.spec[pol])):
             func = real
             print '(using real(vis))'
-        rms = ma.median(ma.std(func(self.spec[pol]),0)).data
+        rms = ma.median(ma.std(func(self.spec[pol]),0))
+        if ma.isMaskedArray(rms):
+            rms = rms.data
         try:
             return rms[0] # in case rms is a single-valued array - this happens sometimes but not always, not sure why
         except:
@@ -371,7 +415,7 @@ class Dynspec:
     def rms_spec(self,pol='i',func=imag):
         # return the RMS spectrum (RMS in each channel) in the complex func of the specified pol
         #  default is RMS of imag(I)
-        if func==imag and type(self.spec[pol][0,0]) != 'complex':
+        if func==imag and isreal(ma.sum(self.spec[pol])):
             func = real
             print '(using real(vis) for RMS spec)'
         return std(func(self.spec[pol]),0)

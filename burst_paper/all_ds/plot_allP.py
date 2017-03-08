@@ -93,7 +93,7 @@ for src in srclist:
 
             # flux limits for Stokes V
             smax = ds.get_rms('v')*6
-            smin = -smax  # make colorbar symmetric about zero to be consistent with Stokes V
+            smin = -smax
 
             # plot Stokes V real
             i = offset + 2
@@ -105,7 +105,7 @@ for src in srclist:
             gca().yaxis.set_visible(False)
             gca().xaxis.set_label_coords(-0.5,-0.3)
             title('Stokes V')
-
+            
             # plot Stokes V imaginary
             i = offset + 3
             subplot(gs[i])
