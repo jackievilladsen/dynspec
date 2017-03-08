@@ -9,7 +9,6 @@ for casa-prereleave version 5.0.0-141, ft does not work, but this will be fixed 
 '''
 
 import os
-from tbavg import tbavg, dyn_spec
 from extract_dynspec import saveTxt
 from pylab import *
 
@@ -27,13 +26,14 @@ def get_nterms(model):
     else:
         return len(model)
 
-def ms2dsfile(vis,model,dsdir):
-    from tasks import *
-    
+def ms2dsfile(vis,model,dsdir):    
     '''
     ms2dsfile subtracts model from vis, then runs tbavg and extracts the dynspec to a numpy data file.
     Returns location of dsfile.
     '''
+    
+    from tbavg import tbavg, dyn_spec
+    from tasks import *
 
     # subtract model from visibilities
     delmod(vis=vis)
