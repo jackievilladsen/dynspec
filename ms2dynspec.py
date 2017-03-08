@@ -9,10 +9,8 @@ for casa-prereleave version 5.0.0-141, ft does not work, but this will be fixed 
 '''
 
 import os
-from tasks import *
 from tbavg import tbavg, dyn_spec
 from extract_dynspec import saveTxt
-from plot import Dynspec
 from pylab import *
 
 params = {'legend.fontsize': 'small',
@@ -30,6 +28,8 @@ def get_nterms(model):
         return len(model)
 
 def ms2dsfile(vis,model,dsdir):
+    from tasks import *
+    
     '''
     ms2dsfile subtracts model from vis, then runs tbavg and extracts the dynspec to a numpy data file.
     Returns location of dsfile.
@@ -70,6 +70,8 @@ def dsplot_Pband(dsfile,nt=50,nf=32,smax='auto',rmsfac=1.5):
     # go from vis and model to dynspec plot
     # the binning and plotting parameters are specific to the case of a P-band example data set
     
+    from plot import Dynspec
+        
     ds=Dynspec({'filename':dsfile,'uniform':True,'convert_stokes':True})
     ds.mask_RFI(rmsfac=rmsfac)
     ds = ds.bin_dynspec(nt=nt,nf=nf)
