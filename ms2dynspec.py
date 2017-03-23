@@ -26,24 +26,12 @@ def get_nterms(model):
     else:
         return len(model)
 
-def ms2dsfile(vis,model,dsdir):    
-    '''
-    ms2dsfile subtracts model from vis, then runs tbavg and extracts the dynspec to a numpy data file.
-    Returns location of dsfile.
-    '''
+def make_dsfile(vis,dsdir,datacolumn='corrected'):
+    # take post-uvsub ms and run tbavg, generate dsfile
+        # create dsdir, directory where stuff will be saved
     
     from tbavg import tbavg, dyn_spec
-    from tasks import *
-
-    # subtract model from visibilities
-    delmod(vis=vis)
-    clearcal(vis=vis,addmodel=True)
-    nterms = get_nterms(model)
-    ft(vis=vis,model=model,nterms=nterms,usescratch=True)
-    ft(vis=vis,model=model,nterms=nterms,usescratch=True)
-    uvsub(vis=vis)
-
-    # create dsdir, directory where stuff will be saved
+    
     if dsdir[-1]!='/':
         dsdir+='/'
     tb = dsdir + 'tbavg.ms'
@@ -54,7 +42,7 @@ def ms2dsfile(vis,model,dsdir):
     
     # avg over all baselines and save dynspec to file
     try:
-        tbavg(vis,tb,speed='fast',weight_mode='flat',datacolumn='corrected')
+        tbavg(vis,tb,speed='fast',weight_mode='flat',datacolumn=datacolumn)
     except:
         print 'tbavg failed, probably b/c table', tb, 'is already open in the CASA cache - restart CASA to fix this problem'
     spec = dyn_spec(tb)
@@ -65,6 +53,29 @@ def ms2dsfile(vis,model,dsdir):
     
     return dsfile
 
+
+def ms2dsfile(vis,model=[],dsdir='tbavg',reset_corrected=True,pop_model=True):    
+    '''
+    ms2dsfile subtracts model from vis, then runs tbavg and extracts the dynspec to a numpy data file.
+    Returns location of dsfile.
+    '''
+    
+    from tasks import *
+    
+    if model==[]:
+        pop_model=False
+    
+    # subtract model from visibilities
+    if reset_corrected:
+        delmod(vis=vis)
+        clearcal(vis=vis,addmodel=True)
+    if pop_model:
+        nterms = get_nterms(model)
+        ft(vis=vis,model=model,nterms=nterms,usescratch=True)
+        #ft(vis=vis,model=model,nterms=nterms,usescratch=True)
+    uvsub(vis=vis)
+
+    return make_dsfile(vis,dsdir)
     
 def dsplot_Pband(dsfile,nt=50,nf=32,smax='auto',rmsfac=1.5):
     # go from vis and model to dynspec plot
