@@ -12,6 +12,9 @@ import os
 from extract_dynspec import saveTxt
 from pylab import *
 
+import tbavg
+reload(tbavg)
+
 params = {'legend.fontsize': 'small',
           'axes.titlesize': 'small',
           'axes.labelsize': 'x-small',
@@ -26,7 +29,7 @@ def get_nterms(model):
     else:
         return len(model)
 
-def make_dsfile(vis,dsdir,datacolumn='corrected'):
+def make_dsfile(vis,dsdir,datacolumn='corrected',weight_mode='flat'):
     # take post-uvsub ms and run tbavg, generate dsfile
         # create dsdir, directory where stuff will be saved
     
@@ -42,7 +45,7 @@ def make_dsfile(vis,dsdir,datacolumn='corrected'):
     
     # avg over all baselines and save dynspec to file
     try:
-        tbavg(vis,tb,speed='fast',weight_mode='flat',datacolumn=datacolumn)
+        tbavg(vis,tb,speed='fast',weight_mode=weight_mode,datacolumn=datacolumn)
     except:
         print 'tbavg failed, probably b/c table', tb, 'is already open in the CASA cache - restart CASA to fix this problem'
     spec = dyn_spec(tb)
@@ -54,7 +57,7 @@ def make_dsfile(vis,dsdir,datacolumn='corrected'):
     return dsfile
 
 
-def ms2dsfile(vis,model=[],dsdir='tbavg',reset_corrected=True,pop_model=True):    
+def ms2dsfile(vis,model=[],dsdir='tbavg',reset_corrected=True,pop_model=True,weight_mode='flat'):    
     '''
     ms2dsfile subtracts model from vis, then runs tbavg and extracts the dynspec to a numpy data file.
     Returns location of dsfile.
@@ -75,7 +78,7 @@ def ms2dsfile(vis,model=[],dsdir='tbavg',reset_corrected=True,pop_model=True):
         #ft(vis=vis,model=model,nterms=nterms,usescratch=True)
     uvsub(vis=vis)
 
-    return make_dsfile(vis,dsdir)
+    return make_dsfile(vis,dsdir,weight_mode=weight_mode)
     
 def dsplot_Pband(dsfile,nt=50,nf=32,smax='auto',rmsfac=1.5):
     # go from vis and model to dynspec plot

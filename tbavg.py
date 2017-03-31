@@ -27,7 +27,7 @@ Notes:
 
 import time as timemod
 from taskinit import tbtool
-from tasks import split
+from tasks import split,mstransform
 import numpy
 
 def table(tablename, readonly=True):
@@ -87,7 +87,7 @@ def tbavg_slow(msname, savename, weight_mode='', datacolumn='DATA'):
     # create a table using first row from each unique combo of time,spw and save that
     # as the output ms
     # DATA_DESC_ID means spw
-    subt = intab.taql('SELECT FROM %s ORDERBY DISTINCT TIME,DATA_DESC_ID' % msname)
+    subt =intab.taql('SELECT FROM %s ORDERBY DISTINCT TIME,DATA_DESC_ID' % msname)
     subt.copy(savename, True)
       
     # open the output ms with permission to write
@@ -201,7 +201,9 @@ def tbavg_fast(msname, savename, weight_mode='', datacolumn='DATA'):
     timebin = str(dt)+'s'
     
     # split and avg over time < integration time
-    split(vis=msname,outputvis=savename,datacolumn=datacolumn,timebin=timebin,keepflags=False)
+    mstransform(vis=msname,outputvis=savename,datacolumn=datacolumn,timeaverage=True,timebin=timebin,keepflags=False)
+    print 'mstransform!'
+    #split(vis=msname,outputvis=savename,datacolumn=datacolumn,timebin=timebin,keepflags=False)
     
     # put original antenna columns back in original ms
     intab.putcol('ANTENNA1',ant1)
