@@ -415,6 +415,8 @@ class Dynspec:
     def rms_spec(self,pol='i',func=imag):
         # return the RMS spectrum (RMS in each channel) in the complex func of the specified pol
         #  default is RMS of imag(I)
+        if pol not in self.spec.keys():
+            pol = self.spec.keys()[0]
         if func==imag and isreal(ma.sum(self.spec[pol])):
             func = real
             print '(using real(vis) for RMS spec)'
