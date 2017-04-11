@@ -11,6 +11,10 @@ for casa-prereleave version 5.0.0-141, ft does not work, but this will be fixed 
 import os
 from pylab import *
 from taskinit import tbtool
+try:
+    from tasks import *
+except:
+    print 'You are trying to use ms2dynspec.py outside CASA, but it needs the CASA tasks module.'
 
 from extract_dynspec import saveTxt
 import tbavg
@@ -67,13 +71,42 @@ def copy_model_RRtoLL(vis):
     tb.unlock()
     tb.close()
 
+def mask_cen(model,pixel_rad=5):
+    # create new model image(s) with circle of radius pixel_rad masked in center
+    
+    # if model image is a string (e.g., nterms=1), put it in a list so that we can iterate
+    nterms = get_nterms(model)
+    if nterms == 1:
+        model = [model]
+    
+    # create mask with ones in center, which we can apply to model image
+    cen_mask = 'center_mask'
+    if os.path.exists(cen_mask):
+        rmtables(cen_mask)
+    ncen = str(int(imhead(imagename=model[0],mode='get',hdkey='crpix1')))   # center pixel of image (assuming square)
+    rad = str(int(pixel_rad))
+    circle_cen = 'circle[['+ncen+'pix,'+ncen+'pix],'+rad+'pix]' # describes a region of a circle in the image center with radius pixel_rad
+    makemask(mode='copy',inpimage=model[0],output=cen_mask,inpmask=circle_cen,overwrite=True) # create mask with ones in center, of same size as model image
+    
+    # create new model images with center pixels masked out
+    bgmodel = []
+    for modelim in model:
+        bgmodelim = modelim + '.cen_masked'
+        immath(imagename=[modelim,cen_mask],outfile=bgmodelim,expr='IM0*(1-IM1)')
+        bgmodel.append(bgmodelim)
+    
+    # if model image was a string, make bgmodel a string too
+    if nterms == 1:
+        bgmodel = bgmodel[0]
+    
+    return bgmodel
+
+
 def ms2dsfile(vis,model=[],dsdir='tbavg',reset_corrected=True,pop_model=True,weight_mode='flat'):    
     '''
     ms2dsfile subtracts model from vis, then runs tbavg and extracts the dynspec to a numpy data file.
     Returns location of dsfile.
     '''
-    
-    from tasks import *
     
     if model==[]:
         pop_model=False
