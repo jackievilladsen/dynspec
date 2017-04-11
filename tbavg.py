@@ -238,6 +238,8 @@ def dyn_spec(msname, ddids=None, interpolate_times=False):
     '''
     Note: dyn_spec has a bug that it sometimes replicates frequency list many times over (why?) -
     something to do with ddids not containing a unique list of spw's
+
+    WARNING: DOES NOT HANDLE FLAGGED CHANNELS CURRENTLY :(
     '''
     tab = table(msname)
     if ddids is None:
