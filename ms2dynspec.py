@@ -9,9 +9,10 @@ for casa-prereleave version 5.0.0-141, ft does not work, but this will be fixed 
 '''
 
 import os
-from extract_dynspec import saveTxt
 from pylab import *
+from taskinit import tbtool
 
+from extract_dynspec import saveTxt
 import tbavg
 reload(tbavg)
 
@@ -56,6 +57,15 @@ def make_dsfile(vis,dsdir,datacolumn='corrected',weight_mode='flat'):
     
     return dsfile
 
+def copy_model_RRtoLL(vis):
+    # copy RR column of model_data column to LL
+    tb = tbtool()
+    tb.open(vis,nomodify=False)
+    model_vis = tb.getcol('MODEL_DATA')
+    model_vis[3,:,:] = model_vis[0,:,:] # copy RR model column to LL model column
+    tb.putcol('MODEL_DATA',model_vis)
+    tb.unlock()
+    tb.close()
 
 def ms2dsfile(vis,model=[],dsdir='tbavg',reset_corrected=True,pop_model=True,weight_mode='flat'):    
     '''
@@ -122,6 +132,80 @@ def dsplot_Pband(dsfile,nt=50,nf=32,smax='auto',rmsfac=1.5):
     ds.plot_dynspec(plot_params=pp)
     gca().yaxis.set_visible(False)
     title('Imag(V)')
+    
+    savefig(dsfile+'/dynspec.pdf',bbox_inches='tight')
+    
+    return ds
+
+def dsplot_Pband_fullstokes(dsfile,nt=50,nf=32,smax='auto',rmsfac=1.5):
+    # go from vis and model to dynspec plot
+    # the binning and plotting parameters are specific to the case of a P-band example data set
+    
+    from plot import Dynspec
+    
+    ds=Dynspec({'filename':dsfile,'uniform':True,'convert_stokes':True})
+    ds.mask_RFI(rmsfac=rmsfac)
+    ds = ds.bin_dynspec(nt=nt,nf=nf)
+    
+    if smax=='auto':
+        smax = ds.get_rms('i') * 3
+    smin = -smax
+    
+    figure()
+    subplot(421)
+    pp = {'pol':'i','smin':smin,'smax':smax,'trim_mask':False,'axis_labels':['ylabel','cbar'],'dy':0.05}
+    ds.plot_dynspec(plot_params=pp)
+    cb = gca().images[-1].colorbar
+    #cb.remove()
+    title('Stokes I')
+    
+    subplot(422)
+    pp.update({'axis_labels':['cbar'],'func':imag})
+    ds.plot_dynspec(plot_params=pp)
+    gca().yaxis.set_visible(False)
+    title('Imag(I)')
+    
+    subplot(423)
+    pp = {'pol':'v','smin':smin,'smax':smax,'trim_mask':False,'axis_labels':['cbar','xlabel']}
+    ds.plot_dynspec(plot_params=pp)
+    cb = gca().images[-1].colorbar
+    gca().yaxis.set_visible(False)
+    gca().xaxis.set_label_coords(-0.5,-0.3)
+    title('Stokes V')
+    
+    subplot(424)
+    pp.update({'axis_labels':['cbar','cbar_label'],'func':imag})
+    ds.plot_dynspec(plot_params=pp)
+    gca().yaxis.set_visible(False)
+    title('Imag(V)')
+
+    subplot(425)
+    pp = {'pol':'q','smin':smin,'smax':smax,'trim_mask':False,'axis_labels':['ylabel','cbar'],'dy':0.05}
+    ds.plot_dynspec(plot_params=pp)
+    cb = gca().images[-1].colorbar
+    #cb.remove()
+    title('Stokes Q')
+    
+    subplot(426)
+    pp.update({'axis_labels':['cbar'],'func':imag})
+    ds.plot_dynspec(plot_params=pp)
+    gca().yaxis.set_visible(False)
+    title('Imag(Q)')
+    
+    subplot(427)
+    pp = {'pol':'u','smin':smin,'smax':smax,'trim_mask':False,'axis_labels':['cbar','xlabel']}
+    ds.plot_dynspec(plot_params=pp)
+    cb = gca().images[-1].colorbar
+    #cb.remove()
+    gca().yaxis.set_visible(False)
+    gca().xaxis.set_label_coords(-0.5,-0.3)
+    title('Stokes U')
+    
+    subplot(428)
+    pp.update({'axis_labels':['cbar','cbar_label'],'func':imag})
+    ds.plot_dynspec(plot_params=pp)
+    gca().yaxis.set_visible(False)
+    title('Imag(U)')
     
     savefig(dsfile+'/dynspec.pdf',bbox_inches='tight')
     
