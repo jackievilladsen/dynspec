@@ -505,13 +505,14 @@ class Dynspec:
         rmspol = plot_params.get('rmspol',pol)
         
         # generate automatic plot limits (units: flux in Jy)
-        smin = self.get_rms(rmspol)*3 # default minimum flux on color scale is 3*RMS (median channel-based RMS)
+        #smin = self.get_rms(rmspol)*3 # default minimum flux on color scale is 3*RMS (median channel-based RMS)
         smax = percentile(func(self.spec[pol]),99) # default max flux on color scale is (99th percentile flux)
-
+        smax = plot_params.get('smax',smax)
+        smin = -smax # default minimum flux on color scale is -smax (so color scale is symmetric about zero by default)
+        smin = plot_params.get('smin',smin)
+        
         # plot params #
         scale = plot_params.get('scale','linear')    # options: log, linear       
-        smin = plot_params.get('smin',smin)
-        smax = plot_params.get('smax',smax)
         dx = plot_params.get('dx',0.)             # spacing between x axis tick marks - time in minutes (default: 0 --> auto)
         dy = plot_params.get('dy',0.)             # spacing between y axis tick marks - frequency in GHz (default: 0 --> auto)
         tlims = self.time[0].mjds()+plot_params.get('tlims',array([0,1e6]))*60.             # min and max time to plot (in min since beginning of obs)
