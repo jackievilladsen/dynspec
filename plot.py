@@ -605,7 +605,7 @@ class Dynspec:
         
         return ds
     
-    def tseries(self,fmin=0,fmax=1.e12,weight_mode='rms',trim_mask=False):
+    def tseries(self,fmin=0,fmax=1.e12,weight_mode='rms',trim_mask=False,mask_partial=1.):
         # return a Dynspec object that is a time series integrated from fmin to fmax
         # weight_mode: 'rms' --> weight by 1/rms^2; anything else --> no weights
         ds = self.clip(fmin=fmin,fmax=fmax,trim_mask=trim_mask)
@@ -616,7 +616,12 @@ class Dynspec:
             rms = ds.rms_spec()
             wt = 1/rms**2
         else:
-            wt = ones(len(ds.f))
+            wt = ones(len(ds.f)) 
         for pol in ds.spec.keys():
             tseries.spec[pol] = ma.average(ds.spec[pol],1,wt)
+            if mask_partial < 1.:
+                frac_masked = mean(ds.spec[pol].mask,1)
+                frac_too_high = frac_masked > mask_partial
+                new_mask = ma.mask_or(tseries.spec[pol].mask,frac_too_high)
+                tseries.spec[pol].mask = new_mask
         return tseries
