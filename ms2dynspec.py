@@ -101,6 +101,20 @@ def mask_cen(model,pixel_rad=5):
     
     return bgmodel
 
+def ft_multi_im(vis,model_list,usescratch=True):
+    '''
+    ft_multi_im will ft multiple model images into the model_data column of vis.
+    model_list should be of the form:
+       nterms=1:  model_list = ['im1.model','im2.model','im3.model',...]
+       nterms>1:  model_list = [['im1.model.tt0','im1.model.tt1'],['im2.model.tt0','im2.model.tt1'],...]
+    model_list must be a list
+    '''
+    incremental=False
+    for model in model_list:
+        nterms = get_nterms(model)
+        ft(vis=vis,model=model,nterms=nterms,usescratch=usescratch,incremental=incremental)
+        incremental=True
+
 
 def ms2dsfile(vis,model=[],dsdir='tbavg',reset_corrected=True,pop_model=True,weight_mode='flat'):    
     '''
