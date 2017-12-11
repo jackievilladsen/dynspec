@@ -13,10 +13,8 @@ import pickle
 close('all')
 savedir = '/data/jrv/burst_paper/rate/'
 
-survey_list = ['VAST','ThunderKAT','VLASS','Pband','Lband']
-survey_list = ['Plo','Phi','Llo','Lhi','Slo','Shi']
-#survey_list = ['Pband','Lband']
-#survey_list = ['Pband']
+#survey_list = ['VAST','ThunderKAT','VLASS']
+survey_list = ['Phi','Llo','Lhi','Slo','Shi'] #,'Clo']
 
 for survey in survey_list:
 

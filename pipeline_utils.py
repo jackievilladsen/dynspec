@@ -8,8 +8,9 @@ Provides functionality used by various pipeline scripts in the dynspec package.
 
 import os
 from glob import glob
-from recipes import tec_maps
-import analysisUtils as au
+#from recipes import tec_maps
+import subprocess
+import numpy as np
 
 def get_fields(vis,vishead):
     # return dictionary f with keys 'src','gcal','bpcal' for a given vis
@@ -190,6 +191,7 @@ def amp_plot_max(vis,visstat,datacolumn='data',field=''):
 
 def im_params(vis,pblevel=0.1):
     # return a good cell size and imsize (in pixels) for the ms
+    import analysisUtils as au
     cell,imsize,fieldID=au.pickCellSize(vis,imsize=True,pblevel=pblevel,npix=3)
     if imsize[0]<5000:
         cell,imsize,fieldID=au.pickCellSize(vis,imsize=True,pblevel=pblevel,npix=5)
@@ -266,3 +268,68 @@ def get_clean_scans(band):
         print 'no line for band', band, 'in file', fname, '- assuming all scans are flare-free'
 
 '''
+
+def load_preferred_files():
+    # returns a dictionary whose keys are observation names (e.g. '15A-416_UVCet_3S') and whose
+    # entries are filenames pointing to the preferred dynspec file
+    fname = '/data/jrv/casa_utils/dynspec/best_dynspec_file.txt'
+    f = open(fname)
+    lines = f.readlines()
+    f.close()
+    file_dict = {}
+    for l in lines:
+        if l[0] != '#':
+            [obs_name,filename]=[s.rstrip() for s in l.split('---')]
+            file_dict[obs_name] = filename
+    return file_dict
+
+def load_ds_filelist():
+    # returns a dictionary whose keys are observation file names (e.g. '/data/jrv/15A-416/UVCet/3') and whose
+    #  entries are lists of dynspec files (e.g. one for L band, one for S band)
+    preferred_file_dict = load_preferred_files()
+    filelist = {}
+    cmd = 'ls -d /data/jrv/*/*/*/*/*.tbavg.ms.dynspec | cut -d / -f 1-6 | uniq'
+    obslist = subprocess.check_output(cmd, shell=True).rstrip().split('\n') # get list of every obs that has dynspec files
+    for obs in obslist:
+        obsname = obs.split('/')[3] + '_' + obs.split('/')[4] + '_' + obs.split('/')[5]
+        cmd = 'ls -d ' + obs + '/*/*.tbavg.ms.dynspec'
+        flist = subprocess.check_output(cmd,shell=True).rstrip().split('\n')
+        filelist[obs] = flist
+        for i in np.arange(len(flist)):
+            f = flist[i]
+            band = f.split('/')[6]
+            band_obsname = obsname+band
+            flist[i] = preferred_file_dict.get(band_obsname,f)
+    return filelist
+
+def load_burst_filelist(band=''):
+    # returns a dictionary whose keys are observation file names (e.g. 'data/jrv/15A-416/UVCet/3') from
+    # epochs where there was a burst, and whose entries are lists of dynspec files (e.g. one for L band, one for S band)
+    # options: band='' --> uses burst_epochs.txt
+    #          band='P' --> uses burst_epochs_Pband.txt
+    ds_filelist = load_ds_filelist()
+    
+    if band=='P':
+        fname = '/data/jrv/casa_utils/dynspec/burst_epochs_Pband.txt'
+    else:
+        fname = '/data/jrv/casa_utils/dynspec/burst_epochs.txt'
+    f = open(fname)
+    lines = f.readlines()
+    f.close()
+    file_dict = {}
+    for l in lines:
+        l = l.rstrip()
+        if l=='':
+            continue
+        if l[0] != '#':
+            file_dict[l] = ds_filelist[l]
+    return file_dict
+
+def load_band_filelist(band='L'):
+    # return list of filenames of all ds files for a certain band
+    #
+    ds_dict = load_ds_filelist()
+    filelist = [item for sublist in ds_dict.values() for item in sublist if item.split('/')[6]==band.upper()]
+    #flatten the list of lists and check if each item matches the desired band
+    return filelist
+        

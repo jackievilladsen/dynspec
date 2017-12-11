@@ -1,36 +1,13 @@
 """
-test_plot.py: Script to test functionality of the Dynspec class as I'm
-              modifying it to use complex visibilities.
+compile_ds.py: Script to load ds files for each epoch (L, S, C band only) and combine them, and flag RFI and average to a desired resolution before saving.
+
+RUN IN IPYTHON NOT CASA, OTHERWISE THE DICTIONARY WON'T SAVE PROPERLY AND YOU WON'T BE ABLE TO LOAD IT IN CASA OR IPYTHON :(
 """
 
-import subprocess
 from dynspec.plot import *
-
-# tested spline interpolation to smooth tseries
-# From time series z (a masked array):
-#    t = s.get_tlist()
-#    ind = find(~s.mask)
-#    ti = t[ind]
-#    zi = z[ind]
-#    us = scipy.interpolate.UnivariateSpline(ti,zi,s=0.5) #0.48 also works
-#    z_smooth=us(ti)
-# This gives us a pretty good smoothed version of the time series
-
-def load_filelist():
-    # returns a dictionary whose keys are file directories for a single obs and whose
-    #  entries are lists of dynspec files (e.g. one for L band, one for S band)
-    filelist = {}
-    cmd = 'ls -d /data/jrv/*/*/*/*/*.tbavg.ms.dynspec | cut -d / -f 1-6 | uniq'
-    obslist = subprocess.check_output(cmd, shell=True).rstrip().split('\n') # get list of every obs that has dynspec files
-    for obs in obslist:
-        cmd = 'ls -d ' + obs + '/*/*.tbavg.ms.dynspec'
-        flist = subprocess.check_output(cmd,shell=True).rstrip().split('\n')
-        filelist[obs] = flist
-    return filelist
-
-def get_srcname(filename):
-    # get source name from dynspec filename
-    return filename.split('/')[4]
+from dynspec.pipeline_utils import load_burst_filelist
+import numpy as np
+import pickle
 
 def get_band(filename):
     # get band from dynspec filename
@@ -39,21 +16,12 @@ def get_band(filename):
 nt = 150
 nf = 64
 
-savefile = '/data/jrv/burst_paper/all_dynspec.npy'
+savefile = '/data/jrv/burst_paper/all_burst_dynspec.npy'
 
-filelist = load_filelist()
-
-# for testing:
-filelist={'/data/jrv/15A-416/YZCMi/1': ['/data/jrv/15A-416/YZCMi/1/L/YZCMi_1L.tbavg.ms.dynspec', '/data/jrv/15A-416/YZCMi/1/S/YZCMi_1S.tbavg.ms.dynspec'],
-          '/data/jrv/15A-416/YZCMi/2': ['/data/jrv/15A-416/YZCMi/2/L/YZCMi_2L.tbavg.ms.dynspec', '/data/jrv/15A-416/YZCMi/2/S/YZCMi_2S.tbavg.ms.dynspec']}
-#keys = filelist.keys()[2:4]
-#filelist = {k:filelist[k] for k in keys}
-#print filelist
-#filelist = {'/data/jrv/15A-416/UVCet/5':['/data/jrv/15A-416/UVCet/5/L/UVCet_5L.tbavg.ms.dynspec','/data/jrv/15A-416/UVCet/5/S/UVCet_5S.tbavg.ms.dynspec']}
+filelist = load_burst_filelist()
 
 ds_list = {}
 for obs in filelist:
-    src = get_srcname(obs)
     ds_files = filelist[obs]
     ds_obs = None
     for f in ds_files:
@@ -75,6 +43,13 @@ for obs in filelist:
     ds_obs = ds_obs.bin_dynspec(nt=nt,nf=nf)
     ds_list[obs] = ds_obs
 
-save(savefile,ds_list)
+np.save(savefile,ds_list)
 print '\nSaved dictionary of all dynspec to', savefile
 
+'''
+output = open(savefile[:-3] + 'pickle','wb')
+# b is for binary
+# w opens and overwrites existing file
+pickle.dump(ds_list,output)
+output.close()
+'''

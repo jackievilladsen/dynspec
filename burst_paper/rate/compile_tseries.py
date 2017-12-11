@@ -4,10 +4,17 @@ compile_tseries.py: Script to compile Stokes I tseries for all P,L,S band data f
 
 """
 
+import dynspec.pipeline_utils
+reload(dynspec.pipeline_utils)
+
 import os
 from dynspec.plot import *
-integration_time = 600
-survey = 'Plo'
+from dynspec.pipeline_utils import load_band_filelist
+survey = 'Shi'
+if survey in ['VAST','ThunderKAT','VLASS']:
+    integration_time = 150
+else:
+    integration_time = 600
 
 # tested spline interpolation to smooth tseries
 # From time series z (a masked array):
@@ -19,17 +26,6 @@ survey = 'Plo'
 #    z_smooth=us(ti)
 # This gives us a pretty good smoothed version of the time series
 
-def load_filelist(band):
-    # makes a file dynspec_filelist.txt containing the locations of all dynspec files for this band
-    # then returns a list of strings of all the filenames
-    cmd = 'ls -d /data/jrv/*/*/*/'+band+'/*.tbavg.ms.dynspec > dynspec_filelist.txt'
-    os.system(cmd)
-    f = open('dynspec_filelist.txt')
-    lines = f.readlines()
-    f.close()
-    filelist = [l.strip('\n') for l in lines]
-    return filelist
-
 def get_srcname(filename):
     # get source name from dynspec filename
     return filename.split('/')[4]
@@ -37,11 +33,11 @@ def get_srcname(filename):
 def get_dist(src):
     # return distance in pc to src
     # (will use this to convert flux to flux at 1 pc)
-    dstar = {'ADLeo':4.69,
-             'UVCet':2.62,
-             'EQPeg':6.18,
-             'EVLac':5.12,
-             'YZCMi':5.96}
+    dstar = {'ADLeo':4.7,
+             'UVCet':2.7,
+             'EQPeg':6.2,
+             'EVLac':5.1,
+             'YZCMi':6.0}
     return dstar[src]
 
 def get_flims(survey):
@@ -49,7 +45,7 @@ def get_flims(survey):
     flims_dict = {'VLASS':      {'band':'S', 'fmin':2.e9,   'fmax':4.e9  },   # VLASS is all of VLA S-band
                   'VAST':       {'band':'L', 'fmin':1.13e9, 'fmax':1.43e9},
                   'VASTtest':   {'band':'L', 'fmin':1.13e9, 'fmax':1.43e9},
-                  'ThunderKAT': {'band':'L', 'fmin':1.e9,   'fmax':1.75e9},
+                  'ThunderKAT': {'band':'L', 'fmin':0.9e9,   'fmax':1.67e9},
                   'Pband':      {'band':'P', 'fmin':1.e8,   'fmax':1.e9  },
                   'Lband':      {'band':'L', 'fmin':0.9e9,  'fmax':2.1e9 },
                   'Plo':        {'band':'P', 'fmin':2.4e8,  'fmax':3.4e8 },
@@ -57,7 +53,8 @@ def get_flims(survey):
                   'Llo':        {'band':'L', 'fmin':1.0e9,  'fmax':1.4e9 },
                   'Lhi':        {'band':'L', 'fmin':1.4e9,  'fmax':2.0e9 },
                   'Slo':        {'band':'S', 'fmin':2.0e9,  'fmax':2.8e9 },
-                  'Shi':        {'band':'S', 'fmin':2.8e9,  'fmax':4.0e9 }}
+                  'Shi':        {'band':'S', 'fmin':2.8e9,  'fmax':4.0e9 },
+                  'Clo':        {'band':'C', 'fmin':4.0e9,  'fmax':5.6e9 }}
     flims = flims_dict[survey]
     return flims['band'], flims['fmin'],flims['fmax']
 
@@ -66,13 +63,14 @@ print 'Generating tseries for', survey,'using', band,'band data from', fmin/1e9,
 savedir = '/data/jrv/burst_paper/rate/'
 savefile = savedir + survey + '_tseries.npy'
 
-filelist = load_filelist(band)
+filelist = load_band_filelist(band)
 times = []
 flux = []
 flux_err = []
 d = []
 src_list = []
 #filelist=['/data/jrv/15A-416/YZCMi/1/L/YZCMi_1L.tbavg.ms.dynspec'] # for testing
+filelist.sort()
 for f in filelist:
     src = get_srcname(f)
     dist = get_dist(src)

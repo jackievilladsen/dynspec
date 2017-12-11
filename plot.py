@@ -515,7 +515,7 @@ class Dynspec:
         scale = plot_params.get('scale','linear')    # options: log, linear       
         dx = plot_params.get('dx',0.)             # spacing between x axis tick marks - time in minutes (default: 0 --> auto)
         dy = plot_params.get('dy',0.)             # spacing between y axis tick marks - frequency in GHz (default: 0 --> auto)
-        tlims = self.time[0].mjds()+plot_params.get('tlims',array([0,1e6]))*60.             # min and max time to plot (in min since beginning of obs)
+        tlims = self.time[0].mjds()+array(plot_params.get('tlims',[0,1e6]))*60.             # min and max time to plot (in min since beginning of obs)
         flims = plot_params.get('flims',array([min(self.f),max(self.f)+1]))                 # min and max frequencies to plot (in Hz)
         ar0 = plot_params.get('ar0',1.0)
         axis_labels = plot_params.get('axis_labels',['xlabel','ylabel','cbar','cbar_label'])
@@ -528,7 +528,10 @@ class Dynspec:
         ar = ar0*len(t)/len(f)
         
         ## Large plot (entire dynspec, binned) ##
-        gca().set_axis_bgcolor('k')
+        if smin >= 0:
+            gca().set_axis_bgcolor('k')
+        else:
+            gca().set_axis_bgcolor('w')
         print func.func_name,pol,smin,smax
         if scale=='log':
             imshow(log10(spec).T,aspect=ar,vmin=log10(smin),vmax=log10(smax),origin='lower',cmap='seismic')
@@ -537,17 +540,19 @@ class Dynspec:
             ticklbls = (10**(ticks+3)).round().astype(int)  # colorbar tick labels
         else: # scale = 'linear'
             imshow(spec.T,aspect=ar,vmin=smin,vmax=smax,origin='lower',cmap='seismic')
-            ds = round((smax-smin),2)/5                            # spacing between colorbar ticks
+            ds = round((smax-smin),2)/4                            # spacing between colorbar ticks
             if ds == 0.0:
                 ds = (smax-smin)/10.
             tickmin = sign(smin) * (abs(smin) - (abs(smin) % ds))
             tickmax = smax - (smax % ds)
             ticks = arange(tickmin,tickmax+ds,ds)                    # colorbar tick locations
             ticklbls = np.round(ticks*1000,1)                           # colorbar tick labels
+            if ds*1000==np.round(ds*1000):
+                ticklbls = array([int(x) for x in ticklbls])
         
         # add colorbar and change labels to show scale
         if 'cbar' in axis_labels:
-            cbar = colorbar(fraction=0.046, pad=0.04) # fraction=0.046,pad=0.04 - these numbers magically make colorbar same size as plot
+            cbar = colorbar(fraction=0.046*ar0, pad=0.04) # fraction=0.046,pad=0.04 - these numbers magically make colorbar same size as plot
             if pol is 'rc':
                 if 'cbar_label' in axis_labels:
                     cbar.set_label('Percent Circular Polarization')
@@ -570,7 +575,7 @@ class Dynspec:
         tick_labels,tick_locs = make_tick_labels(xtick_lbls,t_minutes)
         xticks(tick_locs, tick_labels)
         if 'xlabel' in axis_labels:
-            xlabel('Time in minutes since '+ t0.iso +' UTC')
+            xlabel('Time (min) since '+ t0.iso[:-4] +' UT')
 
         # label y axis in GHz
         f_GHz = f/1.e9
@@ -588,6 +593,9 @@ class Dynspec:
         # returns a new Dynspec object clipped to the time and frequency
         #  limits specified (tmin and tmax are time in minutes since beginning of obs,
         #  fmin and fmax are in Hz)
+        #
+        # BUG: trims the mask on each pol separately, so the specs for different pols may end up different sizes
+        #  Run with trim_mask = False to avoid this
         
         ds = Dynspec()  # create an empty Dynspec object  - need to define ds.spec[pol], ds.time, ds.f
         
@@ -625,3 +633,63 @@ class Dynspec:
                 new_mask = ma.mask_or(tseries.spec[pol].mask,frac_too_high)
                 tseries.spec[pol].mask = new_mask
         return tseries
+
+    def make_spectrum(self,tmin=0,tmax=1.e12,trim_mask=False,mask_partial=1.):
+        # return a Dynspec object that is a spectrum integrated from tmin to tmax (time in minutes since start of obs)
+        ds = self.clip(tmin=tmin,tmax=tmax,trim_mask=trim_mask)
+        myspec = Dynspec()
+        myspec.f = ds.f
+        myspec.time = ds.time[0]
+        wt = ones(len(ds.time)) 
+        for pol in ds.spec.keys():
+            myspec.spec[pol] = ma.average(ds.spec[pol],0,wt)
+            if mask_partial < 1.:
+                frac_masked = mean(ds.spec[pol].mask,0)
+                frac_too_high = frac_masked > mask_partial
+                new_mask = ma.mask_or(myspec.spec[pol].mask,frac_too_high)
+                myspec.spec[pol].mask = new_mask
+        return myspec
+
+    def expand_flims(self,fmin_new=None,fmax_new=None):
+        # return a larger Dynspec object that goes all the way to the specified fmin and fmax with masked values
+        # where there are no data
+        
+        # create the new blank Dynspec object that we will populate
+        ds = Dynspec()
+        
+        # determine current min and max freq and set any lims that weren't defined by user to be the current flims
+        fmax0 = max(self.f)
+        fmin0 = min(self.f)
+        if fmin_new is None:
+            fmin_new = fmin0
+        if fmax_new is None:
+            fmax_new = fmax0
+            print 'setting fmax_new to max(self.f)'
+        
+        # calculate new fmin and fmax that are close to the requested value but exactly on the existing frequency grid
+        df = self.df()
+        nf_add_top = max(int(floor((fmax_new - fmax0)/df)),0)
+        nf_add_bottom = max(int(floor((fmin0 - fmin_new)/df)),0)
+        fmin = fmin0 - nf_add_bottom * df
+        fmax = fmax0 + nf_add_top * df
+        
+        # populate f and time attributes of new Dynspec object
+        ds.f = arange(fmin,fmax+df,df)
+        print 'Extending dynamic spectrum (with masked values) to frequency range of', fmin/1.e9, 'to', fmax/1.e9, 'GHz'
+        ds.time = self.time
+        
+        # cycle through all pols of the dynspec and for each, create a new larger dynspec and add it to new Dynspec object
+        ds.spec = {}
+        for pol in self.spec.keys():
+            tlen = len(ds.get_tlist())
+            flen = len(ds.f)
+            # create big empty masked array with desired dimensions
+            spec = ma.zeros((tlen,flen)) * 0j
+            spec.mask = ones((tlen,flen))
+            # add original dynspec to big masked dynspec
+            spec = add_band(spec,ds.get_tlist(),ds.f,self.spec[pol],self.get_tlist(),self.f)
+            # overwrite ds.spec[pol] with new dynspec
+            ds.spec[pol] = spec
+            spec = None
+
+        return ds

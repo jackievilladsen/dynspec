@@ -10,20 +10,18 @@ from pylab import *
 close('all')
 
 savedir = '/data/jrv/burst_paper/rate/'
-
-survey_list = ['VLASS','Lband','Pband']
-leg_list = ['S band','L band','P band']
-plot_file_root = 'band_'
-
-survey_list = ['VAST','ThunderKAT','VLASS','Lband','Pband']
-leg_list = ['L band/VAST','L band/ThunderKAT','S band/VLASS','L band','P band']
-plot_file_root = 'band_'
-
-survey_list = ['Plo','Phi','Llo','Lhi','Slo','Shi']
-leg_list = ['240-340 MHz','340-480 MHz','1-1.4 GHz','1.4-2 GHz','2-2.8 GHz','2.8-4 GHz']
+'''
+survey_list = ['VAST','ThunderKAT','VLASS']
+leg_list = ['VAST','ThunderKAT','VLASS']
+title_list = leg_list
+plot_file_root = 'transient_'
+'''
+survey_list = ['Phi','Llo','Lhi','Slo','Shi']
+leg_list = ['.34-.48','1-1.4','1.4-2','2-2.8','2.8-4']
+title_list = ['340-480 MHz','1-1.4 GHz','1.4-2 GHz','2-2.8 GHz','2.8-4 GHz']
 plot_file_root = 'halfband_'
 
-params = {'legend.fontsize': 'small',
+params = {'legend.fontsize': 'x-small',
           'axes.titlesize': 'medium',
           'axes.labelsize': 'small',
           'xtick.labelsize': 'x-small',
@@ -35,7 +33,7 @@ n = len(survey_list)
 
 figure(figsize=(6.5,8))
 j=0
-for survey,survey_leg in zip(survey_list,leg_list):
+for survey,survey_leg in zip(survey_list,title_list):
     j+=1
     subplot(n,1,j)
     
@@ -47,7 +45,7 @@ for survey,survey_leg in zip(survey_list,leg_list):
     t_int = survey_dict['t_int']
     print survey, 'smin (red line on tseries.png):', smin*1e3, 'mJy'
     src = survey_dict['src']
-    srclist = unique(src)
+    srclist = sort(unique(src))
     
     imag_offset = 1.0
     if survey[0]=='P':
@@ -102,6 +100,9 @@ xlabel('Flux S (Jy) at 1 pc')
 ylabel('Fraction of time brighter than S')
 #filename2 = savedir+plot_file_root+'fluxdist.pdf'
 #savefig(filename2,bbox_inches='tight')
+if plot_file_root != 'transient_':
+    leg = legend(leg_list,title='Freq (GHz)')
+    setp(leg.get_title(),fontsize='small')
 
 ### PLOT 3: N(>S) vs. S for each survey band ###
 
@@ -113,24 +114,36 @@ for survey in survey_list:
     survey_dict = load(savefile).reshape(1)[0]  # weird song and dance to get it to load a dictionary properly...
     Splot = survey_dict['Splot']*1e3  # same for all
     N_S[survey] = survey_dict['N_S']
-    Neuclid[survey] = N_S[survey][0] * (Splot/Splot[0])**-1.5
 
-#figure(figsize=(4,3))
 subplot(122)
-for survey in survey_list:
-    loglog(Splot,Neuclid[survey])
-gca().set_prop_cycle(None)
-for survey in survey_list:
-    loglog(Splot,N_S[survey],'.')
-legend(leg_list)
-xlabel('S (mJy)')
-ylabel('N(>S) (per sq deg)')
-axis([0.1,1e3,1e-5,1])
-#filename3 = savedir + 'survey_NvS.pdf'
-#savefig(filename3,bbox_inches='tight')
+if plot_file_root == 'transient_':
+# plot 3a: N(>S) vs. S (do for transient surveys)
+    for survey in survey_list:
+        loglog(Splot,N_S[survey],linewidth=2)
+    legend(leg_list)
+    xlabel('S (mJy)',y=0.1)
+    ylabel('N(>S) (per sq deg)')
+    axis([0.1,1e3,1e-5,1])
+else:
+# plot 3b: N(>0.1 mJy) vs. frequency
+    N_0_list = []
+    i = 0
+    freqlist = [0.41,1.2,1.7,2.4,3.4]
+    BWlist = [0.07,0.2,0.3,0.4,0.6]
+    for survey in survey_list:
+        N_0 = N_S[survey][0]
+        N_0_list.append(N_0)
+        errorbar(freqlist[i],N_0,xerr=BWlist[i],fmt='*',mew=0)
+        i += 1
+    plot(freqlist,N_0_list,'k--')
+    xlabel('Frequency (GHz)')
+    ylabel('N(>0.1 mJy) (per sq deg)')
+
+
 fname = savedir + plot_file_root+'burstrate.pdf'
 tight_layout()
 savefig(fname,bbox_inches='tight')
+
 
 
 ### PLOT 4: CONTRIBUTION VS. DISTANCE ###

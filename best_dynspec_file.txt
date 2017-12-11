@@ -1,0 +1,49 @@
+13A-423_UVCet_2S---/data/jrv/13A-423/UVCet/2/S/sc/ds_bgsub_postcal/tbavg.ms.dynspec
+13A-423_UVCet_2C---/data/jrv/13A-423/UVCet/2/C/testI2/ds_bgsub_postcal/tbavg.ms.dynspec
+# script used to create 2S and 2C: /data/jrv/13A-423/UVCet/2/C/testI2/selfcal_UVCet2C.py
+#---
+15A-416_UVCet_2L---/data/jrv/15A-416/UVCet/2/L/sc/ds_bgsub_postcal/tbavg.ms.dynspec
+# script used to create 2L: /data/jrv/15A-416/UVCet/2/L/sc/selfcal_UVCet2L.py
+#---
+15A-416_UVCet_2S---/data/jrv/15A-416/UVCet/2/S/ds_bgsub_precal/tbavg.ms.dynspec
+# script used to create 2S: /data/jrv/15A-416/UVCet/2/S/make_better_im.py
+#---
+15A-416_UVCet_3P---/data/jrv/15A-416/UVCet/3/P/ds_postcal/tbavg.ms.dynspec
+# script used to create 3P: /data/jrv/15A-416/UVCet/3/P/compare_ds.py
+#---
+15A-416_UVCet_3L---/data/jrv/15A-416/UVCet/3/L/sc/ds_bgsub_postcal_noflag/tbavg.ms.dynspec
+# script used to create 3L: /data/jrv/15A-416/UVCet/3/L/sc/selfcal_UVCet3L.py
+#---
+15A-416_UVCet_3S---/data/jrv/15A-416/UVCet/3/S/sc/ds_bgsub_postcal/tbavg.ms.dynspec
+# script used to create 3S: /data/jrv/15A-416/UVCet/3/S/sc/selfcal_UVCet3S.py
+#---
+15A-416_UVCet_4L---/data/jrv/15A-416/UVCet/4/L/sc/ds_bgsub_postcal/tbavg.ms.dynspec
+# script used to create 4L: /data/jrv/15A-416/UVCet/4/L/sc/selfcal_UVCet4L.py
+#---
+15A-416_UVCet_4S---/data/jrv/15A-416/UVCet/4/S/sc/ds_bgsub_postcal/tbavg.ms.dynspec
+# script used to create 4S: /data/jrv/15A-416/UVCet/4/S/sc/selfcal_UVCet4S.py
+#---
+15A-416_UVCet_5L---/data/jrv/15A-416/UVCet/5/L/sc/ds_bgsub_postcal/tbavg.ms.dynspec
+# script used to create 5L: /data/jrv/15A-416/UVCet/5/L/sc/selfcal_UVCet5L.py
+#---
+15A-416_UVCet_5S---/data/jrv/15A-416/UVCet/5/S/sc/ds_bgsub_postcal/tbavg.ms.dynspec
+# script used to create 5S: /data/jrv/15A-416/UVCet/5/S/sc/selfcal_UVCet5S.py
+#---
+15A-416_ADLeo_3L---/data/jrv/15A-416/ADLeo/3/L/test_clean/ds_ap0_big_RR_n2_ms/tbavg.ms.dynspec
+# script used to create 3L: /data/jrv/15A-416/ADLeo/3/L/test_clean.py
+#---
+# Which other dynspecs could use improvement?
+# all of AD Leo generally could improve bg sub by selfcal
+# 15A-416_ADLeo_4L - phase center off - selfcal would fix
+# 13A-423: UV Cet L band and bottom edge of S band needs selfcal to improve bg sub
+# 13A-423_UVCet_1S - phase center off
+# 15A-416_UVCet_2LS - phase center off
+# EQPeg L band - selfcal then redo imaging to improve bg sub
+# EVLac_1LS,2LS - improve bg sub
+# YZCMi_1L,2L: improve bg sub?
+# all P band data - but could focus on epochs w/ bursts
+#---
+# Most urgent to fix:
+# (after submission?) UVCet_5P - bad bg sub
+# (after submission?) ADLeo_5P,3P - bad bg sub (I may have worked on this on Socorro computer?)
+# 15A-416_ADLeo_4L - selfcal on RR before bgsub, like I did for ADLeo_3L
