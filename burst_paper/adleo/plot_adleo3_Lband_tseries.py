@@ -68,7 +68,7 @@ plot(t12,imag(i12),'b--')
 plot(t12,imag(v12),'g--')
 '''
 xlabel('Time in minutes')
-ylabel('Flux (mJy)')
+ylabel('Flux Density (mJy)')
 legend(('I','V','Imag(I)','Imag(V)'))
 gca().axhline(0,color='k')
 savefig(savedir+'ADLeo3_tseries.pdf',bbox_inches='tight')

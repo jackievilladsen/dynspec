@@ -236,43 +236,92 @@ def interpolate(times):
 
 def dyn_spec(msname, ddids=None, interpolate_times=False):
     '''
-    Note: dyn_spec has a bug that it sometimes replicates frequency list many times over (why?) -
-    something to do with ddids not containing a unique list of spw's
+    dynspec_dict = dyn_spec(msname, ddids=None, interpolate_times=False)
 
-    WARNING: DOES NOT HANDLE FLAGGED CHANNELS CURRENTLY :(
+    ddids: which spectral windows you want in output (default is all)
+
+    dynspec_dict: {'data': arr, 'freqs': freq_values, 'times': out_times}
+    - 'data': 3D array dynspec (N_times x N_pols x N_freqs)
+    - 'freqs': 1D array of frequency values, length N_freqs
+    - 'times': 1D array of timestamps, length N_times
+    
+    Rather than writing out a separate table of flags or a masked array, the returned dynspec is
+    a simple array but flagged points are set to exactly zero (so user MUST mask zero values later).
+    Note to self: Consider changing this to nan's instead or to a user-set parameter, or to write out
+    a masked array.
+
+    Note: dyn_spec has a bug that it sometimes replicates frequency list many times over (why?) -
+    something to do with ddids not containing a unique list of spw's.  If this becomes a problem,
+    the user can avoid this by running mstransform with combinespws=True on the ms file before
+    running dyn_spec.
     '''
+    # load data from ms
     tab = table(msname)
+    
+    # define list of spw's to put in dynspec (default is all if user does not specify)
     if ddids is None:
         ddids = numpy.arange(subtable(tab,'SPECTRAL_WINDOW').nrows())
     else:
         ddids = numpy.array(ddids)
+    
+    # define list of times for dynspec
     times = unique_col_values(tab, 'TIME')
     if interpolate_times:
         out_times = interpolate(times)
     else:
         out_times = times
-    tmp_data = tab.getcell('DATA', 0)
-    pols, freqs = tmp_data.shape
+
+    # get number of pols and channels (per spw)
+    tmp_data = tab.getcell('DATA', 0)  # data from one row of ms (one spw, one time)
+    pols, freqs = tmp_data.shape  # this shape gives us number of pols & freq chans per spw
+    
+    # create empty array to hold output dynspec - shape: (N_times, N_pols, N_freqs)
+    #   (where N_freqs is total number of channels across all spw's, NOT per spw)
     arr = numpy.zeros(shape=(len(out_times), pols, len(ddids)*freqs), dtype=tmp_data.dtype)
+
+    # populate dynspec one ms row (one spw/time combo) at a time
     for i in range(tab.nrows()):
+        
+        # skip fully flagged rows (these will have zero value in output dynspec)
         if tab.getcell('FLAG_ROW', i):
             continue
+        
+        # get spw number and timestamp for this row
         ddid = tab.getcell('DATA_DESC_ID', i)
         time = tab.getcell('TIME', i)
+        
+        # get index of row in output dynspec corresponding to timestamp
         t_indx = numpy.where(out_times==time)[0][0]
+        
+        # get index of spw in list of output spw's
+        # and skip this row if the spw is not requested in the output dynspec
         try:
             d_indx = numpy.where(ddids==ddid)[0][0]
         except IndexError:
             # This DATA_DESC is not requested in the output.
             continue
+        
+        # get data from this row of the ms
+        # 2D array: N_pols x N_chan_per_spw
+        put_value = tab.getcell('DATA',i)
+        
+        # mask data points with weight of zero (I assume this is just to get rid
+        #  of flagged points? but it's not getting rid of all flagged points)
+        # ("mask" = set value to zero in output dynspec)
         if tab.iscelldefined('WEIGHT_SPECTRUM', i):
-            arr[t_indx,:,d_indx*freqs:(d_indx+1)*freqs] = tab.getcell('DATA', i) * (tab.getcell('WEIGHT_SPECTRUM', i) > 0)
-        else:
-            arr[t_indx,:,d_indx*freqs:(d_indx+1)*freqs] = tab.getcell('DATA', i)
+           put_value *= (tab.getcell('WEIGHT_SPECTRUM', i) > 0)
+        
+        # mask data points with spectral flags
+        # ("mask" = set value to zero in output dynspec)
+        if tab.iscelldefined('FLAG',i):
+            put_value *= ~tab.getcell('FLAG',i) # FLAG of True will be multiplied by zero
+
+        # put data into output dynspec
+        arr[t_indx,:,d_indx*freqs:(d_indx+1)*freqs] = put_value
 
     # Generate array of frequency axis values
-    ddesc = subtable(tab, 'DATA_DESCRIPTION')
-    spw = subtable(tab, 'SPECTRAL_WINDOW')
+    ddesc = subtable(tab, 'DATA_DESCRIPTION')  # one row per spw - spw_id, flag_row, pol_id
+    spw = subtable(tab, 'SPECTRAL_WINDOW')     # one row per spw - bandwidth, ref freq, etc.
     ftype = spw.getcell('CHAN_FREQ', 0).dtype
     freq_values = numpy.zeros(shape=(len(ddids)*freqs,), dtype=ftype)
     for i in range(len(ddids)):

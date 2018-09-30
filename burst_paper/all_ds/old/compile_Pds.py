@@ -17,9 +17,11 @@ def get_band(filename):
 nt = 50
 nf = 32
 
-savefile = '/data/jrv/burst_paper/ds/all_burst_Pdynspec.npy'
+#savefile = '/data/jrv/burst_paper/ds/all_burst_Pdynspec.npy'
+#filelist = load_burst_filelist(band='P')
 
-filelist = load_burst_filelist(band='P')
+savefile = '/data/jrv/burst_paper/ds/all_burst_epochs_Pdynspec.npy'
+filelist = load_burst_filelist(band='withP')
 
 ds_list = {}
 for obs in filelist:
@@ -31,6 +33,7 @@ for obs in filelist:
         params={'filename':f,'uniform':True}
         ds = Dynspec(params)
         ds.spec['i'] = (ds.spec['xx']+ds.spec['yy'])/2
+        ds.spec['u'] = (ds.spec['xy']+ds.spec['yx'])/2
         ds.spec['v'] = (ds.spec['xy']-ds.spec['yx'])/(2.j)
         del ds.spec['xx']
         del ds.spec['yy']
@@ -38,6 +41,7 @@ for obs in filelist:
         del ds.spec['yx']
     ds.mask_RFI(rmsfac=1.5)
     ds = ds.bin_dynspec(nt=nt,nf=nf)
+    ds.spec['uv'] = sqrt(abs(ds.spec['u'])**2 + abs(ds.spec['v'])**2)
     ds_list[obs] = ds
 
 save(savefile,ds_list)

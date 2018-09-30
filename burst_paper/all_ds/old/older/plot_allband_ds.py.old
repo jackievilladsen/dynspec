@@ -1,0 +1,193 @@
+'''
+plot_allband_ds.py - Load P,L,S band dynamic spectrum for a given epoch, bin to specified resolution, and plot to file
+'''
+
+import dynspec.plot
+reload(dynspec.plot)
+
+from dynspec import load_dict
+from dynspec.plot import *
+from pylab import *
+import os, subprocess
+import matplotlib.gridspec as gridspec
+
+def get_obsname(obsfile):
+    # take a file directory such as '/data/jrv/15A-416/YZCMi/1' and
+    # convert to obs name such as '15A-416_YZCMi_1' and srcname 'YZCMi'
+    names = obsfile.split('/')
+    srcname = names[4]
+    obsname = names[3]+'_'+names[4]+'_'+names[5]
+    return obsname,srcname
+
+params = {'legend.fontsize': 'small',
+          'axes.titlesize': 'medium',
+          'axes.labelsize': 'small',
+          'xtick.labelsize': 'x-small',
+          'ytick.labelsize': 'x-small',
+          'image.interpolation': 'nearest'}
+rcParams.update(params)
+
+loadfile = '/data/jrv/burst_paper/all_burst_epoch_dynspec_LSband.npy'
+ds_list = load_dict(loadfile)
+loadfileP = '/data/jrv/burst_paper/all_burst_epoch_dynspec_Pband.npy'
+dsP_list = load_dict(loadfileP)
+
+ds_dir = '/data/jrv/burst_paper/ds/' # where to save ds plots
+if not os.path.exists(ds_dir):
+    os.system('mkdir '+ds_dir)
+
+close('all')
+
+### PLOT INDIVIDUAL OBSERVATIONS ###
+
+#srclist = [('ADLeo','15A-416'),('UVCet','13A-423'),('UVCet','15A-416'),('EQPeg','15A-416'),('YZCMi','15A-416')]
+#srclist = [('UVCet','15A-416')]
+
+obs_list = ds_list.keys()
+for obs in obs_list:
+    
+    # load dynamic spectra for this observation
+    print '\n', obs
+    obsname,srcname = get_obsname(obs)
+    ds = ds_list[obs]
+    dsP = dsP_list[obs]
+        
+    # create figure
+    figname = ds_dir+obsname+'.pdf'
+    fig=figure(figsize=(9,6.5))
+    n_rows = 2
+    n_cols = 3
+    heights = [1,0.6]
+    widths = [1,1,0.2]
+    gs = gridspec.GridSpec(n_rows,n_cols,height_ratios=heights,width_ratios=widths,wspace=0.0,hspace=0.0)
+    clf()
+    
+    # set flux limits for LS band
+    smax = max(percentile(real(ds.spec['i']),99),median(real(ds.spec['i']))*2)
+    smin = -smax  # make colorbar symmetric about zero
+    
+    # plot Stokes I real, LS band
+    ar0=0.95
+    subplot(gs[0])
+    pp = {'pol':'i','smin':smin,'smax':smax,'trim_mask':False,'axis_labels':['cbar','cbar_label','ylabel'],'ar0':ar0,'dy':0.5}
+    plt,cbar_ticks,cbar_ticklbls = ds.plot_dynspec(plot_params=pp)
+    cbLS = gca().images[-1].colorbar
+    cbLS.remove()
+    gca().xaxis.set_visible(False)
+    
+    # plot Stokes V real, LS band
+    subplot(gs[1])
+    pp = {'pol':'v','smin':smin,'smax':smax,'trim_mask':False,'axis_labels':['cbar','cbar_label'],'ar0':ar0,'dy':0.5}
+    ds.plot_dynspec(plot_params=pp)
+    gca().yaxis.tick_right()
+    cbLS = gca().images[-1].colorbar
+    cbLS.remove()
+    gca().xaxis.set_visible(False)
+
+    # plot P band colorbar
+    gs_LSband_cbar = gridspec.GridSpecFromSubplotSpec(1,2, subplot_spec = gs[2], width_ratios=[1,0.3])
+    ax = subplot(gs_LSband_cbar[1])
+    cbar=colorbar(plt,cax=ax)
+    cbar.set_ticks(cbar_ticks)
+    cbar.set_ticklabels(cbar_ticklbls)
+    cbar.set_label('Flux (mJy)')
+
+    # set flux limits for P band
+    smaxP = dsP.get_rms('i')*3.5
+    sminP = -smaxP
+    ar0=0.3
+        
+    # plot Stokes I real, P band
+    gs_Pband_I = gridspec.GridSpecFromSubplotSpec(2,1, subplot_spec = gs[3])
+    fig.add_subplot(gs_Pband_I[0])
+    pp = {'pol':'i','smin':sminP,'smax':smaxP,'trim_mask':False,'axis_labels':['cbar','cbar_label'],'dy':0.05,'ar0':ar0}
+    dsP.plot_dynspec(plot_params=pp)
+    cbP = gca().images[-1].colorbar
+    cbP.remove()
+    
+    # plot Stokes V real, P band
+    gs_Pband_UV = gridspec.GridSpecFromSubplotSpec(2,1, subplot_spec = gs[4])
+    fig.add_subplot(gs_Pband_UV[0])
+    pp = {'pol':'v','smin':sminP,'smax':smaxP,'trim_mask':False,'axis_labels':['cbar','cbar_label'],'dy':0.05,'ar0':ar0}
+    plt,cbar_ticks,cbar_ticklbls=dsP.plot_dynspec(plot_params=pp)
+    gca().yaxis.tick_right()
+    gca().xaxis.set_visible(False)
+    cbP = gca().images[-1].colorbar
+    #gca().set_axis_bgcolor('#00ff00') #'0.5')
+    cbP.remove()
+    
+    # plot Stokes U real, P band
+    fig.add_subplot(gs_Pband_UV[1])
+    pp = {'pol':'u','smin':sminP,'smax':smaxP,'trim_mask':False,'axis_labels':['cbar','cbar_label','xlabel'],'dy':0.05,'ar0':ar0}
+    gca().yaxis.tick_right()
+    dsP.plot_dynspec(plot_params=pp)
+    cbP = gca().images[-1].colorbar
+    cbP.remove()
+    #gs.tight_layout(fig)
+    
+    # plot P band colorbar
+    gs_Pband_cbar = gridspec.GridSpecFromSubplotSpec(1,2, subplot_spec = gs[5], width_ratios=[1,0.3])
+    ax = subplot(gs_Pband_cbar[1])
+    cbar=colorbar(plt,cax=ax)
+    cbar.set_ticks(cbar_ticks)
+    cbar.set_ticklabels(cbar_ticklbls)
+    cbar.set_label('Flux (mJy)')
+
+    #suptitle(src[0:2]+' '+src[2:5]+' 20'+proj[0:2],y=0.95)
+    #tight_layout()
+    savefig(figname,bbox_inches='tight')
+    clf()
+
+
+'''
+    #smax = min(ds_bin.rms_spec('v'))*rmsfac
+#    pp = {'pol':'v','smin':smin,'smax':smax,'trim_mask':False,'ar0':0.8,'scale':scale,'axis_labels':['ylabel','cbar','cbar_label'],'dy':0.5}
+#    ppP = {'pol':'v','smin':smin,'smax':smax,'ar0':0.2,'trim_mask':False,'scale':scale,'axis_labels':['xlabel','cbar'],'dy':0.1}
+#    ppX = {'pol':'v','smin':smin,'smax':smax,'ar0':0.2,'trim_mask':False,'scale':scale,'axis_labels':['cbar'],'dy':0.1}
+    
+    # plot tseries above dynspec (time axis aligned) and save figure
+    # to do: set x-axis limits for time series
+    clf()
+    ax=axes([0,0.18,1,0.81])                  # VLA LS-band dynspec
+    ds_bin.plot_dynspec(plot_params=pp)
+    ax.xaxis.set_visible(False)
+    
+    ax = axes([0,0.97,1,0.2])                 # VLBA dynspec
+    dsVLBA_bin.plot_dynspec(plot_params=ppX)
+    cb = gca().images[-1].colorbar
+    cb.remove()
+    ax.xaxis.set_visible(False)
+    
+    ax=axes([0,1.17,0.914,0.2]) #2: 0.96      # VLBA time series
+    axhline(0,color='k')
+    errorbar(t,iflux,flux_err)
+    plot(t,vflux)
+    xlim([min(t),max(t)])
+    ylabel('VLBA Flux (mJy)')
+    title(year + ' ' + src + ' ' + epoch)
+    ax.xaxis.set_visible(False)
+    
+    ax = axes([0,0,1,0.2])                    # VLA P-band dynspec
+    dsP_bin.plot_dynspec(plot_params=ppP)
+    cb = gca().images[-1].colorbar
+    cb.remove()
+
+    figfile = savedir + src + '_' + epoch + '_dynspec.pdf'
+    savefig(figfile,bbox_inches='tight')
+
+
+
+# subplots to show im(vis) also
+
+subplot(121)
+ds_bin.plot_dynspec(plot_params=pp)
+cb = gca().images[-1].colorbar
+cb.remove()
+gca().xaxis.set_label_coords(1.2,-0.15)
+title('Stokes V')
+subplot(122)
+pp['func']=imag
+ds_bin.plot_dynspec(plot_params=pp)
+title('Imag(Stokes V)')
+suptitle(src + ' ' + epoch)
+'''

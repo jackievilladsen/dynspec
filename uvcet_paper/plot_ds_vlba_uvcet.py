@@ -86,7 +86,7 @@ for epoch in epochlist:
     errorbar(t,iflux,flux_err)
     plot(t,vflux)
     xlim([min(t),max(t)])
-    ylabel('VLBA Flux (mJy)')
+    ylabel('VLBA Flux Density (mJy)')
     title(year + ' ' + src + ' ' + epoch)
     ax.xaxis.set_visible(False)
     ax = axes([0,0,1,0.2])

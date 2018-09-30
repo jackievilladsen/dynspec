@@ -1,4 +1,4 @@
-__all__ = ['tbavg','extract_dynspec','__plot__']
+__all__ = ['tbavg','extract_dynspec','__plot__','custom_colormap']
 
 from numpy import load
 

@@ -272,6 +272,9 @@ def get_clean_scans(band):
 def load_preferred_files():
     # returns a dictionary whose keys are observation names (e.g. '15A-416_UVCet_3S') and whose
     # entries are filenames pointing to the preferred dynspec file
+    #
+    # does not contain entries for observations that aren't in best_dynspec_file.txt (i.e. which
+    # use the default dynspec from the pipeline)
     fname = '/data/jrv/casa_utils/dynspec/best_dynspec_file.txt'
     f = open(fname)
     lines = f.readlines()
@@ -302,15 +305,24 @@ def load_ds_filelist():
             flist[i] = preferred_file_dict.get(band_obsname,f)
     return filelist
 
-def load_burst_filelist(band=''):
+def load_burst_filelist(band='',project=''):
     # returns a dictionary whose keys are observation file names (e.g. 'data/jrv/15A-416/UVCet/3') from
     # epochs where there was a burst, and whose entries are lists of dynspec files (e.g. one for L band, one for S band)
     # options: band='' --> uses burst_epochs.txt
-    #          band='P' --> uses burst_epochs_Pband.txt
+    #          band='P' --> uses burst_epochs_Pband.txt (all these epochs are covered w/in
+    #                       burst_epochs.txt as well since all have bursts at higher freq)
+    #          band='withP' --> uses burst_epochs_with_Pband.txt
+    #                          (all epochs with detected bursts that have
+    #                           P band coverage, even if burst not detected
+    #                           in P band)
+    # project='': If project is set to '15A-416' or '13A-423', will only load 
+    #             burst filenames from that project
     ds_filelist = load_ds_filelist()
     
     if band=='P':
         fname = '/data/jrv/casa_utils/dynspec/burst_epochs_Pband.txt'
+    elif band=='withP':
+        fname = '/data/jrv/casa_utils/dynspec/burst_epochs_with_Pband.txt'
     else:
         fname = '/data/jrv/casa_utils/dynspec/burst_epochs.txt'
     f = open(fname)
@@ -320,6 +332,8 @@ def load_burst_filelist(band=''):
     for l in lines:
         l = l.rstrip()
         if l=='':
+            continue
+        if project not in l:
             continue
         if l[0] != '#':
             file_dict[l] = ds_filelist[l]

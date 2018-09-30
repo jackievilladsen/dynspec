@@ -3,7 +3,11 @@ plot_all_ds.py - Load all Stokes I,V dynamic spectra from file produced by compi
                  a series of figures showing all of the dynamic spectra - Re(vis) and Im(vis).
 '''
 
+import dynspec.plot
+reload(dynspec.plot)
+
 from dynspec import load_dict
+from dynspec.plot import *
 from pylab import *
 import os, subprocess
 import matplotlib.gridspec as gridspec
@@ -26,7 +30,7 @@ params = {'legend.fontsize': 'small',
           'image.interpolation': 'hanning'}
 rcParams.update(params)
 
-savefile = '/data/jrv/burst_paper/all_dynspec.npy'
+savefile = '/data/jrv/burst_paper/ds/all_burst_Pdynspec.npy'
 ds_list = load_dict(savefile)
 
 ds_dir = '/data/jrv/burst_paper/ds/' # where to save ds plots
@@ -40,80 +44,76 @@ close('all')
 
 ### PLOT INDIVIDUAL OBSERVATIONS ###
 
-srclist = [('ADLeo','13A-423'),('ADLeo','15A-416'),('UVCet','13A-423'),('UVCet','15A-416'),('EQPeg','15A-416'),('EVLac','15A-416'),('YZCMi','15A-416')]
-srclist = [('YZCMi','15A-416')]
+srclist = ['ADLeo','UVCet','EQPeg']
+#srclist = ['UVCet']
 
-figure(figsize=(6,8.5))
+figure(figsize=(7,10))
 
 n_rows = 5
-n_cols = 4
-gs = gridspec.GridSpec(n_rows, n_cols, width_ratios=[1,1,1.2,1])
+n_cols = 3
+gs = gridspec.GridSpec(n_rows, n_cols)
+#ar0 = 0.55
+ar0 = 0.9
 
-for src,proj in srclist:
+proj = '15A-416'
 
-    figname = ds_dir + src + '_' + proj + '.pdf'
+for src in srclist:
+
+    figname = ds_dir + src + '_' + proj + '_P.pdf'
     clf()
     sub_row = 1
-    subplots_adjust(hspace=1.0)
-
-    cmd = 'ls -d /data/jrv/'+proj+'/'+src+'/*/*/*.tbavg.ms.dynspec | cut -d / -f 1-6 | uniq'
-    obslist = subprocess.check_output(cmd, shell=True).rstrip().split('\n')
+    subplots_adjust(hspace=0.5,wspace=0)
+    
+    obslist = [s for s in ds_list.keys() if proj in s and src in s] # choose the obs names that have proj and src in them (eg all ADLeo 15A-416)
+    obslist = sort(obslist)
     
     for obs in obslist:
         
         offset = (sub_row - 1) * n_cols
-
+        
         print '\n', obs
         obsname,srcname = get_obsname(obs)
         ds = ds_list[obs]
-
+        
         # flux limits for Stokes I
         smax = ds.get_rms('i')*6
         smin = -smax  # make colorbar symmetric about zero to be consistent with Stokes V
-
+        
         # plot Stokes I real
         i = offset + 0
         subplot(gs[i])
-        pp = {'pol':'i','smin':smin,'smax':smax,'trim_mask':False,'axis_labels':['ylabel','cbar']}
+        pp = {'pol':'i','smin':smin,'smax':smax,'trim_mask':False,'axis_labels':['cbar','ylabel'],'dy':0.05,'ar0':ar0}
         ds.plot_dynspec(plot_params=pp)
-        cb = gca().images[-1].colorbar
-        cb.remove()
-        title('Stokes I')
-
-        # plot Stokes I imaginary
-        i = offset + 1
-        subplot(gs[i])
-        pp.update({'axis_labels':['cbar'],'func':imag})
-        ds.plot_dynspec(plot_params=pp)
-        gca().yaxis.set_visible(False)
-        title('Imag(I)')
-
-        # flux limits for Stokes V
+        if sub_row==1:
+            title('Stokes I')
+        
+        # flux limits for Stokes U and V
         smax = ds.get_rms('v')*6
         smin = -smax  # make colorbar symmetric about zero to be consistent with Stokes V
+
+        # plot Stokes U real
+        i = offset + 1
+        subplot(gs[i])
+        pp = {'pol':'u','smin':smin,'smax':smax,'trim_mask':False,'axis_labels':['cbar','xlabel'],'ar0':ar0}
+        ds.plot_dynspec(plot_params=pp)
+
+        gca().yaxis.set_visible(False)
+        gca().xaxis.set_label_coords(-0.15,-0.2)
+        if sub_row==1:
+            title('Stokes U')
 
         # plot Stokes V real
         i = offset + 2
         subplot(gs[i])
-        pp = {'pol':'v','smin':smin,'smax':smax,'trim_mask':False,'axis_labels':['cbar','xlabel']}
-        ds.plot_dynspec(plot_params=pp)
-        cb = gca().images[-1].colorbar
-        cb.remove()
-        gca().yaxis.set_visible(False)
-        gca().xaxis.set_label_coords(-0.5,-0.3)
-        title('Stokes V')
-
-        # plot Stokes V imaginary
-        i = offset + 3
-        subplot(gs[i])
-        pp.update({'axis_labels':['cbar','cbar_label'],'func':imag})
+        pp = {'pol':'v','smin':smin,'smax':smax,'trim_mask':False,'axis_labels':['cbar','cbar_label'],'ar0':ar0}
         ds.plot_dynspec(plot_params=pp)
         gca().yaxis.set_visible(False)
-        title('Imag(V)')
+        if sub_row==1:
+            title('Stokes V')        
         
         sub_row += 1
 
-    suptitle(src[0:2]+' '+src[2:5]+' 20'+proj[0:2])
+    suptitle(src[0:2]+' '+src[2:5]+' 20'+proj[0:2],y=0.95)
     savefig(figname,bbox_inches='tight')
     clf()
     subrow=1

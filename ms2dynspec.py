@@ -34,6 +34,50 @@ def get_nterms(model):
     else:
         return len(model)
 
+def tbavg2dsfile(tbavg_ms_file,overwrite_mode='backup'):
+    '''
+    dsdir = tbavg2dsfile(tbavg_ms_file,overwrite_mode='backup')
+    
+    Read dynamic spectrum from tbavg_ms_file and save it as a set
+    of text files in directory dsdir (=tbavg_ms_file+'.dynspec').
+    
+    overwrite_mode = 'backup' means that if there is an old dynspec
+    file with the same name as dsfile, it is moved to [dsdir].old.
+    Other options:
+    - overwrite_mode = 'overwrite': just erase old dynspec file
+    - overwrite_mode = 'none' (or anything else): return w/o creating new ds file
+      if there is already an existing file
+    '''
+    # name of directory to put dynamic spectra text files in
+    if tbavg_ms_file[-1] =='/':
+        tbavg_ms_file = tbavg_ms_file[:-1]
+    dsdir = tbavg_ms_file + '.dynspec'
+    
+    # check if directory already exists and if so, back it up, erase it,
+    #   or exit w/o writing a new file (depending on overwrite_mode)
+    if os.path.exists(dsdir):
+        print 'Warning from tbavg2dsfile:',dsdir, 'already exists'
+        if overwrite_mode=='backup':
+            if os.path.exists(dsdir+'.old'):
+                os.system('rm -rf '+dsdir+'.old')
+            os.system('mv '+dsdir+' '+dsdir+'.old')
+            print 'tbavg2dsfile is moving old',dsdir, 'to', dsdir+'.old before writing new dynspec to',dsdir, '(potentially overwriting old backup)'
+        elif overwrite_mode=='overwrite':
+            os.system('rm -rf '+dsdir)
+            print 'tbavg2dsfile is erasing old',dsdir, 'before creating the new one'
+        else:
+            print 'tbavg2dsfile is not writing a new copy of',dsdir,'- returning old version'
+            return dsdir
+    
+    # Read dynamic spectrum from tbavg.ms file
+    from tbavg import dyn_spec
+    spec = dyn_spec(tbavg_ms_file)
+    
+    # Save dynamic spectrum to text files in dsdir
+    #  (name of dsdir is determined automatically by saveTxt)
+    saveTxt(spec,tbavg_ms_file)
+    return dsdir
+
 def make_dsfile(vis,dsdir,datacolumn='corrected',weight_mode='flat'):
     # take post-uvsub ms and run tbavg, generate dsfile
         # create dsdir, directory where stuff will be saved
@@ -68,6 +112,17 @@ def copy_model_RRtoLL(vis):
     model_vis = tb.getcol('MODEL_DATA')
     model_vis[3,:,:] = model_vis[0,:,:] # copy RR model column to LL model column
     tb.putcol('MODEL_DATA',model_vis)
+    tb.unlock()
+    tb.close()
+
+def copy_data_RRtoLL(vis):
+    # copy RR column of data column to LL
+    # doesn't account for different flags on RR and LL
+    tb = tbtool()
+    tb.open(vis,nomodify=False)
+    data_vis = tb.getcol('DATA')
+    data_vis[3,:,:] = data_vis[0,:,:] # copy RR model column to LL model column
+    tb.putcol('DATA',data_vis)
     tb.unlock()
     tb.close()
 

@@ -23,6 +23,9 @@
 15A-416_UVCet_4S---/data/jrv/15A-416/UVCet/4/S/sc/ds_bgsub_postcal/tbavg.ms.dynspec
 # script used to create 4S: /data/jrv/15A-416/UVCet/4/S/sc/selfcal_UVCet4S.py
 #---
+15A-416_UVCet_5P---/data/jrv/15A-416/UVCet/5/P/better_im/bigms_clean0_multiscale_thresh10mJy_ds/tbavg.ms.dynspec
+# script used to create 5P: /data/jrv/15A-416/UVCet/5/P/make_better_im.py
+#---
 15A-416_UVCet_5L---/data/jrv/15A-416/UVCet/5/L/sc/ds_bgsub_postcal/tbavg.ms.dynspec
 # script used to create 5L: /data/jrv/15A-416/UVCet/5/L/sc/selfcal_UVCet5L.py
 #---
@@ -32,18 +35,26 @@
 15A-416_ADLeo_3L---/data/jrv/15A-416/ADLeo/3/L/test_clean/ds_ap0_big_RR_n2_ms/tbavg.ms.dynspec
 # script used to create 3L: /data/jrv/15A-416/ADLeo/3/L/test_clean.py
 #---
+15A-416_ADLeo_3S---/data/jrv/15A-416/ADLeo/3/S/test_selfcal/ds_ap1_n3_bgsub_big/tbavg.ms.dynspec
+# script used to create 3S: /data/jrv/15A-416/ADLeo/3/S/test_selfcal/ADLeo_3S_selfcal.py
+#---
+15A-416_ADLeo_4L---/data/jrv/15A-416/ADLeo/4/L/test_selfcal/ds_postSC_big/tbavg.ms.dynspec
+# script used to create 4L: /data/jrv/15A-416/ADLeo/4/L/test_selfcal/ADLeo_4L.selfcal_clean.py
+#---
+15A-416_ADLeo_4S---/data/jrv/15A-416/ADLeo/4/S/test_selfcal/ds_big_ap3_briggs/tbavg.ms.dynspec
+# script used to create 4S: /data/jrv/15A-416/ADLeo/4/S/test_selfcal/ADLeo_4S_selfcal.py
+#---
+15A-416_EQPeg_2P---/data/jrv/15A-416/EQPeg/2/P/better_im/star_4spw.ap2.nobg.tbavg/tbavg.ms.dynspec
+# script used to create 2P: /data/jrv/15A-416/EQPeg/2/P/better_im.py
+#---
 # Which other dynspecs could use improvement?
 # all of AD Leo generally could improve bg sub by selfcal
-# 15A-416_ADLeo_4L - phase center off - selfcal would fix
 # 13A-423: UV Cet L band and bottom edge of S band needs selfcal to improve bg sub
 # 13A-423_UVCet_1S - phase center off
-# 15A-416_UVCet_2LS - phase center off
 # EQPeg L band - selfcal then redo imaging to improve bg sub
 # EVLac_1LS,2LS - improve bg sub
 # YZCMi_1L,2L: improve bg sub?
 # all P band data - but could focus on epochs w/ bursts
 #---
-# Most urgent to fix:
-# (after submission?) UVCet_5P - bad bg sub
-# (after submission?) ADLeo_5P,3P - bad bg sub (I may have worked on this on Socorro computer?)
-# 15A-416_ADLeo_4L - selfcal on RR before bgsub, like I did for ADLeo_3L
+# Most in need of improvement:
+# ADLeo_5P,3P - may be hard to improve due to really bright bg src (I may have worked on this on Socorro computer?)

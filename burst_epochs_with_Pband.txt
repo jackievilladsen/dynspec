@@ -1,7 +1,10 @@
 /data/jrv/15A-416/ADLeo/3
+/data/jrv/15A-416/ADLeo/4
 /data/jrv/15A-416/ADLeo/5
 /data/jrv/15A-416/UVCet/2
 /data/jrv/15A-416/UVCet/3
 /data/jrv/15A-416/UVCet/4
 /data/jrv/15A-416/UVCet/5
 /data/jrv/15A-416/EQPeg/2
+/data/jrv/15A-416/YZCMi/1
+/data/jrv/15A-416/YZCMi/2

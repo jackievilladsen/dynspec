@@ -13,8 +13,8 @@ import pickle
 close('all')
 savedir = '/data/jrv/burst_paper/rate/'
 
-#survey_list = ['VAST','ThunderKAT','VLASS']
-survey_list = ['Phi','Llo','Lhi','Slo','Shi'] #,'Clo']
+survey_list = ['VAST','ThunderKAT','VLASS']
+#survey_list = ['Phi','Llo','Lhi','Slo','Shi'] #,'Clo']
 
 for survey in survey_list:
 
@@ -52,7 +52,8 @@ for survey in survey_list:
     ### Calculate N(>S) (per sq deg) vs. S ###
 
     # Volume density of stars like our sample
-    n0 = 5.0/(4./3 * pi * 6.2**3) # conservative lower limit on volume density is our 5 stars divided by the volume containing them
+    #n0 = 5.0/(4./3 * pi * 6.2**3) # conservative lower limit on volume density is our 5 stars divided by the volume containing them
+    n0 = 0.01  # decided on this after literature search - ~2x the density implied by our sample
 
     # Range of flux S for which we want to calculate N(>S)
     Splot = 10.0**arange(-4.,0.,0.1)
@@ -105,7 +106,7 @@ for survey in survey_list:
         N_S.append(N)
     N_S = array(N_S)
 
-    # save variables generated here that are needed for 
+    # save variables generated here that are needed for plot_burst_rate.py
     survey_dict['smin'] = smin
     survey_dict['Srange'] = Srange
     survey_dict['dN_dS'] = dN_dS
