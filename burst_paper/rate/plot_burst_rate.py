@@ -29,8 +29,8 @@ params = {'legend.fontsize': 'x-small',
 rcParams.update(params)
 
 survey_wedge_dict = {
-    'VAST-Wide epoch': {'Smin':0.5, 'UL':3./(1.e4), 'color':'b'},
-    'VLASS epoch': {'Smin':0.12, 'UL':3./(3.4e4), 'color':'r'},
+    'VAST-Wide epoch': {'Smin':2.5, 'UL':3./(1.e4), 'color':'b'},
+    'VLASS epoch': {'Smin':0.6, 'UL':3./(3.4e4), 'color':'r'},
     #'VLASS all': {'Smin':0.12, 'UL':3./(1.02e5), 'color':'r'},
     'Williams+13': {'Smin': 10, 'UL': 0.08, 'color': 'r'},
     'Mooley+16': {'Smin':0.5, 'UL': 0.024, 'color': 'r'},
@@ -123,7 +123,7 @@ for survey in survey_list:
 figure(figsize=(6.5,3))
 subplot(121)
 for survey in survey_list:
-    semilogx(Srange[survey],dN_dS[survey],'-',linewidth=1)
+    semilogx(Srange[survey],dN_dS[survey],'-',linewidth=2)
 #legend(leg_list)
 gca().set_prop_cycle(None)
 for survey in survey_list:
