@@ -30,8 +30,7 @@ savedir='/data/jrv/burst_paper/adleo/'
 nt = 60
 nf = 32
 
-ds_files = ['/data/jrv/15A-416/ADLeo/3/L/test_clean/ds_ap0_big_RR_n2_ms/tbavg.ms.dynspec',
-            '/data/jrv/15A-416/ADLeo/3/S/ADLeo_3S.tbavg.ms.dynspec']
+ds_files = ['/data/jrv/15A-416/ADLeo/3/L/test_clean/ds_ap0_big_RR_n2_ms/tbavg.ms.dynspec','/data/jrv/15A-416/ADLeo/3/S/test_selfcal/ds_ap1_n3_bgsub_big/tbavg.ms.dynspec']
 src = 'ADLeo'
 '''
 ds_obs = None
@@ -49,22 +48,22 @@ ds_obs.mask_RFI(rmsfac=5.)
 
 ds=ds_obs.bin_dynspec(nt=nt,nf=nf,mask_partial=0.8)
 '''
-figure(figsize=(7,10))
+figure(figsize=(6.5,6.5))
 
-n_rows = 1
-n_cols = 4
+n_rows = 2
+n_cols = 2
 gs = gridspec.GridSpec(n_rows, n_cols)
 ar0 = 1.0
 
 clf()
 sub_row = 1
-subplots_adjust(hspace=0,wspace=0)
+subplots_adjust(hspace=0.2,wspace=0)
         
 offset = 0
 
 # flux limits
 smax = percentile(real(ds.spec['i']),98)
-smax = 0.02
+smax = 0.015
 smin = -smax  # make colorbar symmetric about zero to be consistent with Stokes V
 
 # plot Stokes I real
@@ -74,6 +73,7 @@ pp = {'pol':'i','smin':smin,'smax':smax,'trim_mask':False,'axis_labels':['cbar',
 ds.plot_dynspec(plot_params=pp)
 cb = gca().images[-1].colorbar
 cb.remove()
+gca().yaxis.set_label_coords(-0.05,-0.1)
 title('Stokes I')
 
 # plot Stokes I imag
@@ -91,10 +91,10 @@ i = offset + 2
 subplot(gs[i])
 pp = {'pol':'v','smin':smin,'smax':smax,'trim_mask':False,'axis_labels':['cbar','xlabel'],'ar0':ar0}
 ds.plot_dynspec(plot_params=pp)
-gca().yaxis.set_visible(False)
+#gca().yaxis.set_visible(False)
 cb = gca().images[-1].colorbar
 cb.remove()
-gca().xaxis.set_label_coords(-0.07,-0.2)
+gca().xaxis.set_label_coords(1.0,-0.1)
 title('Stokes V')
 
 # plot Stokes V imag
@@ -105,5 +105,5 @@ ds.plot_dynspec(plot_params=pp)
 gca().yaxis.set_visible(False)
 title('Imag(V)')
         
-savefig(ds_dir+'ADLeo3_example_ds.pdf',bbox_inches='tight')
+savefig(savedir+'ADLeo3_example_ds.pdf',bbox_inches='tight')
 
