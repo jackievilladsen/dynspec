@@ -21,7 +21,7 @@ params = {'legend.fontsize': 'small',
           'axes.labelsize': 'x-small',
           'xtick.labelsize': 'xx-small',
           'ytick.labelsize': 'xx-small',
-          'image.interpolation': 'hanning'}
+          'image.interpolation': 'none'}
 rcParams.update(params)
 
 savefile = '/data/jrv/burst_paper/all_burst_dynspec.npy'
@@ -44,9 +44,9 @@ for f in ds_files:
     else:
         ds_obs.add_dynspec(ds)
     del ds
-ds_obs.mask_RFI(rmsfac=5.)
+#ds_obs.mask_RFI(rmsfac=5.)
 
-ds=ds_obs.bin_dynspec(nt=nt,nf=nf,mask_partial=0.8)
+ds=ds_obs.bin_dynspec(nt=nt,nf=nf,mask_partial=0.9)
 '''
 figure(figsize=(6.5,6.5))
 
@@ -69,7 +69,7 @@ smin = -smax  # make colorbar symmetric about zero to be consistent with Stokes 
 # plot Stokes I real
 i = offset + 0
 subplot(gs[i])
-pp = {'pol':'i','smin':smin,'smax':smax,'trim_mask':False,'axis_labels':['cbar','ylabel'],'ar0':ar0}
+pp = {'pol':'i','smin':smin,'smax':smax,'trim_mask':False,'axis_labels':['cbar','ylabel'],'ar0':ar0,'dy':0.5}
 ds.plot_dynspec(plot_params=pp)
 cb = gca().images[-1].colorbar
 cb.remove()
@@ -89,7 +89,7 @@ title('Imag(I)')
 # plot Stokes V real
 i = offset + 2
 subplot(gs[i])
-pp = {'pol':'v','smin':smin,'smax':smax,'trim_mask':False,'axis_labels':['cbar','xlabel'],'ar0':ar0}
+pp = {'pol':'v','smin':smin,'smax':smax,'trim_mask':False,'axis_labels':['cbar','xlabel'],'ar0':ar0,'dy':0.5}
 ds.plot_dynspec(plot_params=pp)
 #gca().yaxis.set_visible(False)
 cb = gca().images[-1].colorbar
