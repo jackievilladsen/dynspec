@@ -1,0 +1,17 @@
+Copyright 2018 Jackie Villadsen (see LICENSE file)
+
+This git repository contains code written to create dynamic spectra from
+CASA data, then manipulate and display those dynamic spectra. It also
+contains sub-directories with other scripts used to create figures for
+Villadsen et al. papers that use those scripts. The code has not been
+prepared to be user-friendly but I am making it available for the sake
+of transparency.  Readers are welcome to use or adapt it as they wish,
+but I recommend contacting me via email (jackievilladsen@gmail.com,
+jvillads@nrao.edu) if you are looking for code to do something in particular
+and I'd be glad to provide advice or an excerpt of code so you don't have to
+sort through the whole git repository.
+
+If you do copy or adapt code from here, and use it in preparing a publication,
+please cite first the Villadsen et al. paper that used this code: "Ultra-Wideband Detection
+of 22 Coherent Radio Bursts on Active M Dwarfs" in ApJ (in revision as of
+2018 Sep 29, arXiv link available soon).
