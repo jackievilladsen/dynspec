@@ -23,6 +23,7 @@ from dynspec.pipeline_utils import load_band_filelist
 
 flims_dict = {'VLASS':      {'band':'S', 'fmin':2.e9,   'fmax':4.e9  },   # VLASS is all of VLA S-band
               'VAST':       {'band':'L', 'fmin':1.13e9, 'fmax':1.43e9},
+              'VLITE':      {'band':'P', 'fmin':3.2e8,  'fmax':3.6e8},
               #'VASTtest':   {'band':'L', 'fmin':1.13e9, 'fmax':1.43e9},
               'ThunderKAT': {'band':'L', 'fmin':0.9e9,   'fmax':1.67e9},
               #'Pband':      {'band':'P', 'fmin':1.e8,   'fmax':1.e9  },
@@ -55,9 +56,9 @@ def get_flims(survey):
     return flims['band'], flims['fmin'],flims['fmax']
 
 survey_list = flims_dict.keys()
-#survey_list=['Lhi']
+survey_list=['VLITE']
 for survey in survey_list:
-    if survey in ['VAST','ThunderKAT','VLASS']:
+    if survey in ['VLITE','VAST','ThunderKAT','VLASS']:
         integration_time = 150
     else:
         integration_time = 600

@@ -28,6 +28,22 @@ params = {'legend.fontsize': 'x-small',
           'ytick.labelsize': 'x-small'}
 rcParams.update(params)
 
+survey_wedge_dict = {
+    'VAST-Wide epoch': {'Smin':0.5, 'UL':3./(1.e4), 'color':'b'},
+    'VLASS epoch': {'Smin':0.12, 'UL':3./(3.4e4), 'color':'r'},
+    #'VLASS all': {'Smin':0.12, 'UL':3./(1.02e5), 'color':'r'},
+    'Williams+13': {'Smin': 10, 'UL': 0.08, 'color': 'r'},
+    'Mooley+16': {'Smin':0.5, 'UL': 0.024, 'color': 'r'},
+    'Bhandari+18': {'Smin':1.5, 'UL':0.01, 'color': 'b'},
+    'Polisensky+16': {'Smin':250, 'UL': 5.6e-4, 'color':'k'}
+}
+
+def plot_wedge(x,y,color,linewidth=1.):
+    # not very robust - i tuned line segment lengths based on this particular plot
+    plot([x,x*6],[y,y],color=color,linewidth=linewidth)
+    plot([x,x],[y,y*9],color=color,linewidth=linewidth)
+
+
 n = len(survey_list)
 ### PLOT 1: TIME SERIES ###
 
@@ -107,7 +123,7 @@ for survey in survey_list:
 figure(figsize=(6.5,3))
 subplot(121)
 for survey in survey_list:
-    semilogx(Srange[survey],dN_dS[survey],'-',linewidth=2.5)
+    semilogx(Srange[survey],dN_dS[survey],'-',linewidth=1)
 #legend(leg_list)
 gca().set_prop_cycle(None)
 for survey in survey_list:
@@ -119,7 +135,9 @@ ylabel(r'Fraction of time brighter than $S_{1pc}$')
 #savefig(filename2,bbox_inches='tight')
 if plot_file_root != 'transient_':
     leg = legend(leg_list,title='Freq (GHz)')
-    setp(leg.get_title(),fontsize='small')
+else:
+    leg = legend(leg_list)
+setp(leg.get_title(),fontsize='small')
 
 ### PLOT 3: N(>S) vs. S for each survey band ###
 
@@ -136,11 +154,17 @@ subplot(122)
 if plot_file_root == 'transient_':
 # plot 3a: N(>S) vs. S (do for transient surveys)
     for survey in survey_list:
-        loglog(Splot,N_S[survey],linewidth=2)
-    legend(leg_list)
+        loglog(Splot,N_S[survey],linewidth=1)
+    #legend(leg_list)
     xlabel('Flux Density S (mJy)',y=0.1)
     ylabel('N(>S) (per sq deg)')
-    axis([0.1,1e3,1e-5,1])
+    axis([0.1,2e4,1e-5,1])
+    for survey in survey_wedge_dict:
+        wedge_dict = survey_wedge_dict[survey]
+        x = wedge_dict['Smin']
+        y = wedge_dict['UL']
+        plot_wedge(x,y,color=wedge_dict['color'],linewidth=1)
+        text(x*1.2,y*1.3,survey,fontsize='xx-small') #,bbox=dict(facecolor='w', linewidth=0,alpha=0.5))
 else:
 # plot 3b: N(>0.1 mJy) vs. frequency
     N_0_list = []

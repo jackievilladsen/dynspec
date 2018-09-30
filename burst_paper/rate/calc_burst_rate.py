@@ -13,8 +13,10 @@ import pickle
 close('all')
 savedir = '/data/jrv/burst_paper/rate/'
 
-survey_list = ['VAST','ThunderKAT','VLASS']
+survey_list = ['VLITE','VAST','ThunderKAT','VLASS']
 #survey_list = ['Phi','Llo','Lhi','Slo','Shi'] #,'Clo']
+
+smin = 0.1
 
 for survey in survey_list:
 
@@ -29,8 +31,7 @@ for survey in survey_list:
     ### Calculate fraction of time that 1-pc flux is > S ###
 
     # flux range to consider: from 3*RMS up to maximum 1-pc flux detected
-    smin = median(flux_err) * 1.5 # minimum flux value for histogram
-    smin = 0.1
+    #smin = median(flux_err) * 1.5 # minimum flux value for histogram
     smax = max(real(flux)) * 1.1
     print 'Median 3-sigma for',survey,'time series:',smin*1e3,'mJy'
 
