@@ -27,10 +27,12 @@ def saveTxt(spec,fileroot):
   
   nu = spec['freqs']
   t = spec['times']
+  if 
+  npol = spec['data'].shape[1]
   
   if max(nu) < 1.e9:
     pol_list = ['xx','xy','yx','yy']
-  elif max(nu) > 7.e9: # VLBA data, I just have rr and ll
+  elif npol == 2: # VLBA data, I just have rr and ll
     pol_list = ['rr','ll']
   else:
     pol_list = ['rr','rl','lr','ll']
