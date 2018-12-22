@@ -27,8 +27,8 @@ def saveTxt(spec,fileroot):
   
   nu = spec['freqs']
   t = spec['times']
-  if 
   npol = spec['data'].shape[1]
+  #print 'npol:',npol
   
   if max(nu) < 1.e9:
     pol_list = ['xx','xy','yx','yy']
@@ -36,6 +36,7 @@ def saveTxt(spec,fileroot):
     pol_list = ['rr','ll']
   else:
     pol_list = ['rr','rl','lr','ll']
+  #print pol_list
   pol_data = {}
   for i in range(len(pol_list)):
     pol_data[pol_list[i]] = spec['data'][:,i,:]
