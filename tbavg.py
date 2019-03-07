@@ -308,9 +308,12 @@ def dyn_spec(msname, ddids=None, interpolate_times=False):
         # mask data points with weight of zero (I assume this is just to get rid
         #  of flagged points? but it's not getting rid of all flagged points)
         # ("mask" = set value to zero in output dynspec)
-        if tab.iscelldefined('WEIGHT_SPECTRUM', i):
-           put_value *= (tab.getcell('WEIGHT_SPECTRUM', i) > 0)
-        
+        try:
+            if tab.iscelldefined('WEIGHT_SPECTRUM', i):
+                put_value *= (tab.getcell('WEIGHT_SPECTRUM', i) > 0)
+        except:
+            pass # bad programming practice - track down problem later
+                 # (has to do w/ when WEIGHT_SPECTRUM col doesn't exist)
         # mask data points with spectral flags
         # ("mask" = set value to zero in output dynspec)
         if tab.iscelldefined('FLAG',i):
