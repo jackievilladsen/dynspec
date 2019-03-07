@@ -546,7 +546,6 @@ class Dynspec:
         
         return ds
 
-
     def plot_dynspec(self,plot_params={}):
         # create an imshow color plot of the dynamic spectrum
         
@@ -568,15 +567,24 @@ class Dynspec:
         # norm = plot_params.get('norm',colors.Normalize(vmin=smin,vmax=smax)) # not supported yet
         dx = plot_params.get('dx',0.)             # spacing between x axis tick marks - time in minutes (default: 0 --> auto)
         dy = plot_params.get('dy',0.)             # spacing between y axis tick marks - frequency in GHz (default: 0 --> auto)
-        tlims = self.time[0].mjds()+array(plot_params.get('tlims',[0,1e6]))*60.             # min and max time to plot (in min since beginning of obs)
+        xaxis_type = plot_params.get('xaxis_type','minutes') # other option: 'phase'
+        if xaxis_type == 'phase':
+            tlims = plot_params.get('tlims',[-1e6,1e6])
+        else:
+            tlims = self.time[0].mjds()+array(plot_params.get('tlims',[0,1e6]))*60.             # min and max time to plot (in min since beginning of obs)
         flims = plot_params.get('flims',array([min(self.f),max(self.f)+1]))                 # min and max frequencies to plot (in Hz)
         ar0 = plot_params.get('ar0',1.0)
         axis_labels = plot_params.get('axis_labels',['xlabel','ylabel','cbar','cexebar_label'])
         trim_mask = plot_params.get('trim_mask',True) # whether to cut off fully masked edges when making plot
-        
+
         # clip dynspec to match tlims, flims
-        spec,t,f = clip_dynspec(func(self.spec[pol]),[tlims[0],tlims[1],flims[0],flims[1]],self.time.mjds(),self.f,trim_mask=trim_mask)
-        t0 = TimeSec(t[0],format='mjds')
+        if xaxis_type == 'phase':
+            t_preclip = self.phase
+        else:
+            t_preclip = self.time.mjds()
+        spec,t,f = clip_dynspec(func(self.spec[pol]),[tlims[0],tlims[1],flims[0],flims[1]],t_preclip,self.f,trim_mask=trim_mask)
+        if xaxis_type != 'phase':
+            t0 = TimeSec(t[0],format='mjds')
         
         if type(ar0)==str:
             ar = ar0
@@ -637,16 +645,25 @@ class Dynspec:
             cbar.set_ticks(cbar_ticks)
             cbar.set_ticklabels(cbar_ticklbls)
 
-        # label x axis in minutes
-        t_minutes = (t-t0.mjds())/60.  # get time since beginning of observation in minutes
-        xmax = max(t_minutes)
-        if dx == 0.:
-            dx = ceil(xmax/40)*10
+        # label x axis
+        if xaxis_type == 'phase':
+            x = t
+            xmax = max(x)
+            if dx==0.:
+                dx = 0.1
+        else:
+            x = (t-t0.mjds())/60.  # get time since beginning of observation in minutes
+            xmax = max(x)
+            if dx == 0.:
+                dx = ceil(xmax/40)*10
         xtick_lbls = arange(0,xmax+dx,dx)
-        tick_labels,tick_locs = make_tick_labels(xtick_lbls,t_minutes)
+        tick_labels,tick_locs = make_tick_labels(xtick_lbls,x)
         xticks(tick_locs, tick_labels)
         if 'xlabel' in axis_labels:
-            xlabel('Time (min) since '+ t0.iso[:-4] +' UT')
+            if xaxis_type == 'phase':
+                xlabel('Rotational phase (scaled from 0 to 1)')
+            else:
+                xlabel('Time (min) since '+ t0.iso[:-4] +' UT')
 
         # label y axis in GHz
         f_GHz = f/1.e9
