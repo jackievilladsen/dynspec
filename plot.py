@@ -582,6 +582,9 @@ class Dynspec:
             t_preclip = self.phase
         else:
             t_preclip = self.time.mjds()
+        #print 'tlims:', tlims
+        #print 'flims:', flims
+        #print 'trim_mask:',trim_mask
         spec,t,f = clip_dynspec(func(self.spec[pol]),[tlims[0],tlims[1],flims[0],flims[1]],t_preclip,self.f,trim_mask=trim_mask)
         if xaxis_type != 'phase':
             t0 = TimeSec(t[0],format='mjds')
@@ -798,7 +801,7 @@ class Dynspec:
         
         # calculate new (list of times in units of integration time)
         tlist_max_old = self.get_tlist()[-1]
-        tlist_max_new = tlist_max_old + nt_add_right
+        tlist_max_new = tlist_max_old + nt_add_left + nt_add_right # ooh this is the problem
         tlist_new = arange(0,tlist_max_new+1)
         #print 'len(tlist_old):',len(self.get_tlist)
         # this should be fine even if tlist in original dynspec is not evenly sampled (has missing entries)
@@ -819,7 +822,7 @@ class Dynspec:
             spec = ma.zeros((tlen,flen)) * 0j
             spec.mask = ones((tlen,flen))
             # add original dynspec to big masked dynspec
-            spec = add_band(spec,ds.get_tlist(),ds.f,self.spec[pol],self.get_tlist(),self.f)
+            spec = add_band(spec,ds.get_tlist(),ds.f,self.spec[pol],self.get_tlist()+nt_add_left,self.f)
             # overwrite ds.spec[pol] with new dynspec
             ds.spec[pol] = spec
             spec = None
