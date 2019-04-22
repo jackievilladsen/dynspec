@@ -1,3 +1,6 @@
+#### NOTE TO SELF: update this to use routines from the ia tool, such as ia.calcmask
+#  (see example in test_refimager.py)
+
 # run this pipeline from the directory for the particular observation you want to process
 # (e.g., /data/jrv/15A-416/YZCMi/1/L)
 #
