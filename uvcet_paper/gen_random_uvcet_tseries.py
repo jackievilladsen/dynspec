@@ -61,7 +61,9 @@ for i in range(N_trials):
     min_tsep = 0.0
     while min_tsep < 6.0:
         tstart = rand(5) * tstart_range + tstart_min
-        min_tsep = amax(tstart)-amin(tstart)
+        t_order = sort(tstart)
+        dt = t_order[1:]-t_order[:-1]
+        min_tsep = amin(dt)
     tstart_list[i,:] = tstart # save start times to an array so I can plot them easily
     
     # for each observation, modify tlist to match that observation's start time
