@@ -30,7 +30,7 @@ clip_thresh_mJy = 15
 RA_hms_UVCet = '01:39:05.103'
 dec_dms_UVCet = '-17:56:51.87'
 
-def convert_to_bary_time(t_obs,RA_hms='00:00:00.0',dec_dms='00:00:00.0',site_name='vla'):
+def convert_to_bary_time(t_obs,RA_hms='00:00:00.0',dec_dms='00:00:00.0',site_name='vla',doprint=False):
     '''
     convert_to_bary_time(t_obs,RA_hms='00:00:00.0',dec_dms='00:00:00.0',site_name='vla'):
     
@@ -45,6 +45,8 @@ def convert_to_bary_time(t_obs,RA_hms='00:00:00.0',dec_dms='00:00:00.0',site_nam
     observatory_coords = coordinates.EarthLocation.of_site(site_name)
     target_coords = coordinates.SkyCoord(RA_hms,dec_dms,unit=(units.hourangle,units.deg),frame='icrs')
     dt_barycenter_observatory = t_obs.light_travel_time(target_coords,location=observatory_coords)
+    if doprint:
+        print 'dt_barycenter_observatory:',dt_barycenter_observatory
     t_barycentric = t_obs.tdb + dt_barycenter_observatory  # in TDB time
     return t_barycentric
 
@@ -52,6 +54,7 @@ close('all')
 
 mydir = '/data/jrv/15A-416/UVCet/'
 bands = ['S','L']
+bands=['L']
 
 filelist=[]
 times = {'L':[],'S':[]}
@@ -96,6 +99,7 @@ for band in bands:
         
         # convert time list from UTC to TDB
         t_TDB = [convert_to_bary_time(t,RA_hms=RA_hms_UVCet,dec_dms=dec_dms_UVCet,site_name='vla') for t in tseries.time]
+        convert_to_bary_time(tseries.time[0],RA_hms=RA_hms_UVCet,dec_dms=dec_dms_UVCet,site_name='vla',doprint=True) # just to print light travel time
         t_TDB_hours = array([t.value*24. for t in t_TDB])
             
         # select only the times that are not masked
